@@ -31,8 +31,8 @@ export default function RootLayout({ children }) {
         geistMono.variable,
         "font-sans",
         inter.variable,
-        // "dark",
       )}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col dark:bg-gray-800">
         <AppProviders>{children}</AppProviders>

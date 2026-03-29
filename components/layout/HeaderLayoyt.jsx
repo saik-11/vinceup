@@ -6,14 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import {
-  // Sidebar,
-  // SidebarContent,
-  // SidebarMenu,
-  // SidebarMenuButton,
-  // SidebarMenuItem,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import vinceup_logo from "../../public/assets/vinceup_logo.png";
 import { Button } from "../ui/button";
 import Footer from "./Footer";
@@ -27,13 +20,20 @@ const HeaderLayout = ({ children }) => {
     { href: "/services", label: "Services" },
     { href: "/about", label: "About Us" },
   ];
-  const isActive = (link) =>
-    link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+  const isActive = (href) => {
+    if (typeof pathname !== "string") return false;
+
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
+    }
+
+    return pathname.startsWith(href);
+  };
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full flex-col">
+      <div className="relative flex h-screen w-full flex-col">
         {/* Top Navbar — full width, always on top */}
-        <header className="flex h-20 shrink-0 items-center justify-between border-b px-4">
+        <header className="sticky top-0 inset-0 flex h-20 shrink-0 items-center justify-between border-b px-4 backdrop-blur-lg">
           <div className="font-bold">
             <Link href={"/"}>
               <Image src={vinceup_logo} alt="vinceup" loading="eager" />

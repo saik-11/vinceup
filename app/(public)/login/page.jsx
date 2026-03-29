@@ -4,17 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import FieldFeedback from "@/components/FieldFeedback";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
+import { Field, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogin } from "@/hooks/useLogin";
@@ -70,13 +67,27 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState(null);
-
+  const hasHandled = useRef(false);
   const { mutate: loginMutate, isPending } = useLogin({
     onSuccess: (data) => {
-      // Adjust based on your API response shape:
-      // e.g. data.token, data.access_token, data.user, etc.
       const token = data?.token || data?.access_token;
-      login(token, "/");
+      const role = data?.user?.role;
+
+      const callbackUrl = new URLSearchParams(window.location.search).get(
+        "callbackUrl",
+      );
+
+      const getRedirectUrl = (callbackUrl, role) => {
+        if (typeof callbackUrl === "string" && callbackUrl.startsWith("/")) {
+          return callbackUrl;
+        }
+
+        return role === "mentor" ? "/mentor/dashboard" : "/dashboard";
+      };
+
+      const redirectTo = getRedirectUrl(callbackUrl, role);
+
+      login(token, redirectTo);
     },
     onError: (message) => {
       setApiError(message);
@@ -100,10 +111,31 @@ export default function LoginPage() {
       password: values.password,
     });
   };
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (hasHandled.current) return;
+    hasHandled.current = true;
+
+    if (typeof window === "undefined") return;
+
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const params = new URLSearchParams(hash.replace("#", ""));
+
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+
+    if (accessToken || refreshToken) {
+      router.replace(pathname);
+    }
+  }, [router, pathname]);
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 drop-shadow-xl shadow-gray-200/60">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 p-8 drop-shadow-xl shadow-gray-200/60 dark:shadow-gray-900/40">
         {/* ── Header ── */}
         <div className="mb-8 flex flex-col items-center gap-3">
           <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/30">
@@ -124,6 +156,7 @@ export default function LoginPage() {
 
         {/* ── Form ── */}
         <form
+          noValidate
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit(onSubmit)();
@@ -141,14 +174,19 @@ export default function LoginPage() {
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     {...field}
+                    type={"email"}
                     id="login-email"
                     placeholder="your@email.com"
                     className="pl-10"
                     aria-invalid={fieldState.invalid}
+                    autoComplete="email"
                   />
                 </div>
                 {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
+                  <FieldFeedback
+                    variant="error"
+                    message={fieldState.error?.message}
+                  />
                 )}
               </Field>
             )}
@@ -188,7 +226,10 @@ export default function LoginPage() {
                   </button>
                 </div>
                 {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
+                  <FieldFeedback
+                    variant="error"
+                    message={fieldState.error?.message}
+                  />
                 )}
               </Field>
             )}
@@ -225,12 +266,13 @@ export default function LoginPage() {
 
           {/* ── API Feedback ── */}
           {apiError && (
-            <div
-              role="alert"
-              className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-            >
-              {apiError}
-            </div>
+            <FieldFeedback variant="block-error" message={apiError} />
+            // <div
+            //   role="alert"
+            //   className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            // >
+            //   {apiError}
+            // </div>
           )}
 
           {/* Submit */}

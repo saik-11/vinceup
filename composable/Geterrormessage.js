@@ -13,8 +13,23 @@ export const getErrorMessage = (
     const { status, data } = error.response;
 
     // Use the server's message if available
-    const serverMessage = data?.message || data?.error || data?.detail;
-    if (serverMessage) return serverMessage;
+    const serverMessage = data?.message || data?.error;
+    if (serverMessage && typeof serverMessage === "string")
+      return serverMessage;
+
+    // Handle FastAPI/Pydantic validation errors: { detail: [{ msg, loc, ... }] }
+    if (Array.isArray(data?.detail)) {
+      return data.detail
+        .map((err) => {
+          const field = err.loc?.slice(-1)[0]; // last element is the field name
+          const msg = err.msg?.replace(/^Value error, /, ""); // clean up Pydantic prefix
+          return field && field !== "body" ? `${field}: ${msg}` : msg;
+        })
+        .join(". ");
+    }
+
+    // Handle FastAPI single detail string: { detail: "some message" }
+    if (typeof data?.detail === "string") return data.detail;
 
     // Map common HTTP status codes
     switch (status) {

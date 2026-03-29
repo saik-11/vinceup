@@ -41,7 +41,13 @@ export function useAuth() {
   const logout = useCallback(
     (redirectTo = "/login") => {
       removeToken();
-      router.push(redirectTo);
+
+      const safeRedirect =
+        typeof redirectTo === "string" && redirectTo.startsWith("/")
+          ? redirectTo
+          : "/login";
+
+      router.push(safeRedirect);
     },
     [removeToken, router],
   );

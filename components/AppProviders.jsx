@@ -1,8 +1,8 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { useState } from "react";
-import HeaderLayoyt from "@/components/layout/HeaderLayoyt";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const AppProviders = ({ children }) => {
@@ -20,9 +20,9 @@ const AppProviders = ({ children }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <HeaderLayoyt>{children}</HeaderLayoyt>
-      </TooltipProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <TooltipProvider>{children}</TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
