@@ -143,7 +143,7 @@ const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [apiError, setApiError] = useState(null);
-
+  const [showPasswordHints, setShowPasswordHints] = useState(false);
   const { data: countries = [], isLoading: countriesLoading } = useCountries();
   const { mutate: signup, isPending } = useSignupMentee({
     onSuccess: () => {
@@ -276,72 +276,70 @@ const SignupPage = () => {
               {/* Password + Confirm Password */}
               <div className="grid grid-cols-2 gap-3">
                 {/* Password */}
+                {/* Password */}
                 <Controller
                   name="password"
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="signup-password">
-                        Password
-                      </FieldLabel>
-                      <div className="relative">
-                        <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          id="signup-password"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          className="pl-10 pr-9"
-                          aria-invalid={fieldState.invalid}
-                          autoComplete="new-password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((prev) => !prev)}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                          tabIndex={-1}
-                          aria-label={
-                            showPassword ? "Hide password" : "Show password"
-                          }
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                      <FieldFeedback
-                        variant={"error"}
-                        message={fieldState.error?.message}
-                      />
-                      <div className="mt-2 space-y-1">
+                    <>
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="signup-password">
+                          Password
+                        </FieldLabel>
+                        <div className="relative">
+                          <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            id="signup-password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className="pl-10 pr-9"
+                            aria-invalid={fieldState.invalid}
+                            autoComplete="new-password"
+                            onFocus={() => setShowPasswordHints(true)}
+                            onBlur={() => {
+                              field.onBlur();
+                              if(!fieldState.error?.message){
+                                setTimeout(
+                                  () => setShowPasswordHints(false),
+                                  150,
+                                );
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                            tabIndex={-1}
+                            aria-label={
+                              showPassword ? "Hide password" : "Show password"
+                            }
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                         <FieldFeedback
-                          variant={passwordChecks.length ? "success" : "hint"}
-                          message="At least 8 characters"
+                          variant="error"
+                          message={fieldState.error?.message}
                         />
-                        <FieldFeedback
-                          variant={
-                            passwordChecks.lowercase ? "success" : "hint"
-                          }
-                          message="1 lowercase letter"
-                        />
-                        <FieldFeedback
-                          variant={
-                            passwordChecks.uppercase ? "success" : "hint"
-                          }
-                          message="1 uppercase letter"
-                        />
-                        <FieldFeedback
-                          variant={passwordChecks.number ? "success" : "hint"}
-                          message="1 number"
-                        />
-                        <FieldFeedback
-                          variant={passwordChecks.special ? "success" : "hint"}
-                          message="1 special character"
-                        />
-                      </div>
-                    </Field>
+                      {(showPasswordHints || !!fieldState.error?.message) && (
+                        <div className="col-span-2 space-y-1">
+                          <FieldFeedback variant={passwordChecks.length ? "success" : "error"} message="At least 8 characters"/>
+                          <FieldFeedback variant={passwordChecks.lowercase ? "success" : "error"} message="1 lowercase letter"/>
+                          <FieldFeedback variant={passwordChecks.uppercase ? "success" : "error"} message="1 uppercase letter"/>
+                          <FieldFeedback variant={passwordChecks.number ? "success" : "error"} message="1 number"/>
+                          <FieldFeedback variant={passwordChecks.special ? "success" : "error"} message="1 special character"/>
+                        </div>
+                      )}
+                      </Field>
+
+                    </>
                   )}
                 />
 

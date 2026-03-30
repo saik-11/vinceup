@@ -11,12 +11,7 @@ import { z } from "zod";
 import FieldFeedback from "@/components/FieldFeedback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useResetPassword } from "@/hooks/useResetPassword";
 
@@ -55,7 +50,7 @@ const ResetPassword = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [seconds, setSeconds] = useState(5);
   const pathnameRef = useRef(pathname);
-
+  const [showPasswordHints, setShowPasswordHints] = useState(false);
   const { mutate: resetPassword, isPending } = useResetPassword({
     onSuccess: () => setIsSuccess(true),
     onError: (message) => setApiError(message),
@@ -86,7 +81,10 @@ const ResetPassword = () => {
   // ⏳ Redirect countdown
   useEffect(() => {
     if (!isSuccess) return;
-    if (seconds === 0) { router.replace("/login?reset=true"); return; }
+    if (seconds === 0) {
+      router.replace("/login?reset=true");
+      return;
+    }
     const timer = setTimeout(() => setSeconds((s) => s - 1), 1000);
     return () => clearTimeout(timer);
   }, [seconds, isSuccess, router]);
@@ -123,11 +121,11 @@ const ResetPassword = () => {
         <Card className="w-full max-w-sm">
           <CardContent className="pt-6 text-center">
             <p className="mb-4 text-sm text-muted-foreground">
-            Invalid or expired reset link.
-          </p>
-          <Button asChild>
-            <Link href="/login">Go to Login</Link>
-          </Button>
+              Invalid or expired reset link.
+            </p>
+            <Button asChild>
+              <Link href="/login">Go to Login</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -145,93 +143,112 @@ const ResetPassword = () => {
                 <LockKeyhole className="h-6 w-6" />
               </div>
               <div>
-              <h1 className="text-2xl font-bold">Create a new password</h1>
+                <h1 className="text-2xl font-bold">Create a new password</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                Enter a new password to secure your account.
-              </p>
-            </div>
+                  Enter a new password to secure your account.
+                </p>
+              </div>
             </CardHeader>
 
             {/* ── Form ── */}
             <CardContent className="pt-6">
-            <form
+              <form
                 noValidate
-              onSubmit={(e) => {
-                e.preventDefault();
-                form.handleSubmit(onSubmit)();
-              }}
-              className="space-y-6"
-            >
-              <FieldSet>
-                <FieldGroup>
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  form.handleSubmit(onSubmit)();
+                }}
+                className="space-y-6"
+              >
+                <FieldSet>
+                  <FieldGroup>
                     {/* ── New Password ── */}
-                  <Controller
-                    name="password"
-                    control={form.control}
+                    <Controller
+                      name="password"
+                      control={form.control}
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor="reset-password">
                             New Password
                           </FieldLabel>
-                        <div className="relative">
+                          <div className="relative">
                             <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                          <Input
-                            {...field}
+                            <Input
+                              {...field}
                               id="reset-password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Enter new password"
-                            className="pl-10 pr-9"
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter new password"
+                              className="pl-10 pr-9"
                               aria-invalid={fieldState.invalid}
                               autoComplete="new-password"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword((p) => !p)}
+                              onFocus={() => setShowPasswordHints(true)}
+                              onBlur={() => {
+                                field.onBlur();
+                                // Delay so eye-toggle click doesn't instantly collapse hints
+                                setTimeout(
+                                  () => setShowPasswordHints(false),
+                                  150,
+                                );
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()} // ← prevents Input blur on toggle click
+                              onClick={() => setShowPassword((p) => !p)}
                               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                               tabIndex={-1}
-                              aria-label={showPassword ? "Hide password" : "Show password"}
-                          >
-                              {showPassword
-                                ? <EyeOff className="h-4 w-4" />
-                                : <Eye className="h-4 w-4" />}
-                          </button>
-                        </div>
+                              aria-label={
+                                showPassword ? "Hide password" : "Show password"
+                              }
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                           <FieldFeedback
                             variant="error"
                             message={fieldState.error?.message}
                           />
-                          <div className="mt-2 space-y-1">
-                            <FieldFeedback variant={passwordChecks.length    ? "success" : "hint"} message="At least 8 characters" />
-                            <FieldFeedback variant={passwordChecks.lowercase ? "success" : "hint"} message="1 lowercase letter" />
-                            <FieldFeedback variant={passwordChecks.uppercase ? "success" : "hint"} message="1 uppercase letter" />
-                            <FieldFeedback variant={passwordChecks.number   ? "success" : "hint"} message="1 number" />
-                            <FieldFeedback variant={passwordChecks.special  ? "success" : "hint"} message="1 special character" />
-                        </div>
-                      </Field>
-                    )}
-                  />
+
+                          {/* ── Password hints — only visible when field is focused ── */}
+                          {showPasswordHints && (
+                            <div className="mt-2 space-y-1">
+                              <FieldFeedback variant={passwordChecks.length ? "success" : "error"} message="At least 8 characters"/>
+                              <FieldFeedback variant={passwordChecks.lowercase ? "success" : "error"} message="1 lowercase letter"/>
+                              <FieldFeedback variant={passwordChecks.uppercase ? "success" : "error"} message="1 uppercase letter"/>
+                              <FieldFeedback variant={passwordChecks.number ? "success" : "error"} message="1 number"/>
+                              <FieldFeedback variant={passwordChecks.special ? "success" : "error"}message="1 special character"/>
+                            </div>
+                          )}
+                        </Field>
+                      )}
+                    />
 
                     {/* ── Confirm Password ── */}
-                  <Controller
-                    name="confirmPassword"
-                    control={form.control}
+                    <Controller
+                      name="confirmPassword"
+                      control={form.control}
                       render={({ field, fieldState }) => {
                         const showError =
-                          fieldState.invalid || (confirmTouched && confirmError);
+                          fieldState.invalid ||
+                          (confirmTouched && confirmError);
                         const showSuccess = passwordsMatch && !showError;
 
-                      return (
+                        return (
                           <Field data-invalid={showError}>
                             <FieldLabel htmlFor="reset-confirm">
                               Confirm Password
                             </FieldLabel>
-                          <div className="relative">
+                            <div className="relative">
                               <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                              {...field}
+                              <Input
+                                {...field}
                                 id="reset-confirm"
-                              type={showConfirm ? "text" : "password"}
-                              placeholder="Confirm new password"
+                                type={showConfirm ? "text" : "password"}
+                                placeholder="Confirm new password"
                                 className={`pl-10 pr-9 ${
                                   showSuccess
                                     ? "border-emerald-500 focus-visible:ring-emerald-500/30"
@@ -239,42 +256,51 @@ const ResetPassword = () => {
                                 }`}
                                 aria-invalid={showError}
                                 autoComplete="new-password"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowConfirm((p) => !p)}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowConfirm((p) => !p)}
                                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                                 tabIndex={-1}
-                                aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
-                            >
-                                {showConfirm
-                                  ? <EyeOff className="h-4 w-4" />
-                                  : <Eye className="h-4 w-4" />}
-                            </button>
-                          </div>
+                                aria-label={
+                                  showConfirm
+                                    ? "Hide confirm password"
+                                    : "Show confirm password"
+                                }
+                              >
+                                {showConfirm ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
+                                )}
+                              </button>
+                            </div>
                             {showError && (
-                            <FieldFeedback
-                              variant="error"
+                              <FieldFeedback
+                                variant="error"
                                 message={
                                   fieldState.error?.message ??
                                   confirmError?.message ??
                                   "Passwords do not match"
                                 }
-                            />
-                          )}
+                              />
+                            )}
                             {showSuccess && (
-                              <FieldFeedback variant="success" message="Passwords match" />
-                          )}
-                        </Field>
-                      );
-                    }}
-                  />
-                </FieldGroup>
-              </FieldSet>
+                              <FieldFeedback
+                                variant="success"
+                                message="Passwords match"
+                              />
+                            )}
+                          </Field>
+                        );
+                      }}
+                    />
+                  </FieldGroup>
+                </FieldSet>
 
-              {apiError && (
-                <FieldFeedback variant="block-error" message={apiError} />
-              )}
+                {apiError && (
+                  <FieldFeedback variant="block-error" message={apiError} />
+                )}
 
                 <Button
                   type="submit"
@@ -282,16 +308,16 @@ const ResetPassword = () => {
                   size="lg"
                   disabled={isPending}
                 >
-                {isPending ? "Resetting..." : "Reset Password"}
-              </Button>
-            </form>
+                  {isPending ? "Resetting..." : "Reset Password"}
+                </Button>
+              </form>
 
-            <Link
-              href="/login"
+              <Link
+                href="/login"
                 className="mt-5 block text-center text-sm text-muted-foreground hover:underline"
-            >
-              Cancel and return to Login
-            </Link>
+              >
+                Cancel and return to Login
+              </Link>
             </CardContent>
           </>
         ) : (
@@ -302,23 +328,30 @@ const ResetPassword = () => {
                 <CircleCheckBig className="h-6 w-6" />
               </div>
               <div>
-              <h1 className="text-2xl font-bold">Password Reset Successful!</h1>
+                <h1 className="text-2xl font-bold">
+                  Password Reset Successful!
+                </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your password has been updated. You can now log in using your new password.
-              </p>
-            </div>
+                  Your password has been updated. You can now log in using your
+                  new password.
+                </p>
+              </div>
             </CardHeader>
 
             {/* ── Success Body ── */}
             <CardContent className="pt-6 space-y-4">
               <div className="rounded-xl bg-purple-50 p-4 text-center">
-                <p className="text-sm text-muted-foreground">Redirecting to login in</p>
-                <p className="text-2xl font-bold text-primary">{seconds} seconds</p>
-            </div>
+                <p className="text-sm text-muted-foreground">
+                  Redirecting to login in
+                </p>
+                <p className="text-2xl font-bold text-primary">
+                  {seconds} seconds
+                </p>
+              </div>
 
               <Button asChild className="w-full" size="lg">
-              <Link href="/login">Go to Login Now</Link>
-            </Button>
+                <Link href="/login">Go to Login Now</Link>
+              </Button>
 
               <FieldFeedback
                 variant="block-success"
