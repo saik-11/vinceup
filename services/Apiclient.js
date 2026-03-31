@@ -3,10 +3,8 @@ import axios from "axios";
 const apiClient = axios.create({
   // Set your own baseURL for internal APIs if needed
   baseURL: "https://vinceup-dev.onrender.com/",
-  timeout: 20000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  // timeout: 20000,
+  headers: {"Content-Type": "application/json"},
 });
 
 // ─── Request Interceptor ───

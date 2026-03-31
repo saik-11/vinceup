@@ -87,10 +87,9 @@ const LinkedInIcon = () => (
 // ─── Validation Schema ───
 const mentorSchema = z
   .object({
-    email: z
-      .string()
-      .min(1, "Email is required")
-      .email("Please enter a valid email"),
+    first_name: z.string().min(1, "Please enter your first name").max(50, "First name is too long"),
+    last_name: z.string().min(1, "Please enter your last name").max(50, "Last name is too long"),
+    email: z.string().min(1, "Email is required").email("Please enter a valid email"),
     password: z
       .string()
       .min(1, "Password is required")
@@ -142,21 +141,8 @@ const MentorPage = () => {
   const form = useForm({
     resolver: zodResolver(mentorSchema),
     mode: "onTouched",
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      country: "",
-      state: "",
-      city: "",
-      companyName: "",
-      title: "",
-      industry: "",
-      sector: "",
-      workExperience: "",
-      terms: false,
-    },
-  });
+    defaultValues: {first_name: "", last_name: "", email: "", password: "", confirmPassword: "", country: "", state: "",
+       city: "", companyName: "", title: "", industry: "", sector: "", workExperience: "", terms: false,},});
 
   const passwordValue = form.watch("password");
   const confirmValue = form.watch("confirmPassword");
@@ -176,15 +162,10 @@ const MentorPage = () => {
   const onSubmit = (values) => {
     setApiError(null);
     const payload = {
-      email: values.email,
-      password: values.password,
-      country: values.country,
-      province: values.state,
-      city: values.city,
-      company_name: values.companyName,
-      title: values.title,
-      industry: values.industry,
-      work_experience: values.workExperience,
+      first_name: values.first_name, last_name: values.last_name, email: values.email,
+      password: values.password, country: values.country, province: values.state,
+      city: values.city, company_name: values.companyName, title: values.title,
+      industry: values.industry, work_experience: values.workExperience,
     };
     signup(payload);
   };
@@ -228,6 +209,49 @@ const MentorPage = () => {
               Basic Information
             </FieldLegend>
             <FieldGroup>
+              {/* First + Last Name */}
+              <div className="grid grid-cols-2 gap-3">
+                <Controller
+                  name="first_name"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="mentor-first-name">First name</FieldLabel>
+                      <Input
+                        {...field}
+                        id="mentor-first-name"
+                        placeholder="John"
+                        aria-invalid={fieldState.invalid}
+                        autoComplete="given-name"
+                      />
+                      <FieldFeedback
+                        variant={fieldState.invalid ? "error" : "hint"}
+                        message={fieldState.error?.message}
+                      />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="last_name"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="mentor-last-name">Last name</FieldLabel>
+                      <Input
+                        {...field}
+                        id="mentor-last-name"
+                        placeholder="Doe"
+                        aria-invalid={fieldState.invalid}
+                        autoComplete="family-name"
+                      />
+                      <FieldFeedback
+                        variant={fieldState.invalid ? "error" : "hint"}
+                        message={fieldState.error?.message}
+                      />
+                    </Field>
+                  )}
+                />
+              </div>
               {/* Email */}
               <Controller
                 name="email"

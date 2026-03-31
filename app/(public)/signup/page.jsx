@@ -96,46 +96,39 @@ const LinkedInIcon = () => (
 // ─── Validation Schema ───
 const signupSchema = z
   .object({
-    email: z
-      .string()
-      .min(1, "Email is required")
-      .email("Please enter a valid email"),
-    password: z
-      .string()
-      .min(1, "Password is required")
-      .min(8, "Password must be at least 8 characters")
+    first_name: z.string().min(1, "Please enter your first name").max(50, "First name is too long"),
+    last_name: z.string().min(1, "Please enter your last name").max(50, "Last name is too long"),
+    email: z.string().min(1, "Please enter your email address").email("That doesn’t look like a valid email"),
+    password: z.string().min(1, "Please create a password").min(8, "Password must be at least 8 characters long")
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/,
-        "Must include uppercase, lowercase, number, and special character",
+        "Use uppercase, lowercase, number, and a special character",
       ),
     confirmPassword: z.string().min(1, "Please confirm your password"),
-    country: z.string().min(1, "Country is required"),
-    state: z.string().min(1, "Province/State is required"),
-    city: z.string().min(1, "City is required"),
-    occupation: z.enum(["working_professional", "student"], {
-      required_error: "Please select your occupation",
-    }),
+    country: z.string().min(1, "Please select your country"),
+    state: z.string().min(1, "Please enter your state"),
+    city: z.string().min(1, "Please enter your city"),
+    occupation: z.enum(["working_professional", "student"], {error: (iss) =>iss.input === undefined || iss.input === ""? "Please select your occupation": "Please select a valid occupation",}),
     yearsOfExperience: z.string().optional(),
     highestEducation: z.string().min(1, "Please select your education level"),
-    terms: z.literal(true, {
-      errorMap: () => ({ message: "You must agree to the terms" }),
-    }),
+    terms: z.boolean().refine((val) => val === true, {message: "You need to accept the terms to continue"}),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Passwords do not match",
+        code: "custom",
+        message: "Passwords don’t match",
         path: ["confirmPassword"],
       });
     }
-    if (data.occupation === "working_professional" && !data.yearsOfExperience) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Years of experience is required",
-        path: ["yearsOfExperience"],
-      });
-    }
+
+  if (data.occupation === "working_professional" && (!data.yearsOfExperience || data.yearsOfExperience === "")) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Please select your work experience",
+      path: ["yearsOfExperience"],
+    });
+  }
   });
 
 const SignupPage = () => {
@@ -157,7 +150,10 @@ const SignupPage = () => {
   const form = useForm({
     resolver: zodResolver(signupSchema),
     mode: "onTouched",
+    reValidateMode: "onChange",
     defaultValues: {
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -192,6 +188,8 @@ const SignupPage = () => {
     setApiError(null);
 
     const payload = {
+      first_name: values.first_name,
+      last_name: values.last_name,
       email: values.email,
       password: values.password,
       country: values.country,
@@ -246,6 +244,49 @@ const SignupPage = () => {
               Basic Information
             </FieldLegend>
             <FieldGroup>
+            <div className="grid grid-cols-2 gap-3">
+              <Controller
+                name="first_name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="signup-first-name">First name</FieldLabel>
+                    <Input
+                      {...field}
+                      id="signup-first-name"
+                      placeholder="John"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="given-name"
+                    />
+                    <FieldFeedback
+                      variant={fieldState.invalid ? "error" : "hint"}
+                      message={fieldState.error?.message}
+                    />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="last_name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="signup-last-name">Last name</FieldLabel>
+                    <Input
+                      {...field}
+                      id="signup-last-name"
+                      placeholder="Doe"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="family-name"
+                    />
+                    <FieldFeedback
+                      variant={fieldState.invalid ? "error" : "hint"}
+                      message={fieldState.error?.message}
+                    />
+                  </Field>
+                )}
+              />
+            </div>
               {/* Email */}
               <Controller
                 name="email"
@@ -275,7 +316,6 @@ const SignupPage = () => {
 
               {/* Password + Confirm Password */}
               <div className="grid grid-cols-2 gap-3">
-                {/* Password */}
                 {/* Password */}
                 <Controller
                   name="password"
@@ -502,7 +542,7 @@ const SignupPage = () => {
                     <FieldLabel>I am a</FieldLabel>
                     <RadioGroup
                       name={field.name}
-                      value={field.value}
+                      value={field.value || ""}
                       onValueChange={(val) => {
                         field.onChange(val);
                         // Clear experience error when switching to student
@@ -565,11 +605,7 @@ const SignupPage = () => {
                         <FieldLabel htmlFor="signup-experience">
                           Work Experience
                         </FieldLabel>
-                        <Select
-                          name={field.name}
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
+                        <Select name={field.name} value={field.value || ""} onValueChange={field.onChange} onOpenChange={(open) => !open && field.onBlur()}>
                           <SelectTrigger
                             id="signup-experience"
                             aria-invalid={!!error}
@@ -675,21 +711,14 @@ const SignupPage = () => {
           />
 
           {/* ── API Feedback ── */}
-          {apiError && (
-            <div
-              role="alert"
-              className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-            >
-              {apiError}
-            </div>
-          )}
+          {apiError && (<FieldFeedback variant="block-error" message={apiError} />)}
 
           {/* ━━ Submit ━━ */}
           <Button
             type="submit"
             className="w-full cursor-pointer"
             size="lg"
-            disabled={isPending}
+            // disabled={!form.formState.isValid || isPending}
           >
             {isPending ? "Creating Account…" : "Create Account"}
           </Button>

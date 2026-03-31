@@ -1,8 +1,8 @@
 // hooks/useAuth.js
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo } from "react";
 import { useCookie } from "@/hooks/useCookie";
 import { decodeJwt, isJwtExpired } from "@/lib/cookies";
 
@@ -24,9 +24,10 @@ export function useAuth() {
     value: token,
     set: setToken,
     remove: removeToken,
+    refresh,
   } = useCookie(AUTH_COOKIE, AUTH_OPTIONS);
   const router = useRouter();
-
+  const pathname = usePathname();
   const user = useMemo(() => decodeJwt(token), [token]);
   const isAuthenticated = !!token && !isJwtExpired(token);
 
@@ -51,6 +52,11 @@ export function useAuth() {
     },
     [removeToken, router],
   );
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: explanation
+  useEffect(() => {
+    refresh(); // 👈 sync cookie on navigation
+  }, [pathname]);
 
   return { token, user, isAuthenticated, login, logout };
 }
