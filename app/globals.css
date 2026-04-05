@@ -127,7 +127,11 @@
   html {
     @apply font-sans;
   }
-  button {
+  /* button, a {
     @apply cursor-pointer;
-  }
+  } */
+}
+
+button, a[href] {
+  cursor: pointer !important;
 }

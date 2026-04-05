@@ -69,7 +69,7 @@ const HeaderLayout = ({ children }) => {
           ))}
         </ul>
         <div className="flex items-center gap-4">
-          <AuthButtons />
+          <AuthButtons layout="public" />
           <Button asChild className="cursor-pointer" size="lg">
             <Link href="/book-session">
               <Calendar />

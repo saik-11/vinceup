@@ -1,23 +1,57 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useRef, useSyncExternalStore } from "react";
 import { cookieEngine } from "@/lib/cookies";
 
+// ─── Module-level event bus ───
+// When any hook sets/removes a cookie, ALL useCookie instances
+// re-read their value synchronously. No stale closures.
+const COOKIE_CHANGE = "cookie-change";
+
+function notify() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(COOKIE_CHANGE));
+  }
+}
+
+// Stable subscribe function — same reference across all hook instances.
+// useSyncExternalStore requires this to be referentially stable.
+function subscribe(onStoreChange) {
+  window.addEventListener(COOKIE_CHANGE, onStoreChange);
+  document.addEventListener("visibilitychange", onStoreChange);
+  return () => {
+    window.removeEventListener(COOKIE_CHANGE, onStoreChange);
+    document.removeEventListener("visibilitychange", onStoreChange);
+  };
+}
+
+// ─── Default serializers ───
+const defaultSerialize = (v) => (typeof v === "string" ? v : JSON.stringify(v));
+
+const defaultDeserialize = (v) => {
+  try {
+    return JSON.parse(v);
+  } catch {
+    return v;
+  }
+};
+
 /**
- * useCookie — reactive cookie state with cross-tab sync.
+ * useCookie — reactive, SSR-safe cookie state.
  *
- * @param {string} name          - Cookie name
- * @param {object} [options]     - Configuration
+ * Uses useSyncExternalStore so the value is available
+ * synchronously on the first client render. No useState,
+ * no useEffect, no "mounted" guards needed in consumers.
+ *
+ * @param {string} name
+ * @param {object} [options]
  * @param {*}      [options.defaultValue]   - Fallback if cookie is absent
- * @param {object} [options.cookieOptions]  - maxAge, path, secure, sameSite, domain
- * @param {function} [options.serialize]    - Custom serializer (default: JSON.stringify for objects, String for primitives)
- * @param {function} [options.deserialize]  - Custom deserializer (default: JSON.parse, falls back to raw string)
+ * @param {object} [options.cookieOptions]  - maxAge, path, secure, sameSite
+ * @param {function} [options.serialize]
+ * @param {function} [options.deserialize]
  *
- * @returns {{ value, set, remove, refresh }}
- *
- * Usage:
- *   const { value, set, remove } = useCookie('theme', { defaultValue: 'light' });
- *   const { value: user, set: setUser } = useCookie('user', { defaultValue: null });
+ * @returns {{ value, set, remove }}
  */
 export function useCookie(name, options = {}) {
   const {
@@ -26,78 +60,50 @@ export function useCookie(name, options = {}) {
     serialize = defaultSerialize,
     deserialize = defaultDeserialize,
   } = options;
+  const pathname = usePathname();
+  // Ref for cookieOptions — avoids re-creating set/remove
+  // when caller passes an inline object literal.
+  const optsRef = useRef(cookieOptions);
+  optsRef.current = cookieOptions;
 
-  // Avoid re-creating functions when cookieOptions object reference changes
-  const cookieOptsRef = useRef(cookieOptions);
-  cookieOptsRef.current = cookieOptions;
+  // Cache the last raw string + deserialized value.
+  // If the raw cookie string hasn't changed, return the same
+  // reference — prevents infinite re-renders when deserialize
+  // returns a new object (e.g. JSON.parse).
+  const cacheRef = useRef({ raw: undefined, value: defaultValue });
 
-  const readCookie = useCallback(() => {
+  const getSnapshot = () => {
     const raw = cookieEngine.get(name);
-    if (raw === null) return defaultValue;
-    return deserialize(raw);
-  }, [name, defaultValue, deserialize]);
+    if (raw === cacheRef.current.raw) return cacheRef.current.value;
+    const next = raw === null ? defaultValue : deserialize(raw);
+    cacheRef.current = { raw, value: next };
+    return next;
+  };
 
-  const [value, setValue] = useState(readCookie);
+  // Server always returns defaultValue — no document.cookie available.
+  const getServerSnapshot = () => defaultValue;
 
-  // Set cookie + update state
+  const value = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
   const set = useCallback(
-    (newValue, overrideOptions = {}) => {
-      // Support functional updates like setState
+    (newValue) => {
+      const current = cookieEngine.get(name);
+      const currentDeserialized =
+        current === null ? defaultValue : deserialize(current);
       const resolved =
-        typeof newValue === "function" ? newValue(value) : newValue;
-
-      const serialized = serialize(resolved);
-      cookieEngine.set(name, serialized, {
-        ...cookieOptsRef.current,
-        ...overrideOptions,
-      });
-      setValue(resolved);
+        typeof newValue === "function"
+          ? newValue(currentDeserialized)
+          : newValue;
+      cookieEngine.set(name, serialize(resolved), optsRef.current);
+      notify();
     },
-    [name, value, serialize],
+    [name, defaultValue, serialize, deserialize],
   );
 
-  // Remove cookie + reset state to default
   const remove = useCallback(() => {
-    cookieEngine.remove(name, cookieOptsRef.current);
-    setValue(defaultValue);
-  }, [name, defaultValue]);
+    cookieEngine.remove(name, optsRef.current);
+    notify();
+  }, [name]);
 
-  // Force re-read from document.cookie (useful after external changes)
-  const refresh = useCallback(() => {
-    setValue(readCookie());
-  }, [readCookie]);
-
-  // Cross-tab sync: when another tab changes cookies, pick it up
-  useEffect(() => {
-    const onStorageOrVisibility = () => {
-      const fresh = readCookie();
-      setValue((prev) =>
-        JSON.stringify(prev) !== JSON.stringify(fresh) ? fresh : prev,
-      );
-    };
-
-    // 'storage' doesn't fire for cookies, but visibilitychange does
-    // when the user returns to this tab
-    document.addEventListener("visibilitychange", onStorageOrVisibility);
-    return () => {
-      document.removeEventListener("visibilitychange", onStorageOrVisibility);
-    };
-  }, [readCookie]);
-
-  return { value, set, remove, refresh };
-}
-
-// ─── Default serializers ───
-
-function defaultSerialize(value) {
-  if (typeof value === "string") return value;
-  return JSON.stringify(value);
-}
-
-function defaultDeserialize(raw) {
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return raw; // return as plain string if not valid JSON
-  }
+  return { value, set, remove };
 }

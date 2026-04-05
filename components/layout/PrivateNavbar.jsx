@@ -19,7 +19,7 @@ const PrivateNavbar = ({ children }) => {
             </Link>
           </div>
 
-          <AuthButtons />
+          <AuthButtons layout="private" />
         </header>
 
         {/* ── Below navbar: sidebar + content ── */}
