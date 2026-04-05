@@ -10,6 +10,7 @@ import vinceup_logo from "../../public/assets/vinceup_logo.svg";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import AuthButtons from "./AuthButtons";
 
 const Navbar = ({ children }) => {
   const pathname = usePathname();
@@ -47,7 +48,7 @@ const Navbar = ({ children }) => {
                   className={`transition-colors p-3 py-3   ${
                     isActive(link.href)
                       ? "text-primary font-bold"
-                      : "text-muted-foreground hover:text-foreground border-b-white"
+                      : "text-[#0A0A0A] hover:text-foreground border-b-white"
                   }`}
                 >
                   {link.label}
@@ -65,7 +66,7 @@ const Navbar = ({ children }) => {
             ))}
           </ul>
           <div className="flex items-center gap-4">
-            {/* <AuthButtons layout="public" /> */}
+            <AuthButtons />
             <Button asChild className="cursor-pointer" size="lg">
               <Link href="/book-session">
                 <Calendar />

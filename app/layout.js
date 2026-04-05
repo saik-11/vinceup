@@ -2,6 +2,9 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { AuthProvider } from "@/components/layout/AuthProvider";
+import { ThemeProviders } from "@/components/layout/ThemeProviders";
+import { NavigationHistory } from "@/components/layout/NavigationHistory";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,12 +25,18 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${inter.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <TooltipProvider>
-          <Navbar>{children}</Navbar>
-        </TooltipProvider>
+        <AuthProvider>
+          <ThemeProviders>
+            <TooltipProvider>
+              <NavigationHistory />
+              <Navbar>{children}</Navbar>
+            </TooltipProvider>
+          </ThemeProviders>
+        </AuthProvider>
       </body>
     </html>
   );
