@@ -2,13 +2,14 @@
 
 import { ChevronDown, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Button } from "./ui/button";
 
 const CountryPicker = ({
   countries = [],
@@ -33,13 +34,13 @@ const CountryPicker = ({
       c.code.toLowerCase().includes(search.toLowerCase()),
   );
 
-  // Reset on open/close
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (next) => {
+    if (next) {
       setSearch("");
       setHighlightIndex(0);
     }
-  }, [open]);
+    setOpen(next);
+  };
 
   // Scroll highlighted item into view
   useEffect(() => {
@@ -48,14 +49,11 @@ const CountryPicker = ({
     }
   }, [highlightIndex, open]);
 
-  const selectCountry = useCallback(
-    (country) => {
-      onChange(country.name);
-      setOpen(false);
-      setSearch("");
-    },
-    [onChange],
-  );
+  const selectCountry = (country) => {
+    onChange(country.name);
+    setOpen(false);
+    setSearch("");
+  };
 
   const handleKeyDown = (e) => {
     if (!open) return;
@@ -101,17 +99,18 @@ const CountryPicker = ({
     : undefined;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <button
+        <Button
           type="button"
+          variant="ghost"
           id={id}
           role="combobox"
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-controls="country-name-listbox"
           aria-label={selected ? `Country: ${selected.name}` : placeholder}
-          className="flex h-9 w-full items-center gap-2 rounded-md border bg-background px-2.5 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+          className="flex h-9 w-full items-center gap-2 rounded-md bg-transparent dark:bg-input/30 border border-input px-2.5 text-sm shadow-xs transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -137,11 +136,11 @@ const CountryPicker = ({
             className={`ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
             aria-hidden="true"
           />
-        </button>
+        </Button>
       </PopoverTrigger>
 
       <PopoverContent
-        className="w-70 p-0"
+        className="w-70 p-0 dark:bg-gray-900"
         align="start"
         onKeyDown={handleKeyDown}
         onOpenAutoFocus={(e) => {

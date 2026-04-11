@@ -18,7 +18,7 @@ import {
 export const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/mentor", label: "Mentor" },
-  { href: "/services", label: "Services" },
+  { href: "/service", label: "Services" },
   { href: "/about", label: "About Us" },
 ];
 
@@ -62,7 +62,7 @@ export const PUBLIC_PAGES = [
   "/mentor-signup",
   "/mentor",
   "/about",
-  "/services",
+  "/service",
   "/reset-password",
   "/forgot-password",
 ];

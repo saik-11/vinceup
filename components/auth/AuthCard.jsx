@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export default function AuthCard({ maxWidth = "md", className, children }) {
+export default function AuthCard({ maxWidth = "lg", className, children }) {
   const widths = {
     sm: "max-w-sm",
     md: "max-w-md",

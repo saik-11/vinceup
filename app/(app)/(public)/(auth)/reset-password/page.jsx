@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleCheckBig, Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { AlertCircle, CircleCheckBig, Eye, EyeOff, LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -117,21 +117,46 @@ const ResetPassword = () => {
   if (isChecking) return null;
 
   // ── Invalid / expired link ──
-  if (!token || !email) {
-    return (
-      <AuthCard maxWidth="sm">
-        <div className="pt-6 text-center">
-          <p className="mb-4 text-sm text-muted-foreground">
-            Invalid or expired reset link.
-          </p>
-          <Button asChild>
-            <Link href="/login">Go to Login</Link>
+if (!token || !email) {
+  return (
+    <AuthCard maxWidth="sm" className="border-destructive/50 dark:border-destructive/30">
+      <div className="flex flex-col items-center pt-2 pb-6 text-center">
+        {/* Icon + Heading */}
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 dark:bg-destructive/20">
+          <AlertCircle className="h-6 w-6 text-destructive" aria-hidden="true" />
+        </div>
+        
+        <h1 className="mb-2 text-lg font-semibold tracking-tight">
+          Reset link expired or invalid
+        </h1>
+        
+        {/* Helpful explanation */}
+        <p className="mb-6 max-w-70 text-sm text-muted-foreground">
+          Password reset links are valid for 1 hour. This link may have expired, 
+          been used already, or contains an invalid token.
+        </p>
+
+        {/* Primary actions */}
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+          <Button asChild variant="outline" size="sm">
+            <Link href="/login">Back to login</Link>
           </Button>
         </div>
-      </AuthCard>
-    );
-  }
 
+        {/* Optional helper text */}
+        {/* <p className="mt-4 text-xs text-muted-foreground">
+          Didn&apos;t request a reset?{" "}
+          <Link 
+            href="/support" 
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Contact support
+          </Link>
+        </p> */}
+      </div>
+    </AuthCard>
+  );
+}
   return (
     <AuthCard>
       {!isSuccess ? (
