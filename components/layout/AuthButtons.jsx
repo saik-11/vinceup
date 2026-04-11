@@ -58,7 +58,7 @@ const NotificationBell = () => (
         <span className="absolute top-2 right-2.5 size-2 rounded-full bg-red-500 ring-2 ring-background" />
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-72 p-3">
+    <DropdownMenuContent align="end" className="w-72 p-3 bg-background">
       <div className="mb-2 text-sm font-semibold">Notifications</div>
       <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
         <Bell className="size-6 opacity-50" />
@@ -137,15 +137,8 @@ const AuthButtonsInner = ({ layout = "public" }) => {
   const { token, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const router = useRouter();
-  const hydrated = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-
-  if (!hydrated) {
-    return <div className="flex items-center gap-4 min-h-10 min-w-40" />;
-  }
+  const hydrated = useSyncExternalStore(() => () => {}, () => true, () => false);
+  if (!hydrated) return <div className="flex items-center gap-4 min-h-10 min-w-40" />;
 
   //   if (!token) {
   //     return (

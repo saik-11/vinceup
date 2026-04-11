@@ -92,7 +92,7 @@ export default function LoginPage() {
     // Only run if auth params exist
     if (hash.includes("access_token") || hash.includes("refresh_token")) {
       // ✅ Remove hash WITHOUT re-render issues
-      window.history.replaceState(null, "", window.location.pathname);
+     window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
   }, []);
 

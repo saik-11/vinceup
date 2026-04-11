@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 
+const AUTH_ROUTES = ["/login", "/signup", "/mentor-signup", "/reset-password",];
 export function proxy(request) {
   const pathname = request.nextUrl.pathname
   const token = request.cookies.get("auth_token")?.value;
 
-  // logged-in user hitting login page → redirect home
-  if (token && pathname === "/login") {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (token && AUTH_ROUTES.some(route => pathname === route || pathname.startsWith(`${route}/`))) {
+    const callbackUrl = request.nextUrl.searchParams.get("callbackUrl") || "/";
+    return NextResponse.redirect(new URL(callbackUrl, request.url));
   }
 
   // no token → redirect to login with callback
