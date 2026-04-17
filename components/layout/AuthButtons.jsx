@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useSyncExternalStore } from "react";
+import { memo } from "react";
 import {
   Bell,
   Calendar,
@@ -17,6 +17,7 @@ import {
   UserIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +29,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
 
 const USER_MENU_ITEMS = [
   { href: "/personal-details", icon: UserCircle, label: "Personal Details" },
@@ -37,118 +37,121 @@ const USER_MENU_ITEMS = [
   { href: "/help", icon: HelpCircle, label: "Help" },
 ];
 
-// ─── Sub-components ───
-const Avatar = ({ size = 9 }) => (
-  <span
-    className={`flex size-${size} items-center justify-center rounded-full bg-primary text-white shrink-0`}
-  >
-    <UserIcon className={size >= 10 ? "size-5" : "size-4"} />
-  </span>
-);
+const AVATAR_SIZE_CLASSES = {
+  9: "size-9",
+  10: "size-10",
+};
 
-const NotificationBell = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative text-muted-foreground hover:text-foreground cursor-pointer"
-      >
-        <Bell className="size-5" />
-        <span className="absolute top-2 right-2.5 size-2 rounded-full bg-red-500 ring-2 ring-background" />
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-72 p-3 bg-background">
-      <div className="mb-2 text-sm font-semibold">Notifications</div>
-      <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
-        <Bell className="size-6 opacity-50" />
-        <span className="text-sm">No notifications available</span>
-      </div>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
+function Avatar({ size = 9 }) {
+  const sizeClass = AVATAR_SIZE_CLASSES[size] || AVATAR_SIZE_CLASSES[9];
 
-const UserMenu = ({ user, logout, isLight, setTheme }) => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button
-        variant="ghost"
-        className="flex items-center gap-1.5 px-2 py-6 cursor-pointer"
-      >
-        <Avatar />
-        <ChevronDown className="size-4 text-muted-foreground" />
-      </Button>
-    </DropdownMenuTrigger>
+  return (
+    <span
+      className={`flex ${sizeClass} shrink-0 items-center justify-center rounded-full bg-primary text-white`}
+    >
+      <UserIcon className={size >= 10 ? "size-5" : "size-4"} />
+    </span>
+  );
+}
 
-    <DropdownMenuContent align="end" className="w-56 p-2">
-      <div className="flex items-center gap-3 px-2 py-3">
-        <Avatar size={10} />
-        <div className="min-w-0">
-          <p className="text-sm font-semibold truncate">
-            {user?.name ?? "User"}
-          </p>
-          {user?.email && (
-            <p className="text-xs text-muted-foreground truncate">
-              {user.email}
-            </p>
-          )}
+function NotificationBell() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative cursor-pointer text-muted-foreground hover:text-foreground"
+        >
+          <Bell className="size-5" />
+          <span className="absolute right-2.5 top-2 size-2 rounded-full bg-red-500 ring-2 ring-background" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72 bg-background p-3">
+        <div className="mb-2 text-sm font-semibold">Notifications</div>
+        <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+          <Bell className="size-6 opacity-50" />
+          <span className="text-sm">No notifications available</span>
         </div>
-      </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
-      <DropdownMenuSeparator />
+function UserMenu({ user, onLogout, isLight, setTheme }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex cursor-pointer items-center gap-1.5 px-2 py-6"
+        >
+          <Avatar />
+          <ChevronDown className="size-4 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
 
-      {USER_MENU_ITEMS.map(({ href, icon: Icon, label }) => (
-        <DropdownMenuItem key={href} asChild>
-          <Link href={href} className="gap-3 py-2.5">
-            <Icon className="size-4" />
-            {label}
-          </Link>
+      <DropdownMenuContent align="end" className="w-56 p-2">
+        <div className="flex items-center gap-3 px-2 py-3">
+          <Avatar size={10} />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">
+              {user?.name ?? "User"}
+            </p>
+            {user?.email ? (
+              <p className="truncate text-xs text-muted-foreground">
+                {user.email}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <DropdownMenuSeparator />
+
+        {USER_MENU_ITEMS.map(({ href, icon: Icon, label }) => (
+          <DropdownMenuItem key={href} asChild>
+            <Link href={href} className="gap-3 py-2.5">
+              <Icon className="size-4" />
+              {label}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+
+        <DropdownMenuItem
+          onSelect={(event) => {
+            event.preventDefault();
+            setTheme(isLight ? "dark" : "light");
+          }}
+          className="cursor-pointer gap-3 py-2.5"
+        >
+          {isLight ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          <span className="flex-1">Theme</span>
+          <Switch
+            checked={!isLight}
+            onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+            onClick={(event) => event.stopPropagation()}
+            className="cursor-pointer"
+          />
         </DropdownMenuItem>
-      ))}
 
-      <DropdownMenuItem
-        onSelect={(e) => {
-          e.preventDefault();
-          setTheme(isLight ? "dark" : "light");
-        }}
-        className="gap-3 py-2.5 cursor-pointer"
-      >
-        {isLight ? <Sun className="size-4" /> : <Moon className="size-4" />}
+        <DropdownMenuSeparator />
 
-        <span className="flex-1">Theme</span>
-        <Switch checked={!isLight} onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-          onClick={(e) => e.stopPropagation()}
-          className={'cursor-pointer'}
-        />
-      </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={onLogout}
+          className="cursor-pointer gap-3 py-2.5 text-red-500"
+        >
+          <LogOut className="size-4" />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
-      <DropdownMenuSeparator />
-
-      <DropdownMenuItem onClick={logout} className="gap-3 py-2.5 text-red-500">
-        <LogOut className="size-4" />
-        Logout
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
-
-// ─── Main Component ───
-const AuthButtonsInner = ({ layout = "public" }) => {
+function AuthButtonsInner({ layout = "public" }) {
   const { token, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const router = useRouter();
-  const hydrated = useSyncExternalStore(() => () => {}, () => true, () => false);
-  if (!hydrated) return <div className="flex items-center gap-4 min-h-10 min-w-40" />;
-
-  //   if (!token) {
-  //     return (
-  //       <div
-  //         className="flex items-center gap-4 min-h-10 min-w-55"
-  //         aria-hidden
-  //       />
-  //     );
-  //   }
-
   const user = null;
 
   if (!token) {
@@ -157,7 +160,7 @@ const AuthButtonsInner = ({ layout = "public" }) => {
         <Button
           asChild
           variant="ghost"
-          className="hover:bg-transparent! border cursor-pointer"
+          className="hover:bg-transparent! cursor-pointer border"
           size="lg"
         >
           <Link href="/login">Login</Link>
@@ -171,7 +174,7 @@ const AuthButtonsInner = ({ layout = "public" }) => {
           <Link href="/signup">Sign Up</Link>
         </Button>
         <Button asChild className="cursor-pointer" size="lg">
-          <Link href={!!token ? "/book-session" : "/signup"}>
+          <Link href="/signup">
             <Calendar />
             Book a Session
           </Link>
@@ -182,8 +185,9 @@ const AuthButtonsInner = ({ layout = "public" }) => {
 
   const isLight = resolvedTheme === "light" || !resolvedTheme;
   const isPublic = layout === "public";
-  const handleLogOut = () => {
-    logout();
+
+  const handleLogout = async () => {
+    await logout();
     router.push("/");
   };
 
@@ -192,19 +196,14 @@ const AuthButtonsInner = ({ layout = "public" }) => {
       <NotificationBell />
       {isPublic ? (
         <>
-          <Button
-            asChild
-            className="cursor-pointer"
-            size="lg"
-            variant="outline"
-          >
+          <Button asChild className="cursor-pointer" size="lg" variant="outline">
             <Link href="/dashboard">
               <LayoutDashboard className="size-4" />
               Dashboard
             </Link>
           </Button>
           <Button asChild className="cursor-pointer" size="lg">
-            <Link href={!!token ? "/book-session" : "/signup"}>
+            <Link href="/book-session">
               <Calendar />
               Book a Session
             </Link>
@@ -216,7 +215,7 @@ const AuthButtonsInner = ({ layout = "public" }) => {
             asChild
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground cursor-pointer"
+            className="cursor-pointer text-muted-foreground hover:text-foreground"
           >
             <Link href="/settings">
               <Settings className="size-5" />
@@ -224,7 +223,7 @@ const AuthButtonsInner = ({ layout = "public" }) => {
           </Button>
           <UserMenu
             user={user}
-            logout={handleLogOut}
+            onLogout={handleLogout}
             isLight={isLight}
             setTheme={setTheme}
           />
@@ -232,8 +231,8 @@ const AuthButtonsInner = ({ layout = "public" }) => {
       )}
     </div>
   );
-};
+}
 
-/** Memoized so route changes in the navbar (pathname) do not re-render auth UI and retrigger animations. */
 const AuthButtons = memo(AuthButtonsInner);
+
 export default AuthButtons;

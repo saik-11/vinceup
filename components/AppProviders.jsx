@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "next-themes";
 
-const AppProviders = ({ children }) => {
+const AppProviders = ({ children, initialAuth = false }) => {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -26,7 +26,7 @@ const AppProviders = ({ children }) => {
         defaultTheme="system"
         disableTransitionOnChange
       >
-        <AuthProvider>
+        <AuthProvider initialAuth={initialAuth}>
           <TooltipProvider>{children}</TooltipProvider>
         </AuthProvider>
       </ThemeProvider>

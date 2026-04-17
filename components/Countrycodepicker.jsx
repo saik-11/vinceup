@@ -2,7 +2,7 @@
 
 import { ChevronDown, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -25,71 +25,70 @@ const CountryCodePicker = ({
   const searchRef = useRef(null);
   const itemRefs = useRef([]);
 
-  const selected = countries.find((c) => c.dialCode === value);
+  const selected = countries.find((country) => country.dialCode === value);
 
   const filtered = countries.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.dialCode.includes(search) ||
-      c.code.toLowerCase().includes(search.toLowerCase()),
+    (country) =>
+      country.name.toLowerCase().includes(search.toLowerCase()) ||
+      country.dialCode.includes(search) ||
+      country.code.toLowerCase().includes(search.toLowerCase()),
   );
 
-  // Reset search and highlight on open/close
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (nextOpen) => {
+    if (nextOpen) {
       setSearch("");
       setHighlightIndex(0);
     }
-  }, [open]);
 
-  // Scroll highlighted item into view
+    setOpen(nextOpen);
+  };
+
   useEffect(() => {
     if (open && itemRefs.current[highlightIndex]) {
       itemRefs.current[highlightIndex].scrollIntoView({ block: "nearest" });
     }
   }, [highlightIndex, open]);
 
-  const selectCountry = useCallback(
-    (country) => {
-      onChange(country.dialCode);
-      setOpen(false);
-      setSearch("");
-    },
-    [onChange],
-  );
+  const selectCountry = (country) => {
+    onChange(country.dialCode);
+    setOpen(false);
+    setSearch("");
+  };
 
-  const handleKeyDown = (e) => {
-    if (!open) return;
+  const handleKeyDown = (event) => {
+    if (!open) {
+      return;
+    }
 
-    switch (e.key) {
+    switch (event.key) {
       case "ArrowDown":
-        e.preventDefault();
-        setHighlightIndex((prev) =>
-          prev < filtered.length - 1 ? prev + 1 : 0,
+        event.preventDefault();
+        setHighlightIndex((previous) =>
+          previous < filtered.length - 1 ? previous + 1 : 0,
         );
         break;
       case "ArrowUp":
-        e.preventDefault();
-        setHighlightIndex((prev) =>
-          prev > 0 ? prev - 1 : filtered.length - 1,
+        event.preventDefault();
+        setHighlightIndex((previous) =>
+          previous > 0 ? previous - 1 : filtered.length - 1,
         );
         break;
       case "Enter":
-        e.preventDefault();
+        event.preventDefault();
         if (filtered[highlightIndex]) {
           selectCountry(filtered[highlightIndex]);
         }
         break;
       case "Escape":
-        e.preventDefault();
+        event.preventDefault();
         setOpen(false);
         break;
       case "Home":
-        e.preventDefault();
+        event.preventDefault();
         setHighlightIndex(0);
         break;
       case "End":
-        e.preventDefault();
+        event.preventDefault();
         setHighlightIndex(filtered.length - 1);
         break;
       default:
@@ -102,7 +101,7 @@ const CountryCodePicker = ({
     : undefined;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -116,7 +115,7 @@ const CountryCodePicker = ({
               ? `Country code: ${selected.name} ${selected.dialCode}`
               : "Select country code"
           }
-          className="flex h-9 w-27.5 shrink-0 items-center gap-1.5 rounded-md border bg-background px-2 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+          className="flex h-9 w-27.5 cursor-pointer items-center gap-1.5 rounded-md border bg-background px-2 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -147,19 +146,18 @@ const CountryCodePicker = ({
         className="w-70 p-0"
         align="start"
         onKeyDown={handleKeyDown}
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
           searchRef.current?.focus();
         }}
       >
-        {/* Search */}
         <div className="border-b p-2">
           <Input
             ref={searchRef}
-            placeholder="Search country or code…"
+            placeholder="Search country or code..."
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+            onChange={(event) => {
+              setSearch(event.target.value);
               setHighlightIndex(0);
             }}
             className="h-8"
@@ -171,7 +169,6 @@ const CountryCodePicker = ({
           />
         </div>
 
-        {/* List */}
         <div
           ref={listRef}
           id="country-code-listbox"
@@ -183,11 +180,10 @@ const CountryCodePicker = ({
             <div className="flex items-center justify-center gap-2 px-3 py-6">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                Loading countries…
+                Loading countries...
               </span>
             </div>
           ) : filtered.length === 0 ? (
-            // biome-ignore lint/a11y/useSemanticElements: explanation
             <p
               className="px-3 py-6 text-center text-sm text-muted-foreground"
               role="status"
@@ -195,31 +191,31 @@ const CountryCodePicker = ({
               No countries found for &ldquo;{search}&rdquo;
             </p>
           ) : (
-            filtered.map((c, index) => {
+            filtered.map((country, index) => {
               const isHighlighted = index === highlightIndex;
-              const isSelected = value === c.dialCode;
+              const isSelected = value === country.dialCode;
 
               return (
                 <button
-                  key={c.code}
-                  ref={(el) => {
-                    itemRefs.current[index] = el;
+                  key={country.code}
+                  ref={(element) => {
+                    itemRefs.current[index] = element;
                   }}
-                  id={`country-option-${c.code}`}
+                  id={`country-option-${country.code}`}
                   type="button"
                   role="option"
                   aria-selected={isSelected}
-                  aria-label={`${c.name} ${c.dialCode}`}
-                  className={`flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm cursor-pointer transition-colors
+                  aria-label={`${country.name} ${country.dialCode}`}
+                  className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors
                     ${isHighlighted ? "bg-accent" : ""}
                     ${isSelected ? "font-medium" : ""}
                     ${!isHighlighted ? "hover:bg-accent/50" : ""}
                   `}
-                  onClick={() => selectCountry(c)}
+                  onClick={() => selectCountry(country)}
                   onMouseEnter={() => setHighlightIndex(index)}
                 >
                   <Image
-                    src={c.flag}
+                    src={country.flag}
                     alt=""
                     width={20}
                     height={16}
@@ -227,9 +223,11 @@ const CountryCodePicker = ({
                     unoptimized
                     className="h-4 w-5 rounded-sm object-cover"
                   />
-                  <span className="flex-1 text-left truncate">{c.name}</span>
-                  <span className="text-muted-foreground tabular-nums">
-                    {c.dialCode}
+                  <span className="flex-1 truncate text-left">
+                    {country.name}
+                  </span>
+                  <span className="tabular-nums text-muted-foreground">
+                    {country.dialCode}
                   </span>
                 </button>
               );
@@ -237,14 +235,12 @@ const CountryCodePicker = ({
           )}
         </div>
 
-        {/* Status for screen readers */}
-        {!isLoading && (
-          // biome-ignore lint/a11y/useSemanticElements: explanation
+        {!isLoading ? (
           <div className="sr-only" role="status" aria-live="polite">
             {filtered.length} {filtered.length === 1 ? "country" : "countries"}{" "}
             available
           </div>
-        )}
+        ) : null}
       </PopoverContent>
     </Popover>
   );

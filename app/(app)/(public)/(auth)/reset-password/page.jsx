@@ -1,11 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, CircleCheckBig, Eye, EyeOff, LockKeyhole } from "lucide-react";
+import {
+  AlertCircle,
+  CircleCheckBig,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+} from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import AuthCard from "@/components/auth/AuthCard";
@@ -16,7 +22,6 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useResetPassword } from "@/hooks/useResetPassword";
 
-// ─── Validation ───
 const resetSchema = z
   .object({
     password: z
@@ -28,9 +33,9 @@ const resetSchema = z
       .regex(/[@$!%*?&#]/, "Must include at least 1 special character"),
     confirmPassword: z.string().min(1, "Please confirm password"),
   })
-  .superRefine((data, ctx) => {
+  .superRefine((data, context) => {
     if (data.password !== data.confirmPassword) {
-      ctx.addIssue({
+      context.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Passwords do not match",
         path: ["confirmPassword"],
@@ -38,20 +43,40 @@ const resetSchema = z
     }
   });
 
-const ResetPassword = () => {
+export default function ResetPasswordPage() {
   const router = useRouter();
-  const pathname = usePathname();
-
-  const [token, setToken] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [isChecking, setIsChecking] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [seconds, setSeconds] = useState(5);
-  const pathnameRef = useRef(pathname);
   const [showPasswordHints, setShowPasswordHints] = useState(false);
+
+  const resetContext = useSyncExternalStore(
+    () => () => {},
+    () => {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const accessToken = params.get("access_token");
+
+      if (!accessToken) {
+        return { token: null, email: null, isChecking: false };
+      }
+
+      try {
+        const payload = JSON.parse(atob(accessToken.split(".")[1]));
+        return {
+          token: accessToken,
+          email: payload.email ?? null,
+          isChecking: false,
+        };
+      } catch {
+        return { token: accessToken, email: null, isChecking: false };
+      }
+    },
+    () => ({ token: null, email: null, isChecking: true }),
+  );
+
+  const { token, email, isChecking } = resetContext;
 
   const { mutate: resetPassword, isPending } = useResetPassword({
     onSuccess: () => setIsSuccess(true),
@@ -64,8 +89,10 @@ const ResetPassword = () => {
     defaultValues: { password: "", confirmPassword: "" },
   });
 
-  const passwordValue = form.watch("password");
-  const confirmValue = form.watch("confirmPassword");
+  const passwordValue =
+    useWatch({ control: form.control, name: "password" }) || "";
+  const confirmValue =
+    useWatch({ control: form.control, name: "confirmPassword" }) || "";
 
   const passwordChecks = {
     length: passwordValue.length >= 8,
@@ -80,83 +107,71 @@ const ResetPassword = () => {
   const passwordsMatch =
     confirmTouched && confirmValue.length > 0 && passwordValue === confirmValue;
 
-  // ⏳ Redirect countdown
   useEffect(() => {
-    if (!isSuccess) return;
+    if (!isSuccess) {
+      return;
+    }
+
     if (seconds === 0) {
       router.replace("/login?reset=true");
       return;
     }
-    const timer = setTimeout(() => setSeconds((s) => s - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [seconds, isSuccess, router]);
 
-  // 🔑 Extract token from URL hash
+    const timer = setTimeout(() => setSeconds((value) => value - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [isSuccess, router, seconds]);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = params.get("access_token");
-    if (accessToken) {
-      setToken(accessToken);
-      try {
-        const payload = JSON.parse(atob(accessToken.split(".")[1]));
-        setEmail(payload.email);
-      } catch {
-        setEmail(null);
-      }
-      router.replace(pathnameRef.current);
+    if (!token || typeof window === "undefined") {
+      return;
     }
-    setIsChecking(false);
-  }, [router]);
+
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + window.location.search,
+    );
+  }, [token]);
 
   const onSubmit = (values) => {
     setApiError(null);
     resetPassword({ email, new_password: values.password, token });
   };
 
-  if (isChecking) return null;
+  if (isChecking) {
+    return null;
+  }
 
-  // ── Invalid / expired link ──
-if (!token || !email) {
-  return (
-    <AuthCard maxWidth="sm" className="border-destructive/50 dark:border-destructive/30">
-      <div className="flex flex-col items-center pt-2 pb-6 text-center">
-        {/* Icon + Heading */}
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 dark:bg-destructive/20">
-          <AlertCircle className="h-6 w-6 text-destructive" aria-hidden="true" />
+  if (!token || !email) {
+    return (
+      <AuthCard
+        maxWidth="sm"
+        className="border-destructive/50 dark:border-destructive/30"
+      >
+        <div className="flex flex-col items-center pb-6 pt-2 text-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 dark:bg-destructive/20">
+            <AlertCircle className="h-6 w-6 text-destructive" aria-hidden="true" />
+          </div>
+
+          <h1 className="mb-2 text-lg font-semibold tracking-tight">
+            Reset link expired or invalid
+          </h1>
+
+          <p className="mb-6 max-w-70 text-sm text-muted-foreground">
+            Password reset links are valid for 1 hour. This link may have
+            expired, been used already, or contains an invalid token.
+          </p>
+
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/login">Back to login</Link>
+            </Button>
+          </div>
         </div>
-        
-        <h1 className="mb-2 text-lg font-semibold tracking-tight">
-          Reset link expired or invalid
-        </h1>
-        
-        {/* Helpful explanation */}
-        <p className="mb-6 max-w-70 text-sm text-muted-foreground">
-          Password reset links are valid for 1 hour. This link may have expired, 
-          been used already, or contains an invalid token.
-        </p>
+      </AuthCard>
+    );
+  }
 
-        {/* Primary actions */}
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/login">Back to login</Link>
-          </Button>
-        </div>
-
-        {/* Optional helper text */}
-        {/* <p className="mt-4 text-xs text-muted-foreground">
-          Didn&apos;t request a reset?{" "}
-          <Link 
-            href="/support" 
-            className="font-medium text-foreground underline-offset-4 hover:underline"
-          >
-            Contact support
-          </Link>
-        </p> */}
-      </div>
-    </AuthCard>
-  );
-}
   return (
     <AuthCard>
       {!isSuccess ? (
@@ -171,18 +186,16 @@ if (!token || !email) {
             subtitle="Enter a new password to secure your account."
           />
 
-          {/* ── Form ── */}
           <form
             noValidate
-            onSubmit={(e) => {
-              e.preventDefault();
+            onSubmit={(event) => {
+              event.preventDefault();
               form.handleSubmit(onSubmit)();
             }}
             className="space-y-6"
           >
             <FieldSet>
               <FieldGroup>
-                {/* ── New Password ── */}
                 <Controller
                   name="password"
                   control={form.control}
@@ -207,9 +220,9 @@ if (!token || !email) {
                         />
                         <button
                           type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => setShowPassword((p) => !p)}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => setShowPassword((value) => !value)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
                           tabIndex={-1}
                           aria-label={showPassword ? "Hide password" : "Show password"}
                         >
@@ -220,21 +233,38 @@ if (!token || !email) {
                           )}
                         </button>
                       </div>
-                      <FieldFeedback variant="error" message={fieldState.error?.message} />
-                      {showPasswordHints && (
+                      <FieldFeedback
+                        variant="error"
+                        message={fieldState.error?.message}
+                      />
+                      {showPasswordHints ? (
                         <div className="mt-2 space-y-1">
-                          <FieldFeedback variant={passwordChecks.length ? "success" : "error"} message="At least 8 characters" />
-                          <FieldFeedback variant={passwordChecks.lowercase ? "success" : "error"} message="1 lowercase letter" />
-                          <FieldFeedback variant={passwordChecks.uppercase ? "success" : "error"} message="1 uppercase letter" />
-                          <FieldFeedback variant={passwordChecks.number ? "success" : "error"} message="1 number" />
-                          <FieldFeedback variant={passwordChecks.special ? "success" : "error"} message="1 special character" />
+                          <FieldFeedback
+                            variant={passwordChecks.length ? "success" : "error"}
+                            message="At least 8 characters"
+                          />
+                          <FieldFeedback
+                            variant={passwordChecks.lowercase ? "success" : "error"}
+                            message="1 lowercase letter"
+                          />
+                          <FieldFeedback
+                            variant={passwordChecks.uppercase ? "success" : "error"}
+                            message="1 uppercase letter"
+                          />
+                          <FieldFeedback
+                            variant={passwordChecks.number ? "success" : "error"}
+                            message="1 number"
+                          />
+                          <FieldFeedback
+                            variant={passwordChecks.special ? "success" : "error"}
+                            message="1 special character"
+                          />
                         </div>
-                      )}
+                      ) : null}
                     </Field>
                   )}
                 />
 
-                {/* ── Confirm Password ── */}
                 <Controller
                   name="confirmPassword"
                   control={form.control}
@@ -245,7 +275,9 @@ if (!token || !email) {
 
                     return (
                       <Field data-invalid={showError}>
-                        <FieldLabel htmlFor="reset-confirm">Confirm Password</FieldLabel>
+                        <FieldLabel htmlFor="reset-confirm">
+                          Confirm Password
+                        </FieldLabel>
                         <div className="relative">
                           <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                           <Input
@@ -263,11 +295,13 @@ if (!token || !email) {
                           />
                           <button
                             type="button"
-                            onClick={() => setShowConfirm((p) => !p)}
-                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                            onClick={() => setShowConfirm((value) => !value)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
                             tabIndex={-1}
                             aria-label={
-                              showConfirm ? "Hide confirm password" : "Show confirm password"
+                              showConfirm
+                                ? "Hide confirm password"
+                                : "Show confirm password"
                             }
                           >
                             {showConfirm ? (
@@ -277,7 +311,7 @@ if (!token || !email) {
                             )}
                           </button>
                         </div>
-                        {showError && (
+                        {showError ? (
                           <FieldFeedback
                             variant="error"
                             message={
@@ -286,10 +320,13 @@ if (!token || !email) {
                               "Passwords do not match"
                             }
                           />
-                        )}
-                        {showSuccess && (
-                          <FieldFeedback variant="success" message="Passwords match" />
-                        )}
+                        ) : null}
+                        {showSuccess ? (
+                          <FieldFeedback
+                            variant="success"
+                            message="Passwords match"
+                          />
+                        ) : null}
                       </Field>
                     );
                   }}
@@ -297,7 +334,9 @@ if (!token || !email) {
               </FieldGroup>
             </FieldSet>
 
-            {apiError && <FieldFeedback variant="block-error" message={apiError} />}
+            {apiError ? (
+              <FieldFeedback variant="block-error" message={apiError} />
+            ) : null}
 
             <Button
               type="submit"
@@ -318,7 +357,6 @@ if (!token || !email) {
         </>
       ) : (
         <>
-          {/* ── Success State ── */}
           <AuthHeader
             icon={
               <GradientIcon>
@@ -350,6 +388,4 @@ if (!token || !email) {
       )}
     </AuthCard>
   );
-};
-
-export default ResetPassword;
+}

@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import AppProviders from "@/components/AppProviders";
+import { AUTH_COOKIE_NAME, readAuthSession } from "@/lib/auth-session";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,7 +20,12 @@ export const metadata = {
 };
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const cookieStore = await cookies();
+  const initialAuth = Boolean(
+    readAuthSession(cookieStore.get(AUTH_COOKIE_NAME)?.value),
+  );
+
   return (
     <html
       lang="en"
@@ -26,7 +33,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} ${inter.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AppProviders>{children}</AppProviders>
+        <AppProviders initialAuth={initialAuth}>{children}</AppProviders>
       </body>
     </html>
   );
