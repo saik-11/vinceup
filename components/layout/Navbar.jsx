@@ -158,7 +158,7 @@ const Navbar = ({ children }) => {
           {!isPublic && (
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: 260 }}
+              animate={{ width: 257 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="shrink-0 overflow-hidden hidden md:block"
             >
