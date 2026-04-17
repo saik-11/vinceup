@@ -3,16 +3,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import AuthCard from "@/components/auth/AuthCard";
-import AuthHeader from "@/components/auth/AuthHeader";
 import AuthFooterLink from "@/components/auth/AuthFooterLink";
-import SocialButtons from "@/components/auth/SocialButtons";
+import AuthHeader from "@/components/auth/AuthHeader";
 import FieldFeedback from "@/components/FieldFeedback";
+import SocialButtons from "@/components/auth/SocialButtons";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -20,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogin } from "@/hooks/useLogin";
 
-// ─── Validation Schema ───
 const loginSchema = z.object({
   email: z
     .string()
@@ -35,31 +34,26 @@ const loginSchema = z.object({
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState(null);
-  const hasHandled = useRef(false);
-  const router = useRouter();
-  const pathname = usePathname();
 
   const { mutate: loginMutate, isPending } = useLogin({
     onSuccess: (data) => {
-      const token = data?.token || data?.access_token;
       const role = data?.user?.role;
-
       const callbackUrl = new URLSearchParams(window.location.search).get(
         "callbackUrl",
       );
 
-      const getRedirectUrl = (callbackUrl, role) => {
-        if (typeof callbackUrl === "string" && callbackUrl.startsWith("/")) {
-          return callbackUrl;
-        }
-        return role === "mentor" ? "/mentor/dashboard" : "/dashboard";
-      };
+      const redirectTo =
+        typeof callbackUrl === "string" && callbackUrl.startsWith("/")
+          ? callbackUrl
+          : role === "mentor"
+            ? "/mentor/dashboard"
+            : "/dashboard";
 
-      const redirectTo = getRedirectUrl(callbackUrl, role);
-      login(token);
-      setTimeout(() => router.push(redirectTo), 0);
+      login();
+      router.replace(redirectTo);
     },
     onError: (message) => {
       setApiError(message);
@@ -84,15 +78,20 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
     const hash = window.location.hash;
-    if (!hash) return;
-
-    // Only run if auth params exist
-    if (hash.includes("access_token") || hash.includes("refresh_token")) {
-      // ✅ Remove hash WITHOUT re-render issues
-     window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    if (
+      hash &&
+      (hash.includes("access_token") || hash.includes("refresh_token"))
+    ) {
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search,
+      );
     }
   }, []);
 
@@ -103,16 +102,14 @@ export default function LoginPage() {
         subtitle="Sign in to continue your growth journey"
       />
 
-      {/* ── Form ── */}
       <form
         noValidate
-        onSubmit={(e) => {
-          e.preventDefault();
+        onSubmit={(event) => {
+          event.preventDefault();
           form.handleSubmit(onSubmit)();
         }}
         className="space-y-5"
       >
-        {/* Email */}
         <Controller
           name="email"
           control={form.control}
@@ -141,7 +138,6 @@ export default function LoginPage() {
           )}
         />
 
-        {/* Password */}
         <Controller
           name="password"
           control={form.control}
@@ -154,14 +150,14 @@ export default function LoginPage() {
                   {...field}
                   id="login-password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="pl-10 pr-10"
                   aria-invalid={fieldState.invalid}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -182,7 +178,6 @@ export default function LoginPage() {
           )}
         />
 
-        {/* Remember + Forgot */}
         <div className="flex items-center justify-between">
           <Controller
             name="remember"
@@ -196,36 +191,34 @@ export default function LoginPage() {
                 />
                 <label
                   htmlFor="login-remember"
-                  className="text-sm font-normal cursor-pointer select-none"
+                  className="cursor-pointer select-none text-sm font-normal"
                 >
                   Remember me
                 </label>
               </div>
             )}
           />
+
           <Link
             href="/forgot-password"
-            className="text-sm font-medium text-primary hover:underline whitespace-nowrap"
+            className="whitespace-nowrap text-sm font-medium text-primary hover:underline"
           >
             Forgot password?
           </Link>
         </div>
 
-        {/* ── API Feedback ── */}
         {apiError && <FieldFeedback variant="block-error" message={apiError} />}
 
-        {/* Submit */}
         <Button
           type="submit"
           className="w-full cursor-pointer"
           size="lg"
           disabled={isPending}
         >
-          {isPending ? "Signing in…" : "Sign In"}
+          {isPending ? "Signing in..." : "Sign In"}
         </Button>
       </form>
 
-      {/* ── Footer ── */}
       <AuthFooterLink
         text="Don't have an account?"
         href="/signup"

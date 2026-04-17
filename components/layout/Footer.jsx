@@ -54,7 +54,7 @@ const footerColumns = [
   {
     title: "Product",
     links: [
-      { label: "Services", href: "/services" },
+      { label: "Services", href: "/service" },
       { label: "Mentors", href: "/mentor" },
       { label: "Dashboard", href: "/dashboard" },
     ],
