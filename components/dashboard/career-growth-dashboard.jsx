@@ -725,7 +725,6 @@ export function CareerGrowthDashboardSkeleton() {
 }
 
 export function DashboardErrorState({ error, retryLabel, onRetry }) {
-  console.log(user);
   return (
     <DashboardShell>
       <Card className={cn(panelClass, "mx-auto max-w-2xl px-0 py-0")}>

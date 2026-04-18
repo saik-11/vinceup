@@ -278,7 +278,6 @@ function GetInTouch() {
   const onSubmit = async (data) => {
     // Replace with your actual submit logic
     await new Promise((r) => setTimeout(r, 1000));
-    console.log(data);
     setSubmitted(true);
     reset();
   };
