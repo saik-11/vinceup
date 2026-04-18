@@ -3,16 +3,11 @@ import axios from "axios";
 
 // ─── Fetch + Transform ───
 const fetchCountries = async () => {
-  const { data } = await axios.get(
-    "https://restcountries.com/v3.1/all?fields=name,idd,cca2,flags",
-  );
+  const { data } = await axios.get("https://restcountries.com/v3.1/all?fields=name,idd,cca2,flags");
 
   return data
     .map((c) => {
-      const dialCode =
-        c.idd?.root && c.idd?.suffixes?.length
-          ? `${c.idd.root}${c.idd.suffixes[0]}`
-          : null;
+      const dialCode = c.idd?.root && c.idd?.suffixes?.length ? `${c.idd.root}${c.idd.suffixes[0]}` : null;
 
       return {
         name: c.name.common,

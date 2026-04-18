@@ -1,18 +1,21 @@
 import axios from "axios";
 import { getApiBaseUrl } from "@/lib/api-base-url";
+import { getBrowserTimezone } from "@/lib/timezone";
 
 const apiClient = axios.create({
   baseURL: getApiBaseUrl(),
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error),
-);
-
-apiClient.interceptors.response.use(
-  (response) => response,
+  (config) => {
+    const tz = getBrowserTimezone();
+    if (tz) {
+      config.headers["x-Timezone"] = tz;
+    }
+    return config;
+  },
   (error) => Promise.reject(error),
 );
 

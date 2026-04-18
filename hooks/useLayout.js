@@ -7,9 +7,7 @@ export function useLayout() {
 
   const layout = (() => {
     // if (!pathname) return "public";
-    return PUBLIC_PAGES.some((route) =>
-      route === "/" ? pathname === "/" : pathname === route || pathname.startsWith(route + "/")
-    )
+    return PUBLIC_PAGES.some((route) => (route === "/" ? pathname === "/" : pathname === route || pathname.startsWith(route + "/")))
       ? "public"
       : "private";
   })();

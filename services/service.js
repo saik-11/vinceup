@@ -7,7 +7,7 @@ import apiClient from "./Apiclient";
 export const authApi = {
   signupMentee: (data) => apiClient.post(`auth/signup/mentee`, data),
   signupMentor: (data) => apiClient.post(`auth/signup/mentor`, data),
-  login: (data) => axios.post(`/api/auth/login`, data),
+  login: (data) => axios.post(`/api/auth/login`, data, { withCredentials: true }),
   forgotPassword: (data) => apiClient.post(`auth/forgot-password`, data),
   resetPassword: (data) => apiClient.post(`auth/reset-password`, data),
 };

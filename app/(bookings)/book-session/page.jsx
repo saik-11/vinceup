@@ -61,29 +61,13 @@ const BookSession = () => {
       <div className="px-4 sm:px-6 lg:px-8">
         <AnimatePresence mode="wait">
           {step === 1 && (
-            <motion.div
-              key="step-1"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
-              <StepSelectService
-                selectedService={selectedService}
-                onSelect={setSelectedService}
-                onNext={() => goTo(2)}
-              />
+            <motion.div key="step-1" variants={pageVariants} initial="enter" animate="center" exit="exit">
+              <StepSelectService selectedService={selectedService} onSelect={setSelectedService} onNext={() => goTo(2)} />
             </motion.div>
           )}
 
           {step === 2 && (
-            <motion.div
-              key="step-2"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
+            <motion.div key="step-2" variants={pageVariants} initial="enter" animate="center" exit="exit">
               <StepSelectSlot
                 selectedService={selectedService}
                 selectedDate={selectedDate}
@@ -99,13 +83,7 @@ const BookSession = () => {
           )}
 
           {step === 3 && (
-            <motion.div
-              key="step-3"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
+            <motion.div key="step-3" variants={pageVariants} initial="enter" animate="center" exit="exit">
               <StepReviewSummary
                 selectedService={selectedService}
                 selectedDate={selectedDate}
@@ -119,13 +97,7 @@ const BookSession = () => {
           )}
 
           {step === 4 && (
-            <motion.div
-              key="step-4"
-              variants={pageVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
+            <motion.div key="step-4" variants={pageVariants} initial="enter" animate="center" exit="exit">
               <StepPaymentSuccess
                 selectedService={selectedService}
                 selectedDate={selectedDate}

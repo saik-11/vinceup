@@ -28,11 +28,7 @@ export default function BookingStepIndicator({ currentStep }) {
               </div>
               <span
                 className={`text-sm font-medium whitespace-nowrap ${
-                  isCompleted
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : isActive
-                      ? "text-primary"
-                      : "text-gray-400 dark:text-gray-500"
+                  isCompleted ? "text-emerald-600 dark:text-emerald-400" : isActive ? "text-primary" : "text-gray-400 dark:text-gray-500"
                 }`}
               >
                 {step.label}

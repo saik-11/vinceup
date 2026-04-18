@@ -3,4 +3,3 @@ import { CareerGrowthDashboardSkeleton } from "@/components/dashboard/career-gro
 export default function Loading() {
   return <CareerGrowthDashboardSkeleton />;
 }
-

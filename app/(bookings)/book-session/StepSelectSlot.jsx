@@ -6,15 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 
 // ─── Mock data (replace with API) ───
-const TIME_SLOTS = [
-  "09:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "02:00 PM",
-  "03:00 PM",
-  "04:00 PM",
-  "05:00 PM",
-];
+const TIME_SLOTS = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
 
 const MENTORS = [
   {
@@ -65,7 +57,10 @@ const MENTORS = [
 
 // ─── Avatar with initials ───
 const MentorAvatar = ({ name }) => {
-  const initials = name.split(" ").map((n) => n[0]).join("");
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
   return (
     <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 dark:from-primary/30 dark:to-primary/10 text-primary font-bold text-base">
       {initials}
@@ -79,9 +74,10 @@ const MentorCard = ({ mentor, isSelected, onSelect }) => (
     onClick={() => onSelect(mentor)}
     className={`
       relative cursor-pointer rounded-2xl border-2 p-4 transition-all duration-200
-      ${isSelected
-        ? "border-primary bg-primary/[0.02] dark:bg-primary/[0.05] shadow-sm"
-        : "border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm"
+      ${
+        isSelected
+          ? "border-primary bg-primary/[0.02] dark:bg-primary/[0.05] shadow-sm"
+          : "border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm"
       }
     `}
   >
@@ -152,14 +148,9 @@ export default function StepSelectSlot({
   return (
     <div>
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Select Date, Time & Mentor
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Select Date, Time & Mentor</h1>
         <p className="mt-2 text-muted-foreground">
-          Booking:{" "}
-          <span className="font-semibold text-primary underline">
-            {selectedService?.title}
-          </span>
+          Booking: <span className="font-semibold text-primary underline">{selectedService?.title}</span>
         </p>
       </div>
 
@@ -178,13 +169,7 @@ export default function StepSelectSlot({
               Select Date
             </h3>
             <div className="flex justify-center">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={onDateChange}
-                disabled={disablePastDates}
-                className="rounded-xl"
-              />
+              <Calendar mode="single" selected={selectedDate} onSelect={onDateChange} disabled={disablePastDates} className="rounded-xl" />
             </div>
           </motion.div>
 
@@ -201,16 +186,9 @@ export default function StepSelectSlot({
             </h3>
 
             {!selectedDate ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">
-                Please select a date first
-              </p>
+              <p className="text-sm text-muted-foreground py-8 text-center">Please select a date first</p>
             ) : (
-              <motion.div
-                className="grid grid-cols-3 gap-3"
-                variants={stagger}
-                initial="hidden"
-                animate="visible"
-              >
+              <motion.div className="grid grid-cols-3 gap-3" variants={stagger} initial="hidden" animate="visible">
                 {TIME_SLOTS.map((slot) => {
                   const isSelected = selectedTime === slot;
                   return (
@@ -221,9 +199,10 @@ export default function StepSelectSlot({
                       onClick={() => onTimeChange(slot)}
                       className={`
                         rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all cursor-pointer
-                        ${isSelected
-                          ? "border-primary text-primary bg-primary/5 dark:bg-primary/10"
-                          : "border-gray-100 dark:border-gray-800 text-muted-foreground hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        ${
+                          isSelected
+                            ? "border-primary text-primary bg-primary/5 dark:bg-primary/10"
+                            : "border-gray-100 dark:border-gray-800 text-muted-foreground hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                         }
                       `}
                     >
@@ -243,14 +222,10 @@ export default function StepSelectSlot({
           transition={{ duration: 0.35, delay: 0.15 }}
           className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
         >
-          <h3 className="flex items-center gap-2 text-lg font-bold mb-4">
-            Select Your Mentor
-          </h3>
+          <h3 className="flex items-center gap-2 text-lg font-bold mb-4">Select Your Mentor</h3>
 
           {!hasDateAndTime ? (
-            <p className="text-sm text-muted-foreground py-20 text-center">
-              Please select a date and time first
-            </p>
+            <p className="text-sm text-muted-foreground py-20 text-center">Please select a date and time first</p>
           ) : (
             <AnimatePresence mode="wait">
               <motion.div
@@ -262,11 +237,7 @@ export default function StepSelectSlot({
               >
                 {MENTORS.map((mentor) => (
                   <motion.div key={mentor.id} variants={fadeIn}>
-                    <MentorCard
-                      mentor={mentor}
-                      isSelected={selectedMentor?.id === mentor.id}
-                      onSelect={onMentorChange}
-                    />
+                    <MentorCard mentor={mentor} isSelected={selectedMentor?.id === mentor.id} onSelect={onMentorChange} />
                   </motion.div>
                 ))}
               </motion.div>
@@ -280,13 +251,7 @@ export default function StepSelectSlot({
         <Button variant="outline" size="lg" onClick={onBack} className="cursor-pointer">
           Back to Services
         </Button>
-        <Button
-          size="lg"
-          variant={isComplete ? "default" : "outline"}
-          disabled={!isComplete}
-          onClick={onNext}
-          className="cursor-pointer"
-        >
+        <Button size="lg" variant={isComplete ? "default" : "outline"} disabled={!isComplete} onClick={onNext} className="cursor-pointer">
           Continue to Summary →
         </Button>
       </div>

@@ -104,10 +104,7 @@ const ForgotPage = () => {
                           aria-invalid={fieldState.invalid}
                         />
                       </div>
-                      <FieldFeedback
-                        variant={fieldState.invalid ? "error" : "hint"}
-                        message={fieldState.error?.message}
-                      />
+                      <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                     </Field>
                   )}
                 />
@@ -115,29 +112,18 @@ const ForgotPage = () => {
             </FieldSet>
 
             {apiError && (
-              <div
-                role="alert"
-                className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-              >
+              <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                 {apiError}
               </div>
             )}
 
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full"
-              disabled={isPending}
-            >
+            <Button type="submit" size="lg" className="w-full" disabled={isPending}>
               {isPending ? "Sending..." : "Send Reset Link"}
             </Button>
           </form>
 
           {/* ── Back ── */}
-          <Link
-            href="/login"
-            className="mt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          >
+          <Link href="/login" className="mt-5 flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
             Back to Login
           </Link>
@@ -155,18 +141,12 @@ const ForgotPage = () => {
             subtitle="We've sent a password reset link to your email."
           />
 
-          <p className="-mt-5 mb-6 text-center font-medium text-primary">
-            {submittedEmail}
-          </p>
-          <p className="mb-6 text-center text-sm text-muted-foreground">
-            Please check your inbox and follow the instructions.
-          </p>
+          <p className="-mt-5 mb-6 text-center font-medium text-primary">{submittedEmail}</p>
+          <p className="mb-6 text-center text-sm text-muted-foreground">Please check your inbox and follow the instructions.</p>
 
           {/* ── Countdown ── */}
           <div className="mb-5 rounded-xl bg-purple-50 p-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Redirecting to login in
-            </p>
+            <p className="text-sm text-muted-foreground">Redirecting to login in</p>
             <p className="text-2xl font-bold text-primary">{seconds} seconds</p>
           </div>
 
@@ -175,20 +155,14 @@ const ForgotPage = () => {
             <Button asChild size="lg" className="w-full">
               <Link href="/login">Go to Login</Link>
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full"
-              onClick={handleResend}
-            >
+            <Button variant="outline" size="lg" className="w-full" onClick={handleResend}>
               Resend Email
             </Button>
           </div>
 
           {/* ── Help Text ── */}
           <div className="mt-4 rounded-lg bg-gray-100 p-3 text-center text-sm text-muted-foreground">
-            {`Didn't`} receive the email? Check your spam folder or try
-            resending.
+            {`Didn't`} receive the email? Check your spam folder or try resending.
           </div>
         </>
       )}

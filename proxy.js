@@ -1,20 +1,12 @@
 import { NextResponse } from "next/server";
 import { AUTH_COOKIE_NAME, readAuthSession } from "@/lib/auth-session";
 
-const AUTH_ROUTES = [
-  "/login",
-  "/signup",
-  "/mentor-signup",
-  "/forgot-password",
-  "/reset-password",
-];
+const AUTH_ROUTES = ["/login", "/signup", "/mentor-signup", "/forgot-password", "/reset-password"];
 
 const DEFAULT_AUTH_REDIRECT = "/dashboard";
 
 function isRouteMatch(pathname, routes) {
-  return routes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
+  return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
 function getSafeCallbackUrl(request) {
@@ -34,17 +26,12 @@ export function proxy(request) {
   const isAuthRoute = isRouteMatch(pathname, AUTH_ROUTES);
 
   if (isAuthenticated && isAuthRoute) {
-    return NextResponse.redirect(
-      new URL(getSafeCallbackUrl(request), request.url),
-    );
+    return NextResponse.redirect(new URL(getSafeCallbackUrl(request), request.url));
   }
 
   if (!isAuthenticated && !isAuthRoute) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set(
-      "callbackUrl",
-      `${pathname}${request.nextUrl.search}`,
-    );
+    loginUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 

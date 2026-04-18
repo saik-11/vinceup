@@ -4,21 +4,10 @@ import { ChevronDown, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "./ui/button";
 
-const CountryPicker = ({
-  countries = [],
-  isLoading = false,
-  value,
-  onChange,
-  id,
-  placeholder = "Select country",
-}) => {
+const CountryPicker = ({ countries = [], isLoading = false, value, onChange, id, placeholder = "Select country" }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(0);
@@ -29,9 +18,7 @@ const CountryPicker = ({
   const selected = countries.find((c) => c.name === value);
 
   const filtered = countries.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.code.toLowerCase().includes(search.toLowerCase()),
+    (c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleOpenChange = (next) => {
@@ -61,15 +48,11 @@ const CountryPicker = ({
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setHighlightIndex((prev) =>
-          prev < filtered.length - 1 ? prev + 1 : 0,
-        );
+        setHighlightIndex((prev) => (prev < filtered.length - 1 ? prev + 1 : 0));
         break;
       case "ArrowUp":
         e.preventDefault();
-        setHighlightIndex((prev) =>
-          prev > 0 ? prev - 1 : filtered.length - 1,
-        );
+        setHighlightIndex((prev) => (prev > 0 ? prev - 1 : filtered.length - 1));
         break;
       case "Enter":
         e.preventDefault();
@@ -94,9 +77,7 @@ const CountryPicker = ({
     }
   };
 
-  const activeDescendant = filtered[highlightIndex]?.code
-    ? `country-name-option-${filtered[highlightIndex].code}`
-    : undefined;
+  const activeDescendant = filtered[highlightIndex]?.code ? `country-name-option-${filtered[highlightIndex].code}` : undefined;
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
@@ -128,9 +109,7 @@ const CountryPicker = ({
               <span className="flex-1 truncate text-left">{selected.name}</span>
             </>
           ) : (
-            <span className="flex-1 text-left text-muted-foreground">
-              {placeholder}
-            </span>
+            <span className="flex-1 text-left text-muted-foreground">{placeholder}</span>
           )}
           <ChevronDown
             className={`ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
@@ -168,25 +147,15 @@ const CountryPicker = ({
         </div>
 
         {/* List */}
-        <div
-          id="country-name-listbox"
-          role="listbox"
-          aria-label="Countries"
-          className="max-h-50 overflow-y-auto p-1"
-        >
+        <div id="country-name-listbox" role="listbox" aria-label="Countries" className="max-h-50 overflow-y-auto p-1">
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 px-3 py-6">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                Loading countries…
-              </span>
+              <span className="text-sm text-muted-foreground">Loading countries…</span>
             </div>
           ) : filtered.length === 0 ? (
             // biome-ignore lint/a11y/useSemanticElements: explanation
-            <p
-              className="px-3 py-6 text-center text-sm text-muted-foreground"
-              role="status"
-            >
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground" role="status">
               No countries found for &ldquo;{search}&rdquo;
             </p>
           ) : (
@@ -233,8 +202,7 @@ const CountryPicker = ({
         {!isLoading && (
           // biome-ignore lint/a11y/useSemanticElements: explanation
           <div className="sr-only" role="status" aria-live="polite">
-            {filtered.length} {filtered.length === 1 ? "country" : "countries"}{" "}
-            available
+            {filtered.length} {filtered.length === 1 ? "country" : "countries"} available
           </div>
         )}
       </PopoverContent>

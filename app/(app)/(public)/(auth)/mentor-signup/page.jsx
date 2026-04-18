@@ -1,8 +1,6 @@
 "use client";
 
-import {
-  Briefcase, Building2, Eye, EyeOff, LockKeyhole, Mail, MailCheck, MapPin, TrendingUp,
-} from "lucide-react";
+import { Briefcase, Building2, Eye, EyeOff, LockKeyhole, Mail, MailCheck, MapPin, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -49,9 +47,20 @@ const MentorPage = () => {
     mode: "all",
     reValidateMode: "onChange",
     defaultValues: {
-      first_name: "", last_name: "", email: "", password: "", confirmPassword: "",
-      country: "", state: "", city: "", companyName: "", title: "",
-      industry: "", sector: "", workExperience: "", terms: false,
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      country: "",
+      state: "",
+      city: "",
+      companyName: "",
+      title: "",
+      industry: "",
+      sector: "",
+      workExperience: "",
+      terms: false,
     },
   });
 
@@ -105,7 +114,13 @@ const MentorPage = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="mentor-first-name">First name</FieldLabel>
-                    <Input {...field} id="mentor-first-name" placeholder="John" aria-invalid={fieldState.invalid} autoComplete="given-name" />
+                    <Input
+                      {...field}
+                      id="mentor-first-name"
+                      placeholder="John"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="given-name"
+                    />
                     <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                   </Field>
                 )}
@@ -120,7 +135,13 @@ const MentorPage = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="mentor-last-name">Last name</FieldLabel>
-                    <Input {...field} id="mentor-last-name" placeholder="Doe" aria-invalid={fieldState.invalid} autoComplete="family-name" />
+                    <Input
+                      {...field}
+                      id="mentor-last-name"
+                      placeholder="Doe"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="family-name"
+                    />
                     <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                   </Field>
                 )}
@@ -139,7 +160,15 @@ const MentorPage = () => {
                   <FieldLabel htmlFor="mentor-email">Email</FieldLabel>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input {...field} id="mentor-email" type="email" placeholder="your@email.com" className="pl-10" aria-invalid={fieldState.invalid} autoComplete="email" />
+                    <Input
+                      {...field}
+                      id="mentor-email"
+                      type="email"
+                      placeholder="your@email.com"
+                      className="pl-10"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="email"
+                    />
                   </div>
                   <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                 </Field>
@@ -218,8 +247,7 @@ const MentorPage = () => {
                   validate: (v) => v === form.getValues("password") || "Passwords do not match",
                 }}
                 render={({ field, fieldState }) => {
-                  const showSuccess =
-                    fieldState.isTouched && confirmValue && passwordValue === confirmValue && !fieldState.error;
+                  const showSuccess = fieldState.isTouched && confirmValue && passwordValue === confirmValue && !fieldState.error;
                   return (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="mentor-confirm">Confirm Password</FieldLabel>
@@ -267,7 +295,14 @@ const MentorPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="mentor-country">Country</FieldLabel>
-                  <CountryPicker id="mentor-country" countries={countries} isLoading={countriesLoading} value={field.value} onChange={field.onChange} placeholder="e.g., US" />
+                  <CountryPicker
+                    id="mentor-country"
+                    countries={countries}
+                    isLoading={countriesLoading}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="e.g., US"
+                  />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -315,7 +350,13 @@ const MentorPage = () => {
                     <FieldLabel htmlFor="mentor-company">Company Name</FieldLabel>
                     <div className="relative">
                       <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input {...field} id="mentor-company" placeholder="e.g., Google" className="pl-10" aria-invalid={fieldState.invalid} />
+                      <Input
+                        {...field}
+                        id="mentor-company"
+                        placeholder="e.g., Google"
+                        className="pl-10"
+                        aria-invalid={fieldState.invalid}
+                      />
                     </div>
                     <FieldFeedback variant="error" message={fieldState.error?.message} />
                   </Field>
@@ -330,7 +371,13 @@ const MentorPage = () => {
                     <FieldLabel htmlFor="mentor-title">Title</FieldLabel>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input {...field} id="mentor-title" placeholder="e.g., Senior Engineer" className="pl-10" aria-invalid={fieldState.invalid} />
+                      <Input
+                        {...field}
+                        id="mentor-title"
+                        placeholder="e.g., Senior Engineer"
+                        className="pl-10"
+                        aria-invalid={fieldState.invalid}
+                      />
                     </div>
                     <FieldFeedback variant="error" message={fieldState.error?.message} />
                   </Field>
@@ -348,7 +395,13 @@ const MentorPage = () => {
                     <FieldLabel htmlFor="mentor-industry">Industry</FieldLabel>
                     <div className="relative">
                       <TrendingUp className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input {...field} id="mentor-industry" placeholder="e.g., Technology" className="pl-10" aria-invalid={fieldState.invalid} />
+                      <Input
+                        {...field}
+                        id="mentor-industry"
+                        placeholder="e.g., Technology"
+                        className="pl-10"
+                        aria-invalid={fieldState.invalid}
+                      />
                     </div>
                     <FieldFeedback variant="error" message={fieldState.error?.message} />
                   </Field>
@@ -384,7 +437,9 @@ const MentorPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {EXPERIENCE_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -406,9 +461,17 @@ const MentorPage = () => {
                 <Checkbox id="mentor-terms" checked={field.value} onCheckedChange={field.onChange} aria-invalid={fieldState.invalid} />
                 <label htmlFor="mentor-terms" className="text-sm cursor-pointer select-none">
                   I agree to the{" "}
-                  <Link href="/terms-of-service" className="font-medium text-primary hover:underline">Terms of Service</Link>,{" "}
-                  <Link href="/privacy-policy" className="font-medium text-primary hover:underline">Privacy Policy</Link>, and{" "}
-                  <Link href="/mentor-guidelines" className="font-medium text-primary hover:underline">Mentor Guidelines</Link>
+                  <Link href="/terms-of-service" className="font-medium text-primary hover:underline">
+                    Terms of Service
+                  </Link>
+                  ,{" "}
+                  <Link href="/privacy-policy" className="font-medium text-primary hover:underline">
+                    Privacy Policy
+                  </Link>
+                  , and{" "}
+                  <Link href="/mentor-guidelines" className="font-medium text-primary hover:underline">
+                    Mentor Guidelines
+                  </Link>
                 </label>
               </div>
               <FieldFeedback variant="error" message={fieldState.error?.message} />
@@ -426,7 +489,12 @@ const MentorPage = () => {
       <SocialButtons />
       <AuthFooterLink text="Already have an account?" href="/login" label="Sign in" />
 
-      <Button asChild variant="outline" className="mt-3 w-full cursor-pointer border-primary! text-primary! border-0 bg-gray-100 hover:bg-gray-200" size="lg">
+      <Button
+        asChild
+        variant="outline"
+        className="mt-3 w-full cursor-pointer border-primary! text-primary! border-0 bg-gray-100 hover:bg-gray-200"
+        size="lg"
+      >
         <Link href="/signup">
           Are you a Mentee? <span className="font-semibold">Sign Up here!</span>
         </Link>

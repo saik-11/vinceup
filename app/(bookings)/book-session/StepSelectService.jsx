@@ -21,17 +21,10 @@ export default function StepSelectService({ selectedService, onSelect, onNext })
     <div>
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Choose Your Service</h1>
-        <p className="mt-2 text-muted-foreground">
-          Select the type of mentorship session you need
-        </p>
+        <p className="mt-2 text-muted-foreground">Select the type of mentorship session you need</p>
       </div>
 
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto"
-        variants={stagger}
-        initial="hidden"
-        animate="visible"
-      >
+      <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto" variants={stagger} initial="hidden" animate="visible">
         {SERVICES.map((service) => {
           const Icon = service.icon;
           const isSelected = selectedService?.id === service.id;
@@ -45,9 +38,10 @@ export default function StepSelectService({ selectedService, onSelect, onNext })
                 relative cursor-pointer rounded-2xl border-2 p-6
                 bg-white dark:bg-gray-900
                 transition-all duration-200 hover:shadow-lg dark:hover:shadow-gray-900/50
-                ${isSelected
-                  ? "border-primary shadow-md dark:shadow-primary/10"
-                  : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700"
+                ${
+                  isSelected
+                    ? "border-primary shadow-md dark:shadow-primary/10"
+                    : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700"
                 }
               `}
             >
@@ -69,9 +63,7 @@ export default function StepSelectService({ selectedService, onSelect, onNext })
                 </div>
                 <div className="pr-6">
                   <h3 className="text-lg font-bold leading-tight">{service.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                    {service.description}
-                  </p>
+                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{service.description}</p>
                 </div>
               </div>
 
@@ -90,9 +82,7 @@ export default function StepSelectService({ selectedService, onSelect, onNext })
                   <Clock className="size-3.5" />
                   {service.duration} minutes
                 </span>
-                <span className="text-xl font-bold text-primary">
-                  ${service.price}
-                </span>
+                <span className="text-xl font-bold text-primary">${service.price}</span>
               </div>
             </motion.div>
           );

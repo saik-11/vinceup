@@ -11,10 +11,7 @@ export const useResetPassword = ({ onSuccess, onError } = {}) => {
     },
 
     onError: (error) => {
-      const message = getErrorMessage(
-        error,
-        "Unable to reset password. Please try again.",
-      );
+      const message = getErrorMessage(error, "Unable to reset password. Please try again.");
       onError?.(message, error);
     },
   });

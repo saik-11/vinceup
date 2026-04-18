@@ -8,163 +8,157 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { SIDEBAR_GROUPS } from "@/config/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import vinceup_logo from "../../public/assets/vinceup_logo.svg";
 
-const sidebarVariants = {
-  hidden: {
-    x: -260,
-    opacity: 0,
-  },
-  visible: {
+// ── Animation variants ──
+
+const itemVariant = {
+  hidden: { opacity: 0, x: -8 },
+  visible: (i) => ({
+    opacity: 1,
     x: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.3,
-      ease: "easeOut",
-
-      when: "beforeChildren", // 👈 ensures order
-      staggerChildren: 0.08, // 👈 ONLY here
-      delayChildren: 0.15, // 👈 smooth delay
-    },
-  },
+    transition: { duration: 0.2, delay: i * 0.04, ease: "easeOut" },
+  }),
 };
 
-const stagger = {
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-    },
-  },
-  hidden: {
-    opacity: 0,
-    transition: {
-      staggerChildren: 0.08,
-      staggerDirection: -1, // reverse exit
-    },
-  },
-};
-
-const fadeSlideIn = {
-  hidden: { opacity: 0, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.25, ease: "easeOut" },
-  },
-};
-
-const titleAnimation = {
+const groupLabelVariant = {
   hidden: { opacity: 0, y: -4 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.25 },
+    transition: { duration: 0.2, ease: "easeOut" },
   },
 };
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { token, logout } = useAuth();
-  const isLoggedIn = !!token;
+  const { isAuthenticated, logout } = useAuth();
+  const { setOpenMobile } = useSidebar();
+  const isLoggedIn = !!isAuthenticated;
+  
+  // Close mobile sidebar drawer on every route change
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [pathname, setOpenMobile]);
 
-  const isActive = (href) =>
-    href === "/dashboard"
-      ? pathname === "/dashboard"
-      : pathname.startsWith(href);
+  const isActive = (href) => (href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href));
 
   const handleLogout = () => {
+    setOpenMobile(false);
     logout();
     router.push("/");
   };
-  const renderMenu = (items) =>
-    items.map((item) => {
-      const Icon = item.icon;
-      const active = isActive(item.href);
-      return (
-        <SidebarMenuItem key={item.href}>
-          <motion.div variants={titleAnimation}>
-            <SidebarMenuButton
-              asChild
-              data-active={active}
-              className={`
-              gap-3 h-10 rounded-lg font-medium
-              text-foreground hover:text-foreground
-              data-[active=true]:bg-primary
-              data-[active=true]:text-white
-              data-[active=true]:hover:bg-primary/90
-            `}
-            >
-              {isLoggedIn ? (
-                <Link href={item.href}>
-                  <Icon className="size-5 shrink-0" />
-                  <span>{item.label}</span>
-                </Link>
-              ) : (
-                <div className="flex items-center gap-3 opacity-50">
-                  <Icon className="size-5 shrink-0" />
-                  <span>{item.label}</span>
-                </div>
-              )}
-            </SidebarMenuButton>
-          </motion.div>
-        </SidebarMenuItem>
-      );
-    });
+
+  if (!isLoggedIn) return null;
+
+  // Sequential index for staggered menu-item animation
+  let itemIndex = 0;
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {isLoggedIn && (
         <motion.div
-          key="sidebar"
-          variants={sidebarVariants}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
+          key="sidebar-wrapper"
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: "var(--sidebar-width, 16rem)", opacity: 1 }}
+          exit={{ width: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="shrink-0 overflow-hidden hidden md:block"
         >
-          <Sidebar className="fixed left-0 top-20 h-[calc(100vh-5rem)] border-r bg-background">
-            <SidebarContent className="px-2 pt-6">
-              {SIDEBAR_GROUPS.map((group, groupIdx) => (
-                <SidebarGroup key={group.label}>
-                  <motion.div variants={fadeSlideIn}>
-                    <SidebarGroupLabel className={group?.class || ''} >
-                      {group.icon && <group.icon className="size-4" />}
+          <Sidebar className="top-16 h-[calc(100svh-4rem)]">
+            {/*
+              Mobile-only header: logo + close button.
+              Uses CSS `md:hidden` so it only shows inside the Sheet drawer.
+              On desktop, the Sidebar component hides this via its own `hidden md:block`.
+            */}
+            <SidebarHeader className="flex md:hidden flex-row items-center justify-between px-4 py-3 border-b border-border">
+              <Link href="/dashboard" onClick={() => setOpenMobile(false)} className="shrink-0">
+                <Image src={vinceup_logo} alt="VinceUp" loading="eager" className="w-28 h-auto" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setOpenMobile(false)}
+                aria-label="Close sidebar"
+                className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <X className="size-5" />
+              </button>
+            </SidebarHeader>
+
+            <SidebarContent className="px-3 pt-4 pb-2">
+              {SIDEBAR_GROUPS.map((group) => (
+                <SidebarGroup key={group.label} className="mb-1">
+                  <motion.div variants={groupLabelVariant} initial="hidden" animate="visible">
+                    <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wider px-3 mb-1 ${group?.class || ""}`}>
+                      {group.icon && <group.icon className="size-4 mr-1.5" />}
                       {group.label}
                     </SidebarGroupLabel>
                   </motion.div>
+
                   <SidebarMenu>
-                    {isLoggedIn ? renderMenu(group.items) : null}
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = isActive(item.href);
+                      const idx = itemIndex++;
+
+                      return (
+                        <SidebarMenuItem key={item.href}>
+                          <motion.div custom={idx} variants={itemVariant} initial="hidden" animate="visible">
+                            <SidebarMenuButton
+                              asChild
+                              data-active={active}
+                              tooltip={item.label}
+                              className={`
+                                gap-3 h-10 rounded-lg font-medium
+                                transition-all duration-150
+                                text-muted-foreground hover:text-foreground
+                                hover:bg-primary/8
+                                data-[active=true]:bg-primary
+                                data-[active=true]:text-primary-foreground
+                                data-[active=true]:shadow-sm
+                                data-[active=true]:hover:bg-primary/90
+                              `}
+                            >
+                              <Link href={item.href}>
+                                <Icon className="size-4.5 shrink-0" />
+                                <span className="truncate">{item.label}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </motion.div>
+                        </SidebarMenuItem>
+                      );
+                    })}
                   </SidebarMenu>
                 </SidebarGroup>
               ))}
             </SidebarContent>
-            <SidebarFooter className="px-2 pb-6">
-              {isLoggedIn && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.4, ease: "easeOut" }}
-                >
-                  <SidebarMenu>
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        onClick={handleLogout}
-                        className="cursor-pointer"
-                      >
-                        <LogOut className="size-5" />
-                        Logout
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </motion.div>
-              )}
+
+            <SidebarFooter className="px-3 pb-4 pt-2 border-t border-border">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.3, ease: "easeOut" }}>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      onClick={handleLogout}
+                      className="gap-3 h-10 rounded-lg cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <LogOut className="size-4.5" />
+                      <span>Logout</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </motion.div>
             </SidebarFooter>
           </Sidebar>
         </motion.div>

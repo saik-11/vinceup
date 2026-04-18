@@ -4,18 +4,14 @@ import axios from "axios";
  * Converts an axios error into a user-friendly message.
  * Falls back to a generic message if nothing specific can be inferred.
  */
-export const getErrorMessage = (
-  error,
-  fallback = "Something went wrong. Please try again.",
-) => {
+export const getErrorMessage = (error, fallback = "Something went wrong. Please try again.") => {
   // Server responded with an error status (4xx, 5xx)
   if (error.response) {
     const { status, data } = error.response;
 
     // Use the server's message if available
     const serverMessage = data?.message || data?.error;
-    if (serverMessage && typeof serverMessage === "string")
-      return serverMessage;
+    if (serverMessage && typeof serverMessage === "string") return serverMessage;
 
     // Handle FastAPI/Pydantic validation errors: { detail: [{ msg, loc, ... }] }
     if (Array.isArray(data?.detail)) {

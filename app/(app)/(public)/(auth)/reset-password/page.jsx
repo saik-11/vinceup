@@ -1,13 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  AlertCircle,
-  CircleCheckBig,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-} from "lucide-react";
+import { AlertCircle, CircleCheckBig, Eye, EyeOff, LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
@@ -89,10 +83,8 @@ export default function ResetPasswordPage() {
     defaultValues: { password: "", confirmPassword: "" },
   });
 
-  const passwordValue =
-    useWatch({ control: form.control, name: "password" }) || "";
-  const confirmValue =
-    useWatch({ control: form.control, name: "confirmPassword" }) || "";
+  const passwordValue = useWatch({ control: form.control, name: "password" }) || "";
+  const confirmValue = useWatch({ control: form.control, name: "confirmPassword" }) || "";
 
   const passwordChecks = {
     length: passwordValue.length >= 8,
@@ -104,8 +96,7 @@ export default function ResetPasswordPage() {
 
   const confirmTouched = form.formState.touchedFields.confirmPassword;
   const confirmError = form.formState.errors.confirmPassword;
-  const passwordsMatch =
-    confirmTouched && confirmValue.length > 0 && passwordValue === confirmValue;
+  const passwordsMatch = confirmTouched && confirmValue.length > 0 && passwordValue === confirmValue;
 
   useEffect(() => {
     if (!isSuccess) {
@@ -126,11 +117,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    window.history.replaceState(
-      null,
-      "",
-      window.location.pathname + window.location.search,
-    );
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
   }, [token]);
 
   const onSubmit = (values) => {
@@ -144,22 +131,16 @@ export default function ResetPasswordPage() {
 
   if (!token || !email) {
     return (
-      <AuthCard
-        maxWidth="sm"
-        className="border-destructive/50 dark:border-destructive/30"
-      >
+      <AuthCard maxWidth="sm" className="border-destructive/50 dark:border-destructive/30">
         <div className="flex flex-col items-center pb-6 pt-2 text-center">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 dark:bg-destructive/20">
             <AlertCircle className="h-6 w-6 text-destructive" aria-hidden="true" />
           </div>
 
-          <h1 className="mb-2 text-lg font-semibold tracking-tight">
-            Reset link expired or invalid
-          </h1>
+          <h1 className="mb-2 text-lg font-semibold tracking-tight">Reset link expired or invalid</h1>
 
           <p className="mb-6 max-w-70 text-sm text-muted-foreground">
-            Password reset links are valid for 1 hour. This link may have
-            expired, been used already, or contains an invalid token.
+            Password reset links are valid for 1 hour. This link may have expired, been used already, or contains an invalid token.
           </p>
 
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
@@ -226,39 +207,17 @@ export default function ResetPasswordPage() {
                           tabIndex={-1}
                           aria-label={showPassword ? "Hide password" : "Show password"}
                         >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                       </div>
-                      <FieldFeedback
-                        variant="error"
-                        message={fieldState.error?.message}
-                      />
+                      <FieldFeedback variant="error" message={fieldState.error?.message} />
                       {showPasswordHints ? (
                         <div className="mt-2 space-y-1">
-                          <FieldFeedback
-                            variant={passwordChecks.length ? "success" : "error"}
-                            message="At least 8 characters"
-                          />
-                          <FieldFeedback
-                            variant={passwordChecks.lowercase ? "success" : "error"}
-                            message="1 lowercase letter"
-                          />
-                          <FieldFeedback
-                            variant={passwordChecks.uppercase ? "success" : "error"}
-                            message="1 uppercase letter"
-                          />
-                          <FieldFeedback
-                            variant={passwordChecks.number ? "success" : "error"}
-                            message="1 number"
-                          />
-                          <FieldFeedback
-                            variant={passwordChecks.special ? "success" : "error"}
-                            message="1 special character"
-                          />
+                          <FieldFeedback variant={passwordChecks.length ? "success" : "error"} message="At least 8 characters" />
+                          <FieldFeedback variant={passwordChecks.lowercase ? "success" : "error"} message="1 lowercase letter" />
+                          <FieldFeedback variant={passwordChecks.uppercase ? "success" : "error"} message="1 uppercase letter" />
+                          <FieldFeedback variant={passwordChecks.number ? "success" : "error"} message="1 number" />
+                          <FieldFeedback variant={passwordChecks.special ? "success" : "error"} message="1 special character" />
                         </div>
                       ) : null}
                     </Field>
@@ -269,15 +228,12 @@ export default function ResetPasswordPage() {
                   name="confirmPassword"
                   control={form.control}
                   render={({ field, fieldState }) => {
-                    const showError =
-                      fieldState.invalid || (confirmTouched && confirmError);
+                    const showError = fieldState.invalid || (confirmTouched && confirmError);
                     const showSuccess = passwordsMatch && !showError;
 
                     return (
                       <Field data-invalid={showError}>
-                        <FieldLabel htmlFor="reset-confirm">
-                          Confirm Password
-                        </FieldLabel>
+                        <FieldLabel htmlFor="reset-confirm">Confirm Password</FieldLabel>
                         <div className="relative">
                           <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                           <Input
@@ -285,11 +241,7 @@ export default function ResetPasswordPage() {
                             id="reset-confirm"
                             type={showConfirm ? "text" : "password"}
                             placeholder="Confirm new password"
-                            className={`pl-10 pr-9 ${
-                              showSuccess
-                                ? "border-emerald-500 focus-visible:ring-emerald-500/30"
-                                : ""
-                            }`}
+                            className={`pl-10 pr-9 ${showSuccess ? "border-emerald-500 focus-visible:ring-emerald-500/30" : ""}`}
                             aria-invalid={showError}
                             autoComplete="new-password"
                           />
@@ -298,35 +250,18 @@ export default function ResetPasswordPage() {
                             onClick={() => setShowConfirm((value) => !value)}
                             className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
                             tabIndex={-1}
-                            aria-label={
-                              showConfirm
-                                ? "Hide confirm password"
-                                : "Show confirm password"
-                            }
+                            aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
                           >
-                            {showConfirm ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
+                            {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
                         </div>
                         {showError ? (
                           <FieldFeedback
                             variant="error"
-                            message={
-                              fieldState.error?.message ??
-                              confirmError?.message ??
-                              "Passwords do not match"
-                            }
+                            message={fieldState.error?.message ?? confirmError?.message ?? "Passwords do not match"}
                           />
                         ) : null}
-                        {showSuccess ? (
-                          <FieldFeedback
-                            variant="success"
-                            message="Passwords match"
-                          />
-                        ) : null}
+                        {showSuccess ? <FieldFeedback variant="success" message="Passwords match" /> : null}
                       </Field>
                     );
                   }}
@@ -334,24 +269,14 @@ export default function ResetPasswordPage() {
               </FieldGroup>
             </FieldSet>
 
-            {apiError ? (
-              <FieldFeedback variant="block-error" message={apiError} />
-            ) : null}
+            {apiError ? <FieldFeedback variant="block-error" message={apiError} /> : null}
 
-            <Button
-              type="submit"
-              className="w-full cursor-pointer"
-              size="lg"
-              disabled={isPending}
-            >
+            <Button type="submit" className="w-full cursor-pointer" size="lg" disabled={isPending}>
               {isPending ? "Resetting..." : "Reset Password"}
             </Button>
           </form>
 
-          <Link
-            href="/login"
-            className="mt-5 block text-center text-sm text-muted-foreground hover:underline"
-          >
+          <Link href="/login" className="mt-5 block text-center text-sm text-muted-foreground hover:underline">
             Cancel and return to Login
           </Link>
         </>
@@ -369,9 +294,7 @@ export default function ResetPasswordPage() {
 
           <div className="space-y-4">
             <div className="rounded-xl bg-purple-50 p-4 text-center">
-              <p className="text-sm text-muted-foreground">
-                Redirecting to login in
-              </p>
+              <p className="text-sm text-muted-foreground">Redirecting to login in</p>
               <p className="text-2xl font-bold text-primary">{seconds} seconds</p>
             </div>
 
@@ -379,10 +302,7 @@ export default function ResetPasswordPage() {
               <Link href="/login">Go to Login Now</Link>
             </Button>
 
-            <FieldFeedback
-              variant="block-success"
-              message="Keep your password secure and don't share it with anyone."
-            />
+            <FieldFeedback variant="block-success" message="Keep your password secure and don't share it with anyone." />
           </div>
         </>
       )}

@@ -1,8 +1,5 @@
 import { CareerGrowthDashboard } from "@/components/dashboard/career-growth-dashboard";
-import {
-  getDashboardPayload,
-  getDashboardScenarioName,
-} from "@/lib/dashboard-data";
+import { getDashboardPayload, getDashboardScenarioName } from "@/lib/dashboard-data";
 
 export const metadata = {
   title: "Dashboard | Vinceup",
@@ -25,9 +22,7 @@ export default async function DashboardPage({ searchParams }) {
   }
 
   if (data.meta.shouldThrow) {
-    throw new Error(
-      "The requested dashboard scenario intentionally triggered a render failure.",
-    );
+    throw new Error("The requested dashboard scenario intentionally triggered a render failure.");
   }
 
   return <CareerGrowthDashboard data={data} activeScenario={scenario} />;

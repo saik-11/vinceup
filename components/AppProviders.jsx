@@ -21,11 +21,7 @@ const AppProviders = ({ children, initialAuth = false }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        disableTransitionOnChange
-      >
+      <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange>
         <AuthProvider initialAuth={initialAuth}>
           <TooltipProvider>{children}</TooltipProvider>
         </AuthProvider>

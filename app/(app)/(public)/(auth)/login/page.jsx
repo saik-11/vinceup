@@ -19,16 +19,11 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogin } from "@/hooks/useLogin";
+import { getBrowserTimezone } from "@/lib/timezone";
 
 const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(6, "Password must be at least 6 characters"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
+  password: z.string().min(1, "Password is required").min(6, "Password must be at least 6 characters"),
   remember: z.boolean().optional(),
 });
 
@@ -41,9 +36,7 @@ export default function LoginPage() {
   const { mutate: loginMutate, isPending } = useLogin({
     onSuccess: (data) => {
       const role = data?.user?.role;
-      const callbackUrl = new URLSearchParams(window.location.search).get(
-        "callbackUrl",
-      );
+      const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl");
 
       const redirectTo =
         typeof callbackUrl === "string" && callbackUrl.startsWith("/")
@@ -52,7 +45,7 @@ export default function LoginPage() {
             ? "/mentor/dashboard"
             : "/dashboard";
 
-      login();
+      login(data.user);
       router.replace(redirectTo);
     },
     onError: (message) => {
@@ -74,6 +67,7 @@ export default function LoginPage() {
     loginMutate({
       email: values.email,
       password: values.password,
+      timezone: getBrowserTimezone(),
     });
   };
 
@@ -83,24 +77,14 @@ export default function LoginPage() {
     }
 
     const hash = window.location.hash;
-    if (
-      hash &&
-      (hash.includes("access_token") || hash.includes("refresh_token"))
-    ) {
-      window.history.replaceState(
-        null,
-        "",
-        window.location.pathname + window.location.search,
-      );
+    if (hash && (hash.includes("access_token") || hash.includes("refresh_token"))) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
   }, []);
 
   return (
     <AuthCard>
-      <AuthHeader
-        title="Welcome Back"
-        subtitle="Sign in to continue your growth journey"
-      />
+      <AuthHeader title="Welcome Back" subtitle="Sign in to continue your growth journey" />
 
       <form
         noValidate
@@ -128,12 +112,7 @@ export default function LoginPage() {
                   autoComplete="email"
                 />
               </div>
-              {fieldState.invalid && (
-                <FieldFeedback
-                  variant="error"
-                  message={fieldState.error?.message}
-                />
-              )}
+              {fieldState.invalid && <FieldFeedback variant="error" message={fieldState.error?.message} />}
             </Field>
           )}
         />
@@ -161,19 +140,10 @@ export default function LoginPage() {
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {fieldState.invalid && (
-                <FieldFeedback
-                  variant="error"
-                  message={fieldState.error?.message}
-                />
-              )}
+              {fieldState.invalid && <FieldFeedback variant="error" message={fieldState.error?.message} />}
             </Field>
           )}
         />
@@ -184,46 +154,27 @@ export default function LoginPage() {
             control={form.control}
             render={({ field }) => (
               <div className="flex items-center gap-2">
-                <Checkbox
-                  id="login-remember"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-                <label
-                  htmlFor="login-remember"
-                  className="cursor-pointer select-none text-sm font-normal"
-                >
+                <Checkbox id="login-remember" checked={field.value} onCheckedChange={field.onChange} />
+                <label htmlFor="login-remember" className="cursor-pointer select-none text-sm font-normal">
                   Remember me
                 </label>
               </div>
             )}
           />
 
-          <Link
-            href="/forgot-password"
-            className="whitespace-nowrap text-sm font-medium text-primary hover:underline"
-          >
+          <Link href="/forgot-password" className="whitespace-nowrap text-sm font-medium text-primary hover:underline">
             Forgot password?
           </Link>
         </div>
 
         {apiError && <FieldFeedback variant="block-error" message={apiError} />}
 
-        <Button
-          type="submit"
-          className="w-full cursor-pointer"
-          size="lg"
-          disabled={isPending}
-        >
+        <Button type="submit" className="w-full cursor-pointer" size="lg" disabled={isPending}>
           {isPending ? "Signing in..." : "Sign In"}
         </Button>
       </form>
 
-      <AuthFooterLink
-        text="Don't have an account?"
-        href="/signup"
-        label="Sign up"
-      />
+      <AuthFooterLink text="Don't have an account?" href="/signup" label="Sign up" />
       <SocialButtons />
     </AuthCard>
   );

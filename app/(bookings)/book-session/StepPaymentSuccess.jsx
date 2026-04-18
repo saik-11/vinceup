@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  CalendarDays,
-  CheckCircle2,
-  DollarSign,
-  FileText,
-  Hash,
-} from "lucide-react";
+import { CalendarDays, CheckCircle2, DollarSign, FileText, Hash } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -26,13 +20,7 @@ function generateTxnId() {
   return id;
 }
 
-export default function StepPaymentSuccess({
-  selectedService,
-  selectedDate,
-  selectedTime,
-  selectedMentor,
-  totalPaid,
-}) {
+export default function StepPaymentSuccess({ selectedService, selectedDate, selectedTime, selectedMentor, totalPaid }) {
   const router = useRouter();
   const [seconds, setSeconds] = useState(10);
   const [txnId] = useState(generateTxnId);
@@ -103,16 +91,9 @@ export default function StepPaymentSuccess({
         </div>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="text-center mb-8"
-      >
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-center mb-8">
         <h1 className="text-3xl font-bold">Payment Successful!</h1>
-        <p className="mt-2 text-muted-foreground">
-          Your session has been booked successfully
-        </p>
+        <p className="mt-2 text-muted-foreground">Your session has been booked successfully</p>
       </motion.div>
 
       {/* ── Booking Details ── */}
@@ -129,19 +110,13 @@ export default function StepPaymentSuccess({
             const Icon = item.icon;
             return (
               <div key={item.label} className="flex items-start gap-4">
-                <div
-                  className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${item.iconBg}`}
-                >
+                <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${item.iconBg}`}>
                   <Icon className="size-5" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{item.label}</p>
-                  <p className={`font-bold ${item.valueClass || ""}`}>
-                    {item.value}
-                  </p>
-                  {item.sub && (
-                    <p className="text-sm text-muted-foreground">{item.sub}</p>
-                  )}
+                  <p className={`font-bold ${item.valueClass || ""}`}>{item.value}</p>
+                  {item.sub && <p className="text-sm text-muted-foreground">{item.sub}</p>}
                 </div>
               </div>
             );
@@ -168,12 +143,7 @@ export default function StepPaymentSuccess({
       </motion.div>
 
       {/* ── Actions ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="flex gap-4"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="flex gap-4">
         <Button asChild size="lg" className="flex-1 cursor-pointer">
           <Link href="/dashboard">Go to Dashboard →</Link>
         </Button>

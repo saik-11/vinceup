@@ -22,9 +22,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
-  const initialAuth = Boolean(
-    readAuthSession(cookieStore.get(AUTH_COOKIE_NAME)?.value),
-  );
+  const initialAuth = Boolean(readAuthSession(cookieStore.get(AUTH_COOKIE_NAME)?.value));
 
   return (
     <html

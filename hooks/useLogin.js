@@ -9,10 +9,7 @@ export const useLogin = ({ onSuccess, onError } = {}) => {
       onSuccess?.(response.data, variables);
     },
     onError: (error) => {
-      const message = getErrorMessage(
-        error,
-        "Unable to sign in. Please try again.",
-      );
+      const message = getErrorMessage(error, "Unable to sign in. Please try again.");
       onError?.(message, error);
     },
   });

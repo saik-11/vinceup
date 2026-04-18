@@ -29,9 +29,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
+import { Avatar as ShadcnAvatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const USER_MENU_ITEMS = [
   { href: "/personal-details", icon: UserCircle, label: "Personal Details" },
+  { href: "/settings", icon: Settings, label: "Settings" },
   { href: "/purchase-history", icon: ShoppingBag, label: "Purchase History" },
   { href: "/", icon: Globe, label: "Go To Website" },
   { href: "/help", icon: HelpCircle, label: "Help" },
@@ -42,15 +44,24 @@ const AVATAR_SIZE_CLASSES = {
   10: "size-10",
 };
 
-function Avatar({ size = 9 }) {
+function Avatar({ size = 9, user }) {
   const sizeClass = AVATAR_SIZE_CLASSES[size] || AVATAR_SIZE_CLASSES[9];
+  const initial =
+    user?.first_name
+      ?.trim()
+      .split(" ")
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("") || "U";
 
   return (
-    <span
-      className={`flex ${sizeClass} shrink-0 items-center justify-center rounded-full bg-primary text-white`}
-    >
-      <UserIcon className={size >= 10 ? "size-5" : "size-4"} />
-    </span>
+    <ShadcnAvatar className={`${sizeClass} shrink-0`}>
+      {/* If image exists */}
+      <AvatarImage src={user?.avatar_url || ""} alt="User avatar" />
+
+      {/* If no image show first letter */}
+      <AvatarFallback className="bg-primary text-white font-semibold">{initial}</AvatarFallback>
+    </ShadcnAvatar>
   );
 }
 
@@ -62,6 +73,7 @@ function NotificationBell() {
           variant="ghost"
           size="icon"
           className="relative cursor-pointer text-muted-foreground hover:text-foreground"
+          aria-label="Notifications"
         >
           <Bell className="size-5" />
           <span className="absolute right-2.5 top-2 size-2 rounded-full bg-red-500 ring-2 ring-background" />
@@ -82,34 +94,31 @@ function UserMenu({ user, onLogout, isLight, setTheme }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex cursor-pointer items-center gap-1.5 px-2 py-6"
-        >
-          <Avatar />
-          <ChevronDown className="size-4 text-muted-foreground" />
+        <Button variant="ghost" className="flex cursor-pointer items-center gap-1 px-1.5 sm:px-2 py-6" aria-label="User menu">
+          <Avatar user={user} />
+          <ChevronDown className="size-3.5 text-muted-foreground hidden sm:block" />
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-56 p-2">
+      <DropdownMenuContent align="end" sideOffset={8} className="w-56 p-2 bg-background z-51">
         <div className="flex items-center gap-3 px-2 py-3">
-          <Avatar size={10} />
+          <Avatar size={10} user={user} />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">
-              {user?.name ?? "User"}
+              {user?.first_name
+                ?.trim()
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(" ") ?? "User"}
             </p>
-            {user?.email ? (
-              <p className="truncate text-xs text-muted-foreground">
-                {user.email}
-              </p>
-            ) : null}
+            {user?.email ? <p className="truncate text-xs text-muted-foreground">{user.email}</p> : null}
           </div>
         </div>
 
         <DropdownMenuSeparator />
 
         {USER_MENU_ITEMS.map(({ href, icon: Icon, label }) => (
-          <DropdownMenuItem key={href} asChild>
+          <DropdownMenuItem key={`${href}-${label}`} asChild>
             <Link href={href} className="gap-3 py-2.5">
               <Icon className="size-4" />
               {label}
@@ -136,10 +145,7 @@ function UserMenu({ user, onLogout, isLight, setTheme }) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={onLogout}
-          className="cursor-pointer gap-3 py-2.5 text-red-500"
-        >
+        <DropdownMenuItem onClick={onLogout} className="cursor-pointer gap-3 py-2.5 text-red-500">
           <LogOut className="size-4" />
           Logout
         </DropdownMenuItem>
@@ -148,29 +154,23 @@ function UserMenu({ user, onLogout, isLight, setTheme }) {
   );
 }
 
-function AuthButtonsInner({ layout = "public" }) {
-  const { token, logout } = useAuth();
+/**
+ * @param {{ layout?: "public" | "private", compact?: boolean }} props
+ * compact — renders minimal icons only (for mobile private navbar)
+ */
+function AuthButtonsInner({ layout = "public", compact = false }) {
+  const { isAuthenticated, user, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const router = useRouter();
-  const user = null;
 
-  if (!token) {
+  /* ── Not logged in ── */
+  if (!isAuthenticated) {
     return (
-      <div className="flex items-center gap-4">
-        <Button
-          asChild
-          variant="ghost"
-          className="hover:bg-transparent! cursor-pointer border"
-          size="lg"
-        >
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+        <Button asChild variant="ghost" className="hover:bg-transparent! cursor-pointer border" size="lg">
           <Link href="/login">Login</Link>
         </Button>
-        <Button
-          asChild
-          variant="outline"
-          className="cursor-pointer border-primary! text-primary!"
-          size="lg"
-        >
+        <Button asChild variant="outline" className="cursor-pointer border-primary! text-primary!" size="lg">
           <Link href="/signup">Sign Up</Link>
         </Button>
         <Button asChild className="cursor-pointer" size="lg">
@@ -183,6 +183,7 @@ function AuthButtonsInner({ layout = "public" }) {
     );
   }
 
+  /* ── Logged in ── */
   const isLight = resolvedTheme === "light" || !resolvedTheme;
   const isPublic = layout === "public";
 
@@ -191,42 +192,42 @@ function AuthButtonsInner({ layout = "public" }) {
     router.push("/");
   };
 
+  /* Compact mode: notification bell + avatar only (mobile private) */
+  if (compact) {
+    return (
+      <div className="flex items-center gap-0.5">
+        <NotificationBell />
+        <UserMenu user={user} onLogout={handleLogout} isLight={isLight} setTheme={setTheme} />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-3">
       <NotificationBell />
       {isPublic ? (
         <>
           <Button asChild className="cursor-pointer" size="lg" variant="outline">
             <Link href="/dashboard">
               <LayoutDashboard className="size-4" />
-              Dashboard
+              <span className="hidden lg:inline">Dashboard</span>
             </Link>
           </Button>
           <Button asChild className="cursor-pointer" size="lg">
             <Link href="/book-session">
-              <Calendar />
-              Book a Session
+              <Calendar className="size-4" />
+              <span className="hidden lg:inline">Book a Session</span>
             </Link>
           </Button>
         </>
       ) : (
         <>
-          <Button
-            asChild
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer text-muted-foreground hover:text-foreground"
-          >
-            <Link href="/settings">
+          <Button asChild variant="ghost" size="icon" className="cursor-pointer text-muted-foreground hover:text-foreground">
+            <Link href="/settings" aria-label="Settings">
               <Settings className="size-5" />
             </Link>
           </Button>
-          <UserMenu
-            user={user}
-            onLogout={handleLogout}
-            isLight={isLight}
-            setTheme={setTheme}
-          />
+          <UserMenu user={user} onLogout={handleLogout} isLight={isLight} setTheme={setTheme} />
         </>
       )}
     </div>

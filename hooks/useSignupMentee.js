@@ -9,10 +9,7 @@ export const useSignupMentee = ({ onSuccess, onError } = {}) => {
       onSuccess?.(response.data, variables);
     },
     onError: (error) => {
-      const message = getErrorMessage(
-        error,
-        "Unable to create account. Please try again.",
-      );
+      const message = getErrorMessage(error, "Unable to create account. Please try again.");
       onError?.(message, error);
     },
   });

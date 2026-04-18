@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  CalendarDays,
-  CheckCircle2,
-  Clock,
-  DollarSign,
-  FileText,
-  Lock,
-  Star,
-  UserCheck,
-} from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock, DollarSign, FileText, Lock, Star, UserCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PLATFORM_FEE_PER_MIN, TAX_RATE } from "./booking-config";
@@ -30,15 +21,7 @@ const WHATS_NEXT = [
   "Meeting link will be shared 15 minutes before start time",
 ];
 
-export default function StepReviewSummary({
-  selectedService,
-  selectedDate,
-  selectedTime,
-  selectedMentor,
-  onBack,
-  onCheckout,
-  isPending,
-}) {
+export default function StepReviewSummary({ selectedService, selectedDate, selectedTime, selectedMentor, onBack, onCheckout, isPending }) {
   const sessionCost = selectedService.price;
   const platformFee = PLATFORM_FEE_PER_MIN * selectedService.duration;
   const subtotal = sessionCost + platformFee;
@@ -51,15 +34,16 @@ export default function StepReviewSummary({
     year: "numeric",
   });
 
-  const initials = selectedMentor.name.split(" ").map((n) => n[0]).join("");
+  const initials = selectedMentor.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
 
   return (
     <div>
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Review Your Booking</h1>
-        <p className="mt-2 text-muted-foreground">
-          Please review all details before checkout
-        </p>
+        <p className="mt-2 text-muted-foreground">Please review all details before checkout</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -82,9 +66,7 @@ export default function StepReviewSummary({
                 <p className="mt-3 text-sm text-muted-foreground">Service Type</p>
                 <p className="text-lg font-bold">{selectedService.title}</p>
               </div>
-              <span className="text-2xl font-bold text-primary">
-                ${selectedService.price}
-              </span>
+              <span className="text-2xl font-bold text-primary">${selectedService.price}</span>
             </div>
 
             <hr className="my-5 border-gray-100 dark:border-gray-800" />
@@ -185,9 +167,7 @@ export default function StepReviewSummary({
             <div className="flex justify-between">
               <div>
                 <p className="font-semibold">Session Cost</p>
-                <p className="text-xs text-muted-foreground">
-                  {selectedService.duration} minutes
-                </p>
+                <p className="text-xs text-muted-foreground">{selectedService.duration} minutes</p>
               </div>
               <span className="font-semibold">${sessionCost.toFixed(2)}</span>
             </div>
@@ -205,9 +185,7 @@ export default function StepReviewSummary({
             <div className="flex justify-between">
               <div>
                 <p className="font-semibold">Tax</p>
-                <p className="text-xs text-muted-foreground">
-                  {(TAX_RATE * 100).toFixed(0)}% sales tax
-                </p>
+                <p className="text-xs text-muted-foreground">{(TAX_RATE * 100).toFixed(0)}% sales tax</p>
               </div>
               <span className="font-semibold">${tax.toFixed(2)}</span>
             </div>
@@ -216,32 +194,18 @@ export default function StepReviewSummary({
 
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold">Total Amount</span>
-              <span className="text-2xl font-bold text-primary">
-                ${total.toFixed(2)}
-              </span>
+              <span className="text-2xl font-bold text-primary">${total.toFixed(2)}</span>
             </div>
           </div>
 
-          <Button
-            size="lg"
-            className="mt-6 w-full cursor-pointer"
-            onClick={() => onCheckout(total)}
-            disabled={isPending}
-          >
+          <Button size="lg" className="mt-6 w-full cursor-pointer" onClick={() => onCheckout(total)} disabled={isPending}>
             <Lock className="size-4" />
             {isPending ? "Processing…" : "Proceed to Checkout"}
           </Button>
 
-          <p className="mt-3 text-center text-xs text-muted-foreground">
-            Secure payment powered by Stripe
-          </p>
+          <p className="mt-3 text-center text-xs text-muted-foreground">Secure payment powered by Stripe</p>
 
-          <Button
-            variant="outline"
-            size="lg"
-            className="mt-3 w-full cursor-pointer"
-            onClick={onBack}
-          >
+          <Button variant="outline" size="lg" className="mt-3 w-full cursor-pointer" onClick={onBack}>
             Back to Selection
           </Button>
         </motion.div>

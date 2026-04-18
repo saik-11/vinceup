@@ -4,19 +4,9 @@ import { ChevronDown, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const CountryCodePicker = ({
-  countries = [],
-  isLoading = false,
-  value,
-  onChange,
-  id,
-}) => {
+const CountryCodePicker = ({ countries = [], isLoading = false, value, onChange, id }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(0);
@@ -63,15 +53,11 @@ const CountryCodePicker = ({
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
-        setHighlightIndex((previous) =>
-          previous < filtered.length - 1 ? previous + 1 : 0,
-        );
+        setHighlightIndex((previous) => (previous < filtered.length - 1 ? previous + 1 : 0));
         break;
       case "ArrowUp":
         event.preventDefault();
-        setHighlightIndex((previous) =>
-          previous > 0 ? previous - 1 : filtered.length - 1,
-        );
+        setHighlightIndex((previous) => (previous > 0 ? previous - 1 : filtered.length - 1));
         break;
       case "Enter":
         event.preventDefault();
@@ -96,9 +82,7 @@ const CountryCodePicker = ({
     }
   };
 
-  const activeDescendant = filtered[highlightIndex]?.code
-    ? `country-option-${filtered[highlightIndex].code}`
-    : undefined;
+  const activeDescendant = filtered[highlightIndex]?.code ? `country-option-${filtered[highlightIndex].code}` : undefined;
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
@@ -110,11 +94,7 @@ const CountryCodePicker = ({
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-controls="country-code-listbox"
-          aria-label={
-            selected
-              ? `Country code: ${selected.name} ${selected.dialCode}`
-              : "Select country code"
-          }
+          aria-label={selected ? `Country code: ${selected.name} ${selected.dialCode}` : "Select country code"}
           className="flex h-9 w-27.5 cursor-pointer items-center gap-1.5 rounded-md border bg-background px-2 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isLoading ? (
@@ -169,25 +149,14 @@ const CountryCodePicker = ({
           />
         </div>
 
-        <div
-          ref={listRef}
-          id="country-code-listbox"
-          role="listbox"
-          aria-label="Country codes"
-          className="max-h-50 overflow-y-auto p-1"
-        >
+        <div ref={listRef} id="country-code-listbox" role="listbox" aria-label="Country codes" className="max-h-50 overflow-y-auto p-1">
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 px-3 py-6">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                Loading countries...
-              </span>
+              <span className="text-sm text-muted-foreground">Loading countries...</span>
             </div>
           ) : filtered.length === 0 ? (
-            <p
-              className="px-3 py-6 text-center text-sm text-muted-foreground"
-              role="status"
-            >
+            <p className="px-3 py-6 text-center text-sm text-muted-foreground" role="status">
               No countries found for &ldquo;{search}&rdquo;
             </p>
           ) : (
@@ -223,12 +192,8 @@ const CountryCodePicker = ({
                     unoptimized
                     className="h-4 w-5 rounded-sm object-cover"
                   />
-                  <span className="flex-1 truncate text-left">
-                    {country.name}
-                  </span>
-                  <span className="tabular-nums text-muted-foreground">
-                    {country.dialCode}
-                  </span>
+                  <span className="flex-1 truncate text-left">{country.name}</span>
+                  <span className="tabular-nums text-muted-foreground">{country.dialCode}</span>
                 </button>
               );
             })
@@ -237,8 +202,7 @@ const CountryCodePicker = ({
 
         {!isLoading ? (
           <div className="sr-only" role="status" aria-live="polite">
-            {filtered.length} {filtered.length === 1 ? "country" : "countries"}{" "}
-            available
+            {filtered.length} {filtered.length === 1 ? "country" : "countries"} available
           </div>
         ) : null}
       </PopoverContent>

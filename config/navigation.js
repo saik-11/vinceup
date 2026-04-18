@@ -42,7 +42,7 @@ export const SIDEBAR_GROUPS = [
       { href: "/clarity-map", label: "Clarity Map", icon: MapIcon },
       { href: "/growth-meter", label: "Growth Meter", icon: TrendingUp },
     ],
-    class: 'text-[#9333EA]'
+    class: "text-[#9333EA]",
   },
 ];
 

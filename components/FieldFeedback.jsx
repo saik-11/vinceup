@@ -23,13 +23,11 @@ const FieldFeedback = ({ variant = "hint", message }) => {
       Icon: null,
     },
     "block-success": {
-      wrapper:
-        "flex items-start gap-3 rounded-xl bg-emerald-50 p-4 text-emerald-700",
+      wrapper: "flex items-start gap-3 rounded-xl bg-emerald-50 p-4 text-emerald-700",
       Icon: CircleCheckBig,
     },
     "block-error": {
-      wrapper:
-        "flex items-start gap-3 rounded-xl bg-destructive/10 p-4 text-destructive",
+      wrapper: "flex items-start gap-3 rounded-xl bg-destructive/10 p-4 text-destructive",
       Icon: CircleX,
     },
   };

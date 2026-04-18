@@ -22,12 +22,8 @@ export default function StatusPage({
           {badge}
         </span>
 
-        <h1 className="mt-5 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          {title}
-        </h1>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-          {description}
-        </p>
+        <h1 className="mt-5 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{title}</h1>
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">{description}</p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Button asChild className="cursor-pointer">

@@ -1,57 +1,46 @@
 import { NextResponse } from "next/server";
-import {
-  AUTH_COOKIE_NAME,
-  createAuthSession,
-  getAuthCookieOptions,
-} from "@/lib/auth-session";
+import { AUTH_COOKIE_NAME, createAuthSession, getAuthCookieOptions } from "@/lib/auth-session";
 import { getApiBaseUrl } from "@/lib/api-base-url";
+
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export async function POST(request) {
   let credentials;
-
   try {
     credentials = await request.json();
   } catch {
-    return NextResponse.json(
-      { message: "Invalid login payload." },
-      { status: 400 },
-    );
+    return NextResponse.json({ message: "Invalid payload." }, { status: 400 });
   }
 
-  const upstreamResponse = await fetch(`${getApiBaseUrl()}/auth/login`, {
+  const upstream = await fetch(`${getApiBaseUrl()}/auth/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
     cache: "no-store",
   });
 
-  const data = await upstreamResponse.json().catch(() => ({}));
+  const data = await upstream.json().catch(() => ({}));
 
-  if (!upstreamResponse.ok) {
-    return NextResponse.json(data, { status: upstreamResponse.status });
+  if (!upstream.ok) {
+    return NextResponse.json(data, { status: upstream.status });
   }
 
-  const token = data?.token || data?.access_token;
+  const token = data?.token ?? data?.access_token;
   if (!token) {
-    return NextResponse.json(
-      { message: "Authentication response did not include a token." },
-      { status: 502 },
-    );
+    return NextResponse.json({ message: "No token in auth response." }, { status: 502 });
   }
 
   const response = NextResponse.json({
-    ...data,
-    token: undefined,
-    access_token: undefined,
+    authenticated: true,
+    token,
+    user: data.user ?? null,
+    expires_in: data.expires_in ?? 3600,
   });
 
-  response.cookies.set(
-    AUTH_COOKIE_NAME,
-    createAuthSession(token),
-    getAuthCookieOptions(),
-  );
+  // app/api/auth/login/route.js  (add after setting AUTH_COOKIE_NAME)
+
+  response.cookies.set(AUTH_COOKIE_NAME, createAuthSession(token, data.user ?? null), getAuthCookieOptions());
 
   return response;
 }

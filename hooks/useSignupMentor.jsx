@@ -9,10 +9,7 @@ export const useSignupMentor = ({ onSuccess, onError } = {}) => {
       onSuccess?.(response.data, variables);
     },
     onError: (error) => {
-      const message = getErrorMessage(
-        error,
-        "Unable to submit application. Please try again.",
-      );
+      const message = getErrorMessage(error, "Unable to submit application. Please try again.");
       onError?.(message, error);
     },
   });

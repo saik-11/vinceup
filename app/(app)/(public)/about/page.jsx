@@ -2,18 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Target,
-  Users,
-  Zap,
-  Heart,
-  Sparkles,
-  Brain,
-  CheckCircle2,
-  Send,
-  Mail,
-  TrendingUp,
-} from "lucide-react";
+import { Target, Users, Zap, Heart, Sparkles, Brain, CheckCircle2, Send, Mail, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -60,16 +49,11 @@ const AboutPage = () => {
             className="mb-6 bg-white/80 dark:bg-white/5 backdrop-blur px-4 py-1.5 rounded-full border-purple-100 dark:border-purple-800 shadow-sm"
           >
             <Sparkles className="w-3.5 h-3.5 mr-1.5 text-purple-500 dark:text-purple-400" />
-            <span className="text-xs font-medium text-foreground">
-              Building the Future of Career Growth
-            </span>
+            <span className="text-xs font-medium text-foreground">Building the Future of Career Growth</span>
           </Badge>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-            About VinceUp
-          </h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">About VinceUp</h1>
           <p className="text-base sm:text-lg md:text-xl text-[#4A5565] dark:text-slate-400 max-w-2xl mx-auto leading-relaxed px-2">
-            {`We're`} building the future of career development by combining
-            human expertise with AI intelligence.
+            {`We're`} building the future of career development by combining human expertise with AI intelligence.
           </p>
         </div>
       </section>
@@ -85,9 +69,7 @@ const AboutPage = () => {
                 </div>
                 <div>
                   <h1 className="font-semibold text-xs sm:text-sm">VEGA AI</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">
-                    Our smart co-pilot
-                  </p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Our smart co-pilot</p>
                 </div>
               </CardContent>
             </Card>
@@ -116,20 +98,14 @@ const AboutPage = () => {
           </div>
 
           <div className="text-[#364153] dark:text-slate-300 order-1 md:order-2">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6">
-              Our Mission
-            </h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6">Our Mission</h2>
             <p className="leading-relaxed mb-4 text-sm sm:text-base">
-              VinceUp exists to democratize access to world-class career
-              mentorship. We believe that everyone deserves guidance from
-              experienced professionals, paired with intelligent tools that help
-              them grow faster and smarter.
+              VinceUp exists to democratize access to world-class career mentorship. We believe that everyone deserves guidance from
+              experienced professionals, paired with intelligent tools that help them grow faster and smarter.
             </p>
             <p className="leading-relaxed text-sm sm:text-base">
-              By combining expert human mentorship with our AI assistant VEGA,
-              we create a comprehensive career growth operating system that
-              tracks progress, provides insights, and helps professionals
-              achieve their goals with clarity and confidence.
+              By combining expert human mentorship with our AI assistant VEGA, we create a comprehensive career growth operating system that
+              tracks progress, provides insights, and helps professionals achieve their goals with clarity and confidence.
             </p>
           </div>
         </div>
@@ -139,25 +115,19 @@ const AboutPage = () => {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
         <Card className="border-0 bg-linear-to-br from-[#FAF5FF] to-[#EEF2FF] dark:from-purple-950/40 dark:to-indigo-950/40 rounded-[16px] shadow-none">
           <CardHeader>
-            <CardTitle className="text-2xl sm:text-3xl font-bold text-center">
-              Our Journey
-            </CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-center">Our Journey</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 sm:space-y-5 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl mx-auto pb-8 sm:pb-10 px-4 sm:px-6">
             <p>
-              VinceUp was born from a simple observation: traditional career
-              development is broken. Expensive career coaches are out of reach
-              for most, while free advice is often generic and unhelpful.
+              VinceUp was born from a simple observation: traditional career development is broken. Expensive career coaches are out of
+              reach for most, while free advice is often generic and unhelpful.
             </p>
             <p>
-              In 2024, our founders came together with a vision to bridge this
-              gap. We built a platform that makes expert mentorship accessible
-              and affordable, while leveraging AI to maximize the impact of
-              every interaction.
+              In 2024, our founders came together with a vision to bridge this gap. We built a platform that makes expert mentorship
+              accessible and affordable, while leveraging AI to maximize the impact of every interaction.
             </p>
             <p>
-              Today, {`we're`} proud to serve over 25,000 professionals
-              worldwide, with a network of 500+ expert mentors and our AI
+              Today, {`we're`} proud to serve over 25,000 professionals worldwide, with a network of 500+ expert mentors and our AI
               assistant VEGA working 24/7 to accelerate career growth.
             </p>
           </CardContent>
@@ -177,9 +147,7 @@ const AboutPage = () => {
                   <v.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-lg mb-2">{v.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {v.desc}
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -189,13 +157,8 @@ const AboutPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Meet Our Team
-            </h1>
-            <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-              Experienced leaders passionate about transforming career
-              development
-            </p>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Meet Our Team</h1>
+            <p className="text-lg text-gray-400 max-w-3xl mx-auto">Experienced leaders passionate about transforming career development</p>
           </div>
 
           {/* Team Members Grid */}
@@ -211,12 +174,9 @@ const AboutPage = () => {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-1">Vallabah</h3>
-                <p className="text-purple-400 font-medium mb-4">
-                  CEO & Co-Founder
-                </p>
+                <p className="text-purple-400 font-medium mb-4">CEO & Co-Founder</p>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Former VP of Engineering at Meta, passionate about
-                  democratizing access to quality mentorship
+                  Former VP of Engineering at Meta, passionate about democratizing access to quality mentorship
                 </p>
               </div>
             </div>
@@ -232,12 +192,9 @@ const AboutPage = () => {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-1">Sarah Kim</h3>
-                <p className="text-purple-400 font-medium mb-4">
-                  CTO & Co-Founder
-                </p>
+                <p className="text-purple-400 font-medium mb-4">CTO & Co-Founder</p>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  AI researcher and product leader, previously led ML teams at
-                  Google and OpenAI
+                  AI researcher and product leader, previously led ML teams at Google and OpenAI
                 </p>
               </div>
             </div>
@@ -253,12 +210,9 @@ const AboutPage = () => {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-1">Vasista</h3>
-                <p className="text-purple-400 font-medium mb-4">
-                  Director of Operations
-                </p>
+                <p className="text-purple-400 font-medium mb-4">Director of Operations</p>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Operations expert with 15+ years scaling marketplace platforms
-                  and building communities
+                  Operations expert with 15+ years scaling marketplace platforms and building communities
                 </p>
               </div>
             </div>
@@ -333,9 +287,7 @@ function GetInTouch() {
     <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24 pt-16">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-          Get in Touch
-        </h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Get in Touch</h1>
         <p className="text-lg text-muted-foreground max-w-xl mx-auto">
           Have questions or want to learn more? We&apos;d love to hear from you.
         </p>
@@ -350,42 +302,26 @@ function GetInTouch() {
                 <div className="size-16 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
                   <CheckCircle2 className="size-8 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  Message Sent!
-                </h3>
+                <h3 className="text-xl font-semibold text-foreground">Message Sent!</h3>
                 <p className="text-muted-foreground text-sm max-w-xs">
-                  Thanks for reaching out. {`We'll`} get back to you as soon as
-                  possible.
+                  Thanks for reaching out. {`We'll`} get back to you as soon as possible.
                 </p>
-                <Button
-                  variant="outline"
-                  className="mt-2 rounded-full"
-                  onClick={() => setSubmitted(false)}
-                >
+                <Button variant="outline" className="mt-2 rounded-full" onClick={() => setSubmitted(false)}>
                   Send another message
                 </Button>
               </div>
             ) : (
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-6"
-                noValidate
-              >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                 {/* Name */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="name"
-                    className="font-semibold text-foreground"
-                  >
+                  <Label htmlFor="name" className="font-semibold text-foreground">
                     Name
                   </Label>
                   <Input
                     id="name"
                     placeholder="Your full name"
                     className={`rounded-2xl bg-white dark:bg-[#0f0d2a] border dark:border-white/10 h-12 px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-purple-500 ${
-                      errors.name
-                        ? "border-red-400 focus-visible:ring-red-400"
-                        : "border-transparent"
+                      errors.name ? "border-red-400 focus-visible:ring-red-400" : "border-transparent"
                     }`}
                     {...register("name", {
                       required: "Name is required",
@@ -395,19 +331,12 @@ function GetInTouch() {
                       },
                     })}
                   />
-                  {errors.name && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.name.message}
-                    </p>
-                  )}
+                  {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
                 </div>
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="email"
-                    className="font-semibold text-foreground"
-                  >
+                  <Label htmlFor="email" className="font-semibold text-foreground">
                     Email
                   </Label>
                   <Input
@@ -415,9 +344,7 @@ function GetInTouch() {
                     type="email"
                     placeholder="your.email@example.com"
                     className={`rounded-2xl bg-white dark:bg-[#0f0d2a] border dark:border-white/10 h-12 px-4 text-sm placeholder:text-muted-foreground focus-visible:ring-purple-500 ${
-                      errors.email
-                        ? "border-red-400 focus-visible:ring-red-400"
-                        : "border-transparent"
+                      errors.email ? "border-red-400 focus-visible:ring-red-400" : "border-transparent"
                     }`}
                     {...register("email", {
                       required: "Email is required",
@@ -427,19 +354,12 @@ function GetInTouch() {
                       },
                     })}
                   />
-                  {errors.email && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.email.message}
-                    </p>
-                  )}
+                  {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
                 </div>
 
                 {/* Comments */}
                 <div className="space-y-2">
-                  <Label
-                    htmlFor="comments"
-                    className="font-semibold text-foreground"
-                  >
+                  <Label htmlFor="comments" className="font-semibold text-foreground">
                     Comments
                   </Label>
                   <Textarea
@@ -447,9 +367,7 @@ function GetInTouch() {
                     placeholder="How can we help you?"
                     rows={6}
                     className={`rounded-2xl bg-white dark:bg-[#0f0d2a] border dark:border-white/10 px-4 py-3 text-sm placeholder:text-muted-foreground resize-none focus-visible:ring-purple-500 ${
-                      errors.comments
-                        ? "border-red-400 focus-visible:ring-red-400"
-                        : "border-transparent"
+                      errors.comments ? "border-red-400 focus-visible:ring-red-400" : "border-transparent"
                     }`}
                     {...register("comments", {
                       required: "Please enter your message",
@@ -459,11 +377,7 @@ function GetInTouch() {
                       },
                     })}
                   />
-                  {errors.comments && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.comments.message}
-                    </p>
-                  )}
+                  {errors.comments && <p className="text-xs text-red-500 mt-1">{errors.comments.message}</p>}
                 </div>
 
                 {/* Submit */}
@@ -474,24 +388,9 @@ function GetInTouch() {
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
-                      <svg
-                        className="animate-spin size-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v8z"
-                        />
+                      <svg className="animate-spin size-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                       </svg>
                       Sending...
                     </span>
@@ -509,7 +408,7 @@ function GetInTouch() {
 
         {/* Contact Email Badge */}
         <div className="flex justify-center mt-10">
-          <a href={'mailto:contact@vinceup.com'} >
+          <a href={"mailto:contact@vinceup.com"}>
             <Badge
               variant="secondary"
               className="flex items-center p-5 rounded-2xl bg-muted text-muted-foreground text-sm font-normal gap-1 border-0"

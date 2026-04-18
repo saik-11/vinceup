@@ -11,10 +11,7 @@ export const useForgotPassword = ({ onSuccess, onError } = {}) => {
     },
 
     onError: (error) => {
-      const message = getErrorMessage(
-        error,
-        "Unable to send reset email. Please try again.",
-      );
+      const message = getErrorMessage(error, "Unable to send reset email. Please try again.");
 
       onError?.(message, error);
     },

@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -18,63 +19,40 @@ import {
   UserRoundSearch,
 } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 const statAccentStyles = {
   blue: {
     iconWrap:
       "bg-[linear-gradient(135deg,rgba(88,110,255,0.16),rgba(60,130,246,0.22))] text-[var(--dashboard-blue)] dark:bg-[linear-gradient(135deg,rgba(88,110,255,0.22),rgba(60,130,246,0.28))]",
-    hoverBorder:
-      "hover:border-[rgba(59,130,246,0.22)] dark:hover:border-[rgba(96,165,250,0.32)]",
-    hoverShadow:
-      "hover:shadow-[0_22px_54px_-32px_rgba(59,130,246,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(37,99,235,0.34)]",
+    hoverBorder: "hover:border-[rgba(59,130,246,0.22)] dark:hover:border-[rgba(96,165,250,0.32)]",
+    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(59,130,246,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(37,99,235,0.34)]",
   },
   green: {
     iconWrap:
       "bg-[linear-gradient(135deg,rgba(18,183,106,0.14),rgba(5,150,105,0.22))] text-[var(--dashboard-green)] dark:bg-[linear-gradient(135deg,rgba(18,183,106,0.22),rgba(5,150,105,0.3))]",
-    hoverBorder:
-      "hover:border-[rgba(18,183,106,0.22)] dark:hover:border-[rgba(52,211,153,0.32)]",
-    hoverShadow:
-      "hover:shadow-[0_22px_54px_-32px_rgba(18,183,106,0.3)] dark:hover:shadow-[0_24px_60px_-32px_rgba(5,150,105,0.34)]",
+    hoverBorder: "hover:border-[rgba(18,183,106,0.22)] dark:hover:border-[rgba(52,211,153,0.32)]",
+    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(18,183,106,0.3)] dark:hover:shadow-[0_24px_60px_-32px_rgba(5,150,105,0.34)]",
   },
   purple: {
     iconWrap:
       "bg-[linear-gradient(135deg,rgba(124,58,237,0.14),rgba(192,38,211,0.22))] text-[var(--dashboard-purple)] dark:bg-[linear-gradient(135deg,rgba(139,92,246,0.24),rgba(217,70,239,0.28))]",
-    hoverBorder:
-      "hover:border-[rgba(124,58,237,0.22)] dark:hover:border-[rgba(167,139,250,0.32)]",
-    hoverShadow:
-      "hover:shadow-[0_22px_54px_-32px_rgba(124,58,237,0.32)] dark:hover:shadow-[0_24px_60px_-32px_rgba(124,58,237,0.36)]",
+    hoverBorder: "hover:border-[rgba(124,58,237,0.22)] dark:hover:border-[rgba(167,139,250,0.32)]",
+    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(124,58,237,0.32)] dark:hover:shadow-[0_24px_60px_-32px_rgba(124,58,237,0.36)]",
   },
   orange: {
     iconWrap:
       "bg-[linear-gradient(135deg,rgba(249,115,22,0.16),rgba(234,88,12,0.22))] text-[var(--dashboard-orange)] dark:bg-[linear-gradient(135deg,rgba(251,146,60,0.24),rgba(249,115,22,0.28))]",
-    hoverBorder:
-      "hover:border-[rgba(249,115,22,0.24)] dark:hover:border-[rgba(251,146,60,0.34)]",
-    hoverShadow:
-      "hover:shadow-[0_22px_54px_-32px_rgba(249,115,22,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(234,88,12,0.34)]",
+    hoverBorder: "hover:border-[rgba(249,115,22,0.24)] dark:hover:border-[rgba(251,146,60,0.34)]",
+    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(249,115,22,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(234,88,12,0.34)]",
   },
 };
 
@@ -96,8 +74,7 @@ const insightIcons = [Target, TrendingUp, Sparkles];
 
 const priorityTone = {
   high: "border-rose-200/80 bg-rose-50 text-rose-700 dark:border-rose-400/20 dark:bg-rose-500/12 dark:text-rose-200",
-  medium:
-    "border-amber-200/80 bg-amber-50 text-amber-700 dark:border-amber-400/20 dark:bg-amber-500/12 dark:text-amber-200",
+  medium: "border-amber-200/80 bg-amber-50 text-amber-700 dark:border-amber-400/20 dark:bg-amber-500/12 dark:text-amber-200",
   low: "border-emerald-200/80 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/12 dark:text-emerald-200",
 };
 
@@ -147,8 +124,7 @@ const sectionActionClass =
   "h-9 shrink-0 rounded-full px-3 text-sm font-medium text-[var(--dashboard-purple)] hover:bg-[var(--dashboard-panel-muted)] hover:text-[var(--dashboard-purple)] dark:hover:bg-white/6";
 
 const metaTextClass = "text-sm leading-6 text-[var(--dashboard-subtle)]";
-const sectionTitleClass =
-  "text-xl font-semibold tracking-[-0.03em] text-[var(--dashboard-text)]";
+const sectionTitleClass = "text-xl font-semibold tracking-[-0.03em] text-[var(--dashboard-text)]";
 
 function formatMetric(stat) {
   if (stat?.value == null) {
@@ -184,9 +160,7 @@ function DashboardShell({ children }) {
         "career-dashboard min-h-full bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.11),transparent_26%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)] px-4 py-4 sm:px-6 sm:py-6 xl:px-8 xl:py-8 dark:bg-[radial-gradient(circle_at_top,rgba(124,58,237,0.16),transparent_24%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)]",
       )}
     >
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6">
-        {children}
-      </div>
+      <div className="mx-auto flex w-full max-w-350 flex-col gap-6">{children}</div>
     </section>
   );
 }
@@ -200,10 +174,7 @@ function DashboardHeader({ user, activeScenario }) {
             size="lg"
             className="mt-1 border border-white/70 bg-[linear-gradient(135deg,#ede9fe,#dbeafe)] shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(76,29,149,0.9),rgba(30,41,59,0.95))]"
           >
-            <AvatarImage
-              src={user.avatarUrl ?? undefined}
-              alt={user.name ?? "Vinny"}
-            />
+            <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? "Vinny"} />
             <AvatarFallback className="bg-transparent font-semibold text-slate-700 dark:text-slate-100">
               {getInitials(user.name)}
             </AvatarFallback>
@@ -211,39 +182,39 @@ function DashboardHeader({ user, activeScenario }) {
 
           <div className="min-w-0">
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <Badge className="rounded-full border border-[rgba(124,58,237,0.12)] bg-[rgba(124,58,237,0.1)] px-3 text-[11px] font-semibold tracking-[0.18em] text-[var(--dashboard-purple)] uppercase dark:border-[rgba(167,139,250,0.18)] dark:bg-[rgba(124,58,237,0.18)] dark:text-violet-200">
+              <Badge className="rounded-full border border-[rgba(124,58,237,0.12)] bg-[rgba(124,58,237,0.1)] px-3 text-[11px] font-semibold tracking-[0.18em] text-(--dashboard-purple) uppercase dark:border-[rgba(167,139,250,0.18)] dark:bg-[rgba(124,58,237,0.18)] dark:text-violet-200">
                 {user.headline ?? "Career Growth Dashboard"}
               </Badge>
-              <Badge
+              {/* <Badge
                 variant="outline"
-                className="rounded-full border-[var(--dashboard-border)] bg-[var(--dashboard-panel-strong)] px-3 text-[var(--dashboard-subtle)]"
+                className="rounded-full border-(--dashboard-border) bg-(--dashboard-panel-strong) px-3 text-(--dashboard-subtle)"
               >
                 {user.role === "admin" ? "Admin role" : "Viewer role"}
               </Badge>
               <Badge
                 variant="outline"
-                className="rounded-full border-[var(--dashboard-border)] bg-[var(--dashboard-panel-strong)] px-3 text-[var(--dashboard-subtle)]"
+                className="rounded-full border-(--dashboard-border) bg-(--dashboard-panel-strong) px-3 text-(--dashboard-subtle)"
               >
                 Scenario: {activeScenario}
-              </Badge>
+              </Badge> */}
             </div>
 
-            <h1 className="max-w-3xl text-balance text-[2rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--dashboard-text)] sm:text-[2.4rem] lg:text-[2.75rem]">
+            <h1 className="max-w-3xl text-balance text-[2rem] font-semibold leading-tight tracking-[-0.04em] text-(--dashboard-text) sm:text-[2.4rem] lg:text-[2.75rem]">
               Welcome back, {user.name ?? "Vinny"}!
             </h1>
-            <p className="mt-2 max-w-2xl text-base leading-7 text-[var(--dashboard-muted)]">
+            <p className="mt-2 max-w-2xl text-base leading-7 text-(--dashboard-muted)">
               {user.subtitle ?? "Here's your career growth overview"}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="relative w-full md:w-[22rem]">
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[var(--dashboard-subtle)]" />
+        {/* <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="relative w-full md:w-88">
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-(--dashboard-subtle)" />
             <Input
               type="search"
               placeholder="Search sessions, tasks, or mentors"
-              className="h-11 rounded-[16px] border-[var(--dashboard-border)] bg-[var(--dashboard-panel-strong)] px-4 pl-11 text-[var(--dashboard-text)] shadow-none placeholder:text-[var(--dashboard-subtle)] hover:border-[var(--dashboard-border-strong)] focus-visible:border-[var(--dashboard-purple)] focus-visible:ring-[3px] focus-visible:ring-[rgba(124,58,237,0.14)] dark:focus-visible:ring-[rgba(167,139,250,0.18)]"
+              className="h-11 rounded-[16px] border-(--dashboard-border) bg-(--dashboard-panel-strong) px-4 pl-11 text-(--dashboard-text) shadow-none placeholder:text-(--dashboard-subtle) hover:border-(--dashboard-border-strong) focus-visible:border-(--dashboard-purple) focus-visible:ring-[3px] focus-visible:ring-[rgba(124,58,237,0.14)] dark:focus-visible:ring-[rgba(167,139,250,0.18)]"
               aria-label="Search dashboard content"
             />
           </div>
@@ -251,12 +222,12 @@ function DashboardHeader({ user, activeScenario }) {
           <Button
             variant="outline"
             size="icon"
-            className="size-11 shrink-0 rounded-[16px] border-[var(--dashboard-border)] bg-[var(--dashboard-panel-strong)] text-[var(--dashboard-muted)] shadow-none hover:bg-[var(--dashboard-panel-muted)] hover:text-[var(--dashboard-text)]"
+            className="size-11 shrink-0 rounded-[16px] border-(--dashboard-border) bg-(--dashboard-panel-strong) text-(--dashboard-muted) shadow-none hover:bg-(--dashboard-panel-muted) hover:text-(--dashboard-text)"
             aria-label="View notifications"
           >
             <Bell className="size-4" />
           </Button>
-        </div>
+        </div> */}
       </div>
     </header>
   );
@@ -271,15 +242,7 @@ function StatsGrid({ stats }) {
 
         return (
           <li key={stat.id} className="min-w-0">
-            <Card
-              className={cn(
-                panelClass,
-                interactivePanelClass,
-                accentStyles.hoverBorder,
-                accentStyles.hoverShadow,
-                "h-full px-0 py-0",
-              )}
-            >
+            <Card className={cn(panelClass, interactivePanelClass, accentStyles.hoverBorder, accentStyles.hoverShadow, "h-full px-0 py-0")}>
               <CardContent className="flex h-full flex-col gap-4 p-4 sm:p-6">
                 <div
                   className={cn(
@@ -291,17 +254,11 @@ function StatsGrid({ stats }) {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-[1.95rem] font-semibold leading-none tracking-[-0.05em] text-[var(--dashboard-text)]">
+                  <div className="text-[1.95rem] font-semibold leading-none tracking-[-0.05em] text-(--dashboard-text)">
                     {formatMetric(stat)}
                   </div>
-                  <div className="text-sm font-medium leading-6 text-[var(--dashboard-muted)]">
-                    {stat.label}
-                  </div>
-                  {stat.helper ? (
-                    <p className="text-sm leading-6 text-[var(--dashboard-subtle)]">
-                      {stat.helper}
-                    </p>
-                  ) : null}
+                  <div className="text-sm font-medium leading-6 text-(--dashboard-muted)">{stat.label}</div>
+                  {stat.helper ? <p className="text-sm leading-6 text-(--dashboard-subtle)">{stat.helper}</p> : null}
                 </div>
               </CardContent>
             </Card>
@@ -334,18 +291,13 @@ function SectionHeading({ title, description, actionLabel, actionHref }) {
 
 function EmptyBlock({ icon: Icon, title, description, ctaLabel, ctaHref }) {
   return (
-    <Empty className="rounded-[20px] border border-dashed border-[var(--dashboard-border-strong)] bg-[var(--dashboard-panel-muted)] px-6 py-10 text-[var(--dashboard-text)]">
+    <Empty className="rounded-[20px] border border-dashed border-(--dashboard-border-strong) bg-(--dashboard-panel-muted) px-6 py-10 text-(--dashboard-text)">
       <EmptyHeader>
-        <EmptyMedia
-          variant="icon"
-          className="bg-[var(--dashboard-panel-strong)] text-[var(--dashboard-purple)]"
-        >
+        <EmptyMedia variant="icon" className="bg-(--dashboard-panel-strong) text-(--dashboard-purple)">
           <Icon className="size-5" />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription className="text-[var(--dashboard-subtle)]">
-          {description}
-        </EmptyDescription>
+        <EmptyDescription className="text-(--dashboard-subtle)">{description}</EmptyDescription>
       </EmptyHeader>
 
       {ctaLabel && ctaHref ? (
@@ -385,18 +337,15 @@ function SessionsCard({ sessions }) {
 
                     <div className="min-w-0 space-y-2">
                       <h3
-                        className="text-lg font-semibold leading-7 tracking-[-0.03em] text-[var(--dashboard-text)]"
+                        className="text-lg font-semibold leading-7 tracking-[-0.03em] text-(--dashboard-text)"
                         title={session.title ?? "Session details pending"}
                       >
                         {session.title ?? "Session details pending"}
                       </h3>
-                      <p
-                        className="text-sm leading-6 text-[var(--dashboard-muted)]"
-                        title={session.mentorName ?? "Mentor to be assigned"}
-                      >
+                      <p className="text-sm leading-6 text-(--dashboard-muted)" title={session.mentorName ?? "Mentor to be assigned"}>
                         with {session.mentorName ?? "Mentor to be assigned"}
                       </p>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm leading-6 text-[var(--dashboard-subtle)]">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm leading-6 text-(--dashboard-subtle)">
                         <span className="inline-flex items-center gap-1.5">
                           <CalendarDays className="size-4" />
                           {session.date ?? "Date TBD"}
@@ -464,22 +413,16 @@ function TasksCard({ tasks }) {
                 <div
                   className={cn(
                     subCardClass,
-                    "flex items-start justify-between gap-3 p-4 hover:border-[var(--dashboard-border-strong)] hover:-translate-y-0.5 sm:p-5",
+                    "flex items-start justify-between gap-3 p-4 hover:border-(--dashboard-border-strong) hover:-translate-y-0.5 sm:p-5",
                   )}
                 >
                   <div className="min-w-0 flex-1">
-                    <h3
-                      className="text-base font-medium leading-7 text-[var(--dashboard-text)]"
-                      title={task.title ?? "Task details pending"}
-                    >
+                    <h3 className="text-base font-medium leading-7 text-(--dashboard-text)" title={task.title ?? "Task details pending"}>
                       {task.title ?? "Task details pending"}
                     </h3>
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm leading-6 text-[var(--dashboard-subtle)]">
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm leading-6 text-(--dashboard-subtle)">
                       <Badge
-                        className={cn(
-                          "rounded-full border px-2.5 py-1 text-xs font-semibold ring-0",
-                          priorityTone[task.priority ?? "low"],
-                        )}
+                        className={cn("rounded-full border px-2.5 py-1 text-xs font-semibold ring-0", priorityTone[task.priority ?? "low"])}
                       >
                         {task.priority ?? "low"}
                       </Badge>
@@ -490,9 +433,7 @@ function TasksCard({ tasks }) {
                   <CheckCheck
                     className={cn(
                       "mt-0.5 size-5 shrink-0",
-                      task.status === "done"
-                        ? "text-emerald-500 dark:text-emerald-300"
-                        : "text-slate-300 dark:text-slate-600",
+                      task.status === "done" ? "text-emerald-500 dark:text-emerald-300" : "text-slate-300 dark:text-slate-600",
                     )}
                   />
                 </div>
@@ -526,19 +467,14 @@ function VegaInsightsCard({ insights }) {
             <Sparkles className="size-5" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-xl font-semibold tracking-[-0.03em] text-white">
-              VEGA Insights
-            </h2>
-            <p className="text-sm leading-6 text-white/78">
-              AI guidance tuned to your coaching momentum
-            </p>
+            <h2 className="text-xl font-semibold tracking-[-0.03em] text-white">VEGA Insights</h2>
+            <p className="text-sm leading-6 text-white/78">AI guidance tuned to your coaching momentum</p>
           </div>
         </div>
 
         <ul className="space-y-3" aria-label="VEGA insights">
           {insights.map((insight, index) => {
-            const InsightIcon =
-              insightIcons[index] ?? insightIcons[insightIcons.length - 1];
+            const InsightIcon = insightIcons[index] ?? insightIcons[insightIcons.length - 1];
 
             return (
               <li key={insight.id}>
@@ -576,30 +512,21 @@ function RecentInsightsCard({ items }) {
   return (
     <Card className={cn(panelClass, "px-0 py-0")}>
       <CardContent className="space-y-6 p-4 sm:p-6">
-        <SectionHeading
-          title="Recent Insights"
-          actionLabel="View all"
-          actionHref="/clarity-capsule"
-        />
+        <SectionHeading title="Recent Insights" actionLabel="View all" actionHref="/clarity-capsule" />
 
         <ul className="space-y-3" aria-label="Recent insights">
           {items.map((item) => (
             <li key={item.id}>
               <div className={cn(subCardClass, "p-4 sm:p-5")}>
-                <div className="mb-2 flex items-center gap-2 text-sm font-medium leading-6 text-[var(--dashboard-subtle)]">
-                  <Sparkles className="size-4 text-[var(--dashboard-purple)]" />
+                <div className="mb-2 flex items-center gap-2 text-sm font-medium leading-6 text-(--dashboard-subtle)">
+                  <Sparkles className="size-4 text-(--dashboard-purple)" />
                   {item.date ?? "Date pending"}
                 </div>
-                <div
-                  className="text-base leading-7 text-[var(--dashboard-text)]"
-                  title={item.summary ?? "Insight summary pending sync"}
-                >
+                <div className="text-base leading-7 text-(--dashboard-text)" title={item.summary ?? "Insight summary pending sync"}>
                   {item.summary ?? "Insight summary pending sync"}
                 </div>
                 {item.meta ? (
-                  <div className="mt-3 text-sm leading-6 text-[var(--dashboard-purple)] dark:text-violet-300">
-                    {item.meta}
-                  </div>
+                  <div className="mt-3 text-sm leading-6 text-(--dashboard-purple) dark:text-violet-300">{item.meta}</div>
                 ) : null}
               </div>
             </li>
@@ -632,16 +559,16 @@ function QuickActionsCard({ actions, userRole }) {
                 <Button
                   asChild
                   variant="outline"
-                  className="h-12 w-full justify-between rounded-[16px] border-[var(--dashboard-border)] bg-[var(--dashboard-panel-strong)] px-4 text-[var(--dashboard-muted)] shadow-none transition-colors duration-200 hover:border-[var(--dashboard-border-strong)] hover:bg-[var(--dashboard-panel-muted)] hover:text-[var(--dashboard-text)]"
+                  className="h-12 w-full justify-between rounded-[16px] border-(--dashboard-border) bg-(--dashboard-panel-strong) px-4 text-(--dashboard-muted) shadow-none transition-colors duration-200 hover:border-(--dashboard-border-strong) hover:bg-(--dashboard-panel-muted) hover:text-(--dashboard-text)"
                 >
                   <Link href={action.href}>
                     <span className="inline-flex min-w-0 items-center gap-3">
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-[14px] bg-[var(--dashboard-panel-muted)] text-[var(--dashboard-subtle)]">
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-[14px] bg-(--dashboard-panel-muted) text-(--dashboard-subtle)">
                         <Icon className="size-4" />
                       </span>
                       <span className="truncate">{action.label}</span>
                     </span>
-                    <ArrowRight className="size-4 shrink-0 text-[var(--dashboard-subtle)]" />
+                    <ArrowRight className="size-4 shrink-0 text-(--dashboard-subtle)" />
                   </Link>
                 </Button>
               </li>
@@ -654,24 +581,36 @@ function QuickActionsCard({ actions, userRole }) {
 }
 
 export function CareerGrowthDashboard({ data, activeScenario }) {
+  const { user: authUser } = useAuth();
+  const mergedData = {
+    ...data,
+    user: {
+      ...data.user,
+      name: authUser?.first_name
+        ? authUser.first_name
+            .trim()
+            .split(" ")
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(" ")
+        : data.user.name,
+      avatarUrl: authUser?.avatar_url ?? data.user.avatarUrl,
+    },
+  };
   return (
     <DashboardShell>
-      <DashboardHeader user={data.user} activeScenario={activeScenario} />
-      <StatsGrid stats={data.stats} />
+      <DashboardHeader user={mergedData?.user} activeScenario={activeScenario} />
+      <StatsGrid stats={mergedData?.stats} />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.95fr)]">
         <div className="space-y-6">
-          <SessionsCard sessions={data.sessions} />
-          <TasksCard tasks={data.tasks} />
+          <SessionsCard sessions={mergedData?.sessions} />
+          <TasksCard tasks={mergedData?.tasks} />
         </div>
 
         <aside className="space-y-6" aria-label="Insights and actions">
-          <VegaInsightsCard insights={data.insights} />
-          <RecentInsightsCard items={data.recentInsights} />
-          <QuickActionsCard
-            actions={data.quickActions}
-            userRole={data.user.role}
-          />
+          <VegaInsightsCard insights={mergedData?.insights} />
+          <RecentInsightsCard items={mergedData?.recentInsights} />
+          <QuickActionsCard actions={mergedData?.quickActions} userRole={mergedData?.user.role} />
         </aside>
       </div>
     </DashboardShell>
@@ -685,16 +624,16 @@ export function CareerGrowthDashboardSkeleton() {
         <CardContent className="space-y-6 p-4 sm:p-6 lg:p-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-4">
-              <Skeleton className="size-14 rounded-full bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="size-14 rounded-full bg-(--dashboard-panel-muted)" />
               <div className="space-y-3">
-                <Skeleton className="h-5 w-32 rounded-full bg-[var(--dashboard-panel-muted)]" />
-                <Skeleton className="h-10 w-72 max-w-[75vw] bg-[var(--dashboard-panel-muted)]" />
-                <Skeleton className="h-4 w-56 max-w-[65vw] bg-[var(--dashboard-panel-muted)]" />
+                <Skeleton className="h-5 w-32 rounded-full bg-(--dashboard-panel-muted)" />
+                <Skeleton className="h-10 w-72 max-w-[75vw] bg-(--dashboard-panel-muted)" />
+                <Skeleton className="h-4 w-56 max-w-[65vw] bg-(--dashboard-panel-muted)" />
               </div>
             </div>
             <div className="flex flex-col gap-3 md:flex-row">
-              <Skeleton className="h-11 w-full rounded-[16px] bg-[var(--dashboard-panel-muted)] md:w-72" />
-              <Skeleton className="size-11 rounded-[16px] bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="h-11 w-full rounded-[16px] bg-(--dashboard-panel-muted) md:w-72" />
+              <Skeleton className="size-11 rounded-[16px] bg-(--dashboard-panel-muted)" />
             </div>
           </div>
         </CardContent>
@@ -702,16 +641,13 @@ export function CareerGrowthDashboardSkeleton() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <Card
-            key={`stat-skeleton-${index}`}
-            className={cn(panelClass, "px-0 py-0")}
-          >
+          <Card key={`stat-skeleton-${index}`} className={cn(panelClass, "px-0 py-0")}>
             <CardContent className="space-y-4 p-4 sm:p-6">
-              <Skeleton className="size-12 rounded-[16px] bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="size-12 rounded-[16px] bg-(--dashboard-panel-muted)" />
               <div className="space-y-3">
-                <Skeleton className="h-9 w-28 bg-[var(--dashboard-panel-muted)]" />
-                <Skeleton className="h-4 w-36 bg-[var(--dashboard-panel-muted)]" />
-                <Skeleton className="h-4 w-24 bg-[var(--dashboard-panel-muted)]" />
+                <Skeleton className="h-9 w-28 bg-(--dashboard-panel-muted)" />
+                <Skeleton className="h-4 w-36 bg-(--dashboard-panel-muted)" />
+                <Skeleton className="h-4 w-24 bg-(--dashboard-panel-muted)" />
               </div>
             </CardContent>
           </Card>
@@ -722,41 +658,35 @@ export function CareerGrowthDashboardSkeleton() {
         <div className="space-y-6">
           <Card className={cn(panelClass, "px-0 py-0")}>
             <CardContent className="space-y-4 p-4 sm:p-6">
-              <Skeleton className="h-8 w-48 bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="h-8 w-48 bg-(--dashboard-panel-muted)" />
               {Array.from({ length: 2 }).map((_, index) => (
-                <div
-                  key={`session-skeleton-${index}`}
-                  className={cn(subCardClass, "p-4 sm:p-5")}
-                >
+                <div key={`session-skeleton-${index}`} className={cn(subCardClass, "p-4 sm:p-5")}>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex gap-4">
-                      <Skeleton className="size-12 rounded-[16px] bg-[var(--dashboard-panel-muted)]" />
+                      <Skeleton className="size-12 rounded-[16px] bg-(--dashboard-panel-muted)" />
                       <div className="space-y-3">
-                        <Skeleton className="h-6 w-64 max-w-[55vw] bg-[var(--dashboard-panel-muted)]" />
-                        <Skeleton className="h-4 w-32 bg-[var(--dashboard-panel-muted)]" />
-                        <Skeleton className="h-4 w-48 bg-[var(--dashboard-panel-muted)]" />
+                        <Skeleton className="h-6 w-64 max-w-[55vw] bg-(--dashboard-panel-muted)" />
+                        <Skeleton className="h-4 w-32 bg-(--dashboard-panel-muted)" />
+                        <Skeleton className="h-4 w-48 bg-(--dashboard-panel-muted)" />
                       </div>
                     </div>
-                    <Skeleton className="h-11 w-full rounded-full bg-[var(--dashboard-panel-muted)] sm:w-40" />
+                    <Skeleton className="h-11 w-full rounded-full bg-(--dashboard-panel-muted) sm:w-40" />
                   </div>
                 </div>
               ))}
-              <Skeleton className="h-11 w-full rounded-[16px] bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="h-11 w-full rounded-[16px] bg-(--dashboard-panel-muted)" />
             </CardContent>
           </Card>
 
           <Card className={cn(panelClass, "px-0 py-0")}>
             <CardContent className="space-y-4 p-4 sm:p-6">
-              <Skeleton className="h-8 w-40 bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="h-8 w-40 bg-(--dashboard-panel-muted)" />
               {Array.from({ length: 3 }).map((_, index) => (
-                <div
-                  key={`task-skeleton-${index}`}
-                  className={cn(subCardClass, "p-4 sm:p-5")}
-                >
-                  <Skeleton className="h-5 w-full max-w-[70%] bg-[var(--dashboard-panel-muted)]" />
+                <div key={`task-skeleton-${index}`} className={cn(subCardClass, "p-4 sm:p-5")}>
+                  <Skeleton className="h-5 w-full max-w-[70%] bg-(--dashboard-panel-muted)" />
                   <div className="mt-3 flex gap-2">
-                    <Skeleton className="h-5 w-16 rounded-full bg-[var(--dashboard-panel-muted)]" />
-                    <Skeleton className="h-5 w-24 bg-[var(--dashboard-panel-muted)]" />
+                    <Skeleton className="h-5 w-16 rounded-full bg-(--dashboard-panel-muted)" />
+                    <Skeleton className="h-5 w-24 bg-(--dashboard-panel-muted)" />
                   </div>
                 </div>
               ))}
@@ -769,26 +699,23 @@ export function CareerGrowthDashboardSkeleton() {
             <CardContent className="space-y-4 p-4 sm:p-6">
               <Skeleton className="h-8 w-40 rounded-full bg-white/20" />
               {Array.from({ length: 3 }).map((_, index) => (
-                <Skeleton
-                  key={`insight-skeleton-${index}`}
-                  className="h-30 rounded-[20px] bg-white/18"
-                />
+                <Skeleton key={`insight-skeleton-${index}`} className="h-30 rounded-[20px] bg-white/18" />
               ))}
             </CardContent>
           </Card>
           <Card className={cn(panelClass, "px-0 py-0")}>
             <CardContent className="space-y-4 p-4 sm:p-6">
-              <Skeleton className="h-8 w-40 bg-[var(--dashboard-panel-muted)]" />
-              <Skeleton className="h-28 rounded-[20px] bg-[var(--dashboard-panel-muted)]" />
-              <Skeleton className="h-28 rounded-[20px] bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="h-8 w-40 bg-(--dashboard-panel-muted)" />
+              <Skeleton className="h-28 rounded-[20px] bg-(--dashboard-panel-muted)" />
+              <Skeleton className="h-28 rounded-[20px] bg-(--dashboard-panel-muted)" />
             </CardContent>
           </Card>
           <Card className={cn(panelClass, "px-0 py-0")}>
             <CardContent className="space-y-3 p-4 sm:p-6">
-              <Skeleton className="h-8 w-36 bg-[var(--dashboard-panel-muted)]" />
-              <Skeleton className="h-12 rounded-[16px] bg-[var(--dashboard-panel-muted)]" />
-              <Skeleton className="h-12 rounded-[16px] bg-[var(--dashboard-panel-muted)]" />
-              <Skeleton className="h-12 rounded-[16px] bg-[var(--dashboard-panel-muted)]" />
+              <Skeleton className="h-8 w-36 bg-(--dashboard-panel-muted)" />
+              <Skeleton className="h-12 rounded-[16px] bg-(--dashboard-panel-muted)" />
+              <Skeleton className="h-12 rounded-[16px] bg-(--dashboard-panel-muted)" />
+              <Skeleton className="h-12 rounded-[16px] bg-(--dashboard-panel-muted)" />
             </CardContent>
           </Card>
         </div>
@@ -798,6 +725,7 @@ export function CareerGrowthDashboardSkeleton() {
 }
 
 export function DashboardErrorState({ error, retryLabel, onRetry }) {
+  console.log(user);
   return (
     <DashboardShell>
       <Card className={cn(panelClass, "mx-auto max-w-2xl px-0 py-0")}>
@@ -805,20 +733,18 @@ export function DashboardErrorState({ error, retryLabel, onRetry }) {
           <div className="flex size-14 items-center justify-center rounded-[20px] bg-rose-50 text-rose-500 dark:bg-rose-500/12 dark:text-rose-200">
             <CircleAlert className="size-6" />
           </div>
-          <CardTitle className="text-2xl font-semibold tracking-[-0.03em] text-[var(--dashboard-text)]">
+          <CardTitle className="text-2xl font-semibold tracking-[-0.03em] text-(--dashboard-text)">
             Dashboard data could not be loaded
           </CardTitle>
-          <CardDescription className="max-w-xl text-sm leading-6 text-[var(--dashboard-muted)]">
-            {error?.message ??
-              "The dashboard hit an unexpected issue while rendering your career snapshot."}
+          <CardDescription className="max-w-xl text-sm leading-6 text-(--dashboard-muted)">
+            {error?.message ?? "The dashboard hit an unexpected issue while rendering your career snapshot."}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-5 px-6 pb-6 sm:px-8 sm:pb-8">
-          <div className="rounded-[20px] border border-[var(--dashboard-border)] bg-[var(--dashboard-panel-muted)] p-4 text-sm leading-6 text-[var(--dashboard-muted)]">
-            Try refreshing the route or switching back to the default scenario.
-            Route-level errors are handled by Next 16 in this segment through
-            `error.js`, so this state is recoverable without leaving the page.
+          <div className="rounded-[20px] border border-(--dashboard-border) bg-(--dashboard-panel-muted) p-4 text-sm leading-6 text-(--dashboard-muted)">
+            Try refreshing the route or switching back to the default scenario. Route-level errors are handled by Next 16 in this segment
+            through `error.js`, so this state is recoverable without leaving the page.
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -831,7 +757,7 @@ export function DashboardErrorState({ error, retryLabel, onRetry }) {
             <Button
               asChild
               variant="outline"
-              className="h-11 rounded-full border-[var(--dashboard-border)] bg-[var(--dashboard-panel-strong)] px-5 text-[var(--dashboard-text)] hover:bg-[var(--dashboard-panel-muted)]"
+              className="h-11 rounded-full border-(--dashboard-border) bg-(--dashboard-panel-strong) px-5 text-(--dashboard-text) hover:bg-(--dashboard-panel-muted)"
             >
               <Link href="/dashboard">Open default dashboard</Link>
             </Button>

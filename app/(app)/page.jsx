@@ -221,17 +221,10 @@ function FaqItem({ q, a }) {
       >
         {q}
         <ChevronDown
-          className={cn(
-            "ml-4 h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200",
-            open && "rotate-180",
-          )}
+          className={cn("ml-4 h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200", open && "rotate-180")}
         />
       </button>
-      {open && (
-        <p className="pb-4 text-sm text-muted-foreground leading-relaxed">
-          {a}
-        </p>
-      )}
+      {open && <p className="pb-4 text-sm text-muted-foreground leading-relaxed">{a}</p>}
     </div>
   );
 }
@@ -258,11 +251,7 @@ export default function HomePage() {
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             {/* Left text */}
             <div>
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45 }}
-              >
+              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
                 <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-500/10 px-4 py-1.5 text-sm font-medium text-purple-300 backdrop-blur-sm">
                   <Zap className="h-3.5 w-3.5" />
                   AI-powered career growth platform
@@ -287,8 +276,7 @@ export default function HomePage() {
                 transition={{ duration: 0.5, delay: 0.15 }}
                 className="mt-5 max-w-lg text-base text-slate-300 leading-relaxed"
               >
-                Accelerate your career with AI-driven insights, 1:1 mentorship
-                from verified industry experts, and structured roadmaps built
+                Accelerate your career with AI-driven insights, 1:1 mentorship from verified industry experts, and structured roadmaps built
                 for where you actually want to go.
               </motion.p>
 
@@ -308,12 +296,7 @@ export default function HomePage() {
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  className="cursor-pointer text-white hover:bg-white/10 border border-white/20"
-                  asChild
-                >
+                <Button size="lg" variant="ghost" className="cursor-pointer text-white hover:bg-white/10 border border-white/20" asChild>
                   <Link href="/book-session">
                     <Calendar className="h-4 w-4 mr-1" />
                     Book Free Session
@@ -330,12 +313,8 @@ export default function HomePage() {
               >
                 {heroStats.map(({ value, label }, i) => (
                   <div key={label}>
-                    {i > 0 && (
-                      <div className="hidden sm:block absolute h-8 w-px bg-white/10 -left-5 top-1/2 -translate-y-1/2" />
-                    )}
-                    <p className="text-2xl font-extrabold text-white">
-                      {value}
-                    </p>
+                    {i > 0 && <div className="hidden sm:block absolute h-8 w-px bg-white/10 -left-5 top-1/2 -translate-y-1/2" />}
+                    <p className="text-2xl font-extrabold text-white">{value}</p>
                     <p className="text-xs text-slate-400 mt-0.5">{label}</p>
                   </div>
                 ))}
@@ -356,16 +335,10 @@ export default function HomePage() {
                     RK
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white">
-                      Rahul Kapoor
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      VP Engineering · Flipkart
-                    </p>
+                    <p className="text-sm font-semibold text-white">Rahul Kapoor</p>
+                    <p className="text-xs text-slate-400">VP Engineering · Flipkart</p>
                   </div>
-                  <span className="rounded-lg bg-purple-500/30 px-2.5 py-1 text-xs font-medium text-purple-200 shrink-0">
-                    Available
-                  </span>
+                  <span className="rounded-lg bg-purple-500/30 px-2.5 py-1 text-xs font-medium text-purple-200 shrink-0">Available</span>
                 </div>
 
                 {/* stat row */}
@@ -375,10 +348,7 @@ export default function HomePage() {
                     { label: "Rating", val: "4.9 ★" },
                     { label: "Learners", val: "180+" },
                   ].map((s) => (
-                    <div
-                      key={s.label}
-                      className="rounded-xl bg-white/5 border border-white/10 p-3 text-center"
-                    >
+                    <div key={s.label} className="rounded-xl bg-white/5 border border-white/10 p-3 text-center">
                       <p className="text-base font-bold text-white">{s.val}</p>
                       <p className="text-xs text-slate-400">{s.label}</p>
                     </div>
@@ -387,9 +357,7 @@ export default function HomePage() {
 
                 {/* progress bars */}
                 <div className="rounded-xl bg-white/5 border border-white/10 p-4 space-y-3">
-                  <p className="text-xs font-medium text-slate-300">
-                    Your progress
-                  </p>
+                  <p className="text-xs font-medium text-slate-300">Your progress</p>
                   {[
                     { label: "System Design", pct: 78 },
                     { label: "Leadership Skills", pct: 55 },
@@ -401,10 +369,7 @@ export default function HomePage() {
                         <span>{pct}%</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-white/10">
-                        <div
-                          className="h-full rounded-full bg-linear-to-r from-purple-500 to-indigo-400"
-                          style={{ width: `${pct}%` }}
-                        />
+                        <div className="h-full rounded-full bg-linear-to-r from-purple-500 to-indigo-400" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                   ))}
@@ -416,17 +381,10 @@ export default function HomePage() {
                     <Video className="h-4 w-4 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-white">
-                      Next session
-                    </p>
-                    <p className="text-xs text-purple-300">
-                      Today · 4:00 PM with Rahul
-                    </p>
+                    <p className="text-xs font-medium text-white">Next session</p>
+                    <p className="text-xs text-purple-300">Today · 4:00 PM with Rahul</p>
                   </div>
-                  <Button
-                    size="sm"
-                    className="h-7 text-xs bg-purple-600 hover:bg-purple-700 cursor-pointer border-0 shrink-0"
-                  >
+                  <Button size="sm" className="h-7 text-xs bg-purple-600 hover:bg-purple-700 cursor-pointer border-0 shrink-0">
                     Join
                   </Button>
                 </div>
@@ -440,12 +398,10 @@ export default function HomePage() {
       <section className="bg-white py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-              Why Choose VinceUp?
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Why Choose VinceUp?</h2>
             <p className="mt-3 text-muted-foreground max-w-xl mx-auto text-sm">
-              The only platform that combines AI-driven insights with human
-              mentorship and structured frameworks to accelerate career growth.
+              The only platform that combines AI-driven insights with human mentorship and structured frameworks to accelerate career
+              growth.
             </p>
           </div>
 
@@ -458,22 +414,14 @@ export default function HomePage() {
                 <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
                   <item.icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {item.desc}
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-10 text-center">
-            <Button
-              variant="outline"
-              className="cursor-pointer border-purple-200 text-purple-700 hover:bg-purple-50"
-              asChild
-            >
+            <Button variant="outline" className="cursor-pointer border-purple-200 text-purple-700 hover:bg-purple-50" asChild>
               <Link href="/about">
                 Know More
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -499,18 +447,13 @@ export default function HomePage() {
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             {/* Left */}
             <div>
-              <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
-                AI-Powered
-              </Badge>
+              <Badge className="mb-4 bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">AI-Powered</Badge>
               <h2 className="text-3xl font-bold text-white sm:text-4xl leading-tight">
                 Your AI Career{" "}
-                <span className="bg-linear-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-                  Intelligence Partner
-                </span>
+                <span className="bg-linear-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">Intelligence Partner</span>
               </h2>
               <p className="mt-4 text-slate-300 text-sm leading-relaxed max-w-md">
-                VinceUp AI Career Growth Assistant works 24/7 to help you
-                maximise every session, stay on track between calls, and surface
+                VinceUp AI Career Growth Assistant works 24/7 to help you maximise every session, stay on track between calls, and surface
                 the insights that matter most.
               </p>
               <ul className="mt-8 space-y-4">
@@ -519,9 +462,7 @@ export default function HomePage() {
                     <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-purple-600/30 text-purple-300">
                       <f.icon className="h-4 w-4" />
                     </div>
-                    <span className="text-sm text-slate-300 leading-relaxed">
-                      {f.text}
-                    </span>
+                    <span className="text-sm text-slate-300 leading-relaxed">{f.text}</span>
                   </li>
                 ))}
               </ul>
@@ -540,9 +481,7 @@ export default function HomePage() {
             <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 space-y-3">
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                <p className="text-xs text-slate-400 font-medium">
-                  VinceUp AI · Online
-                </p>
+                <p className="text-xs text-slate-400 font-medium">VinceUp AI · Online</p>
               </div>
               {[
                 {
@@ -567,9 +506,7 @@ export default function HomePage() {
                   key={i}
                   className={cn(
                     "max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed whitespace-pre-line",
-                    msg.from === "ai"
-                      ? "bg-white/10 text-slate-200 rounded-tl-sm"
-                      : "ml-auto bg-purple-600 text-white rounded-tr-sm",
+                    msg.from === "ai" ? "bg-white/10 text-slate-200 rounded-tl-sm" : "ml-auto bg-purple-600 text-white rounded-tr-sm",
                   )}
                 >
                   {msg.text}
@@ -595,25 +532,17 @@ export default function HomePage() {
       <section className="bg-[#0C0E2B] py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Learn from Industry Experts
-            </h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Learn from Industry Experts</h2>
             <p className="mt-3 text-slate-400 max-w-xl mx-auto text-sm">
-              Our guidance comes from practitioners {`who've`} solved real problems
-              — not coaches with only theoretical knowledge.
+              Our guidance comes from practitioners {`who've`} solved real problems — not coaches with only theoretical knowledge.
             </p>
           </div>
 
           {/* Expert stats */}
           <div className="grid gap-6 md:grid-cols-3 mb-12">
             {expertStats.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center"
-              >
-                <p className="text-4xl font-extrabold text-purple-400">
-                  {s.value}
-                </p>
+              <div key={s.label} className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                <p className="text-4xl font-extrabold text-purple-400">{s.value}</p>
                 <p className="mt-1 font-semibold text-white">{s.label}</p>
                 <p className="mt-1 text-xs text-slate-400">{s.sub}</p>
               </div>
@@ -637,9 +566,7 @@ export default function HomePage() {
                     {m.initials}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">
-                      {m.name}
-                    </p>
+                    <p className="text-sm font-semibold text-white truncate">{m.name}</p>
                     <p className="text-xs text-slate-400 truncate">
                       {m.role} · {m.company}
                     </p>
@@ -647,28 +574,17 @@ export default function HomePage() {
                 </div>
                 <div className="flex flex-wrap gap-1 mb-4">
                   {m.specialties.map((s) => (
-                    <span
-                      key={s}
-                      className="rounded-md bg-white/10 px-2 py-0.5 text-xs text-slate-300"
-                    >
+                    <span key={s} className="rounded-md bg-white/10 px-2 py-0.5 text-xs text-slate-300">
                       {s}
                     </span>
                   ))}
                 </div>
                 <div className="flex items-center gap-1 mb-3">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  <span className="text-xs text-slate-300 font-medium">
-                    {m.rating}
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    · {m.sessions} sessions
-                  </span>
+                  <span className="text-xs text-slate-300 font-medium">{m.rating}</span>
+                  <span className="text-xs text-slate-500">· {m.sessions} sessions</span>
                 </div>
-                <Button
-                  size="sm"
-                  className="w-full cursor-pointer h-8 text-xs bg-purple-600 hover:bg-purple-700 border-0"
-                  asChild
-                >
+                <Button size="sm" className="w-full cursor-pointer h-8 text-xs bg-purple-600 hover:bg-purple-700 border-0" asChild>
                   <Link href="/mentor">Book Now</Link>
                 </Button>
               </div>
@@ -676,11 +592,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-10 text-center">
-            <Button
-              variant="outline"
-              className="cursor-pointer text-white border-white/20 hover:bg-white/10 gap-2"
-              asChild
-            >
+            <Button variant="outline" className="cursor-pointer text-white border-white/20 hover:bg-white/10 gap-2" asChild>
               <Link href="/mentor">
                 View All Mentors
                 <ArrowRight className="h-4 w-4" />
@@ -695,16 +607,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
-              <Badge className="mb-4 bg-purple-50 text-purple-700 border-purple-200 text-xs">
-                For Experts
-              </Badge>
+              <Badge className="mb-4 bg-purple-50 text-purple-700 border-purple-200 text-xs">For Experts</Badge>
               <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl leading-tight">
-                Share Your Expertise.{" "}
-                <span className="text-purple-600">Earn While You Impact.</span>
+                Share Your Expertise. <span className="text-purple-600">Earn While You Impact.</span>
               </h2>
               <p className="mt-4 text-muted-foreground text-sm leading-relaxed max-w-md">
-                Join our mentor network and turn your hard-won experience into
-                income — while making a real difference in {`someone's`} career.
+                Join our mentor network and turn your hard-won experience into income — while making a real difference in {`someone's`}{" "}
+                career.
               </p>
               <ul className="mt-6 space-y-3">
                 {mentorBenefits.map((b) => (
@@ -732,25 +641,19 @@ export default function HomePage() {
                   <div className="mx-auto h-24 w-24 rounded-full bg-linear-to-br from-purple-400 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold mb-3">
                     <Users className="h-10 w-10" />
                   </div>
-                  <p className="text-sm text-purple-700 font-medium">
-                    Join our mentor network
-                  </p>
+                  <p className="text-sm text-purple-700 font-medium">Join our mentor network</p>
                 </div>
               </div>
               <div className="absolute -bottom-4 -left-4 rounded-2xl border bg-white shadow-lg p-4 text-center">
                 <p className="text-xl font-bold text-purple-600">$150+</p>
-                <p className="text-xs text-muted-foreground">
-                  Avg hourly earnings
-                </p>
+                <p className="text-xs text-muted-foreground">Avg hourly earnings</p>
               </div>
               <div className="absolute -top-4 -right-4 rounded-2xl border bg-white shadow-lg p-4 text-center">
                 <div className="flex items-center gap-1 justify-center">
                   <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                   <p className="text-xl font-bold">4.0</p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Min mentor rating
-                </p>
+                <p className="text-xs text-muted-foreground">Min mentor rating</p>
               </div>
               <div className="absolute bottom-12 -right-4 rounded-2xl border bg-white shadow-lg p-4 text-center">
                 <p className="text-xl font-bold text-purple-600">100+</p>
@@ -764,43 +667,21 @@ export default function HomePage() {
       {/* ══ PRICING ════════════════════════════════════════════ */}
       <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            Simple, Transparent Pricing
-          </h2>
-          <p className="mt-3 text-muted-foreground text-sm">
-            Pay only for the time you use. No subscriptions, no lock-ins, no
-            surprises.
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Simple, Transparent Pricing</h2>
+          <p className="mt-3 text-muted-foreground text-sm">Pay only for the time you use. No subscriptions, no lock-ins, no surprises.</p>
 
           <div className="mt-10 rounded-2xl border bg-white shadow-sm p-8">
             <div className="flex items-end justify-center gap-1">
-              <span className="text-6xl font-extrabold text-purple-600">
-                $2–$5
-              </span>
+              <span className="text-6xl font-extrabold text-purple-600">$2–$5</span>
               <span className="text-xl text-muted-foreground mb-2">/hr</span>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Rates set by mentors · Only pay per session · No subscription
-              required
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Rates set by mentors · Only pay per session · No subscription required</p>
 
             <div className="mt-8 text-left space-y-3 border-t pt-6 max-w-xs mx-auto">
               {pricingFeatures.map((f) => (
                 <div key={f.label} className="flex items-center gap-3">
-                  <CheckCircle2
-                    className={cn(
-                      "h-4 w-4 shrink-0",
-                      f.included ? "text-purple-600" : "text-gray-300",
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "text-sm",
-                      f.included ? "text-gray-800" : "text-gray-400",
-                    )}
-                  >
-                    {f.label}
-                  </span>
+                  <CheckCircle2 className={cn("h-4 w-4 shrink-0", f.included ? "text-purple-600" : "text-gray-300")} />
+                  <span className={cn("text-sm", f.included ? "text-gray-800" : "text-gray-400")}>{f.label}</span>
                 </div>
               ))}
             </div>
@@ -822,12 +703,9 @@ export default function HomePage() {
       <section className="bg-white py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-              Success Stories
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Success Stories</h2>
             <p className="mt-3 text-muted-foreground text-sm">
-              {`Don't`} take our word for it — hear from learners {`who've`} levelled
-              up.
+              {`Don't`} take our word for it — hear from learners {`who've`} levelled up.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
@@ -837,22 +715,13 @@ export default function HomePage() {
                 className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col gap-4"
               >
                 <Stars n={t.rating} />
-                <blockquote className="text-sm text-gray-700 leading-relaxed flex-1">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
+                <blockquote className="text-sm text-gray-700 leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</blockquote>
                 <div className="flex items-center gap-3 pt-4 border-t">
-                  <div
-                    className={cn(
-                      "h-9 w-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0",
-                      t.bg,
-                    )}
-                  >
+                  <div className={cn("h-9 w-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0", t.bg)}>
                     {t.avatar}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {t.name}
-                    </p>
+                    <p className="text-sm font-semibold text-gray-900">{t.name}</p>
                     <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
@@ -866,12 +735,8 @@ export default function HomePage() {
       <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-2xl px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-              Frequently Asked Questions
-            </h2>
-            <p className="mt-3 text-muted-foreground text-sm">
-              Everything you need to know about VinceUp.
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">Frequently Asked Questions</h2>
+            <p className="mt-3 text-muted-foreground text-sm">Everything you need to know about VinceUp.</p>
           </div>
           <div className="rounded-2xl border bg-white shadow-sm px-6 divide-y">
             {faqs.map((faq) => (

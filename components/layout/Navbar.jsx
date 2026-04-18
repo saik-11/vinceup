@@ -43,15 +43,10 @@ const Navbar = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex flex-col w-full bg-background text-foreground">
-        <header className="w-full sticky top-0 inset-x-0 z-50 flex h-16 md:h-20 shrink-0 items-center justify-between border-b border-border px-3 sm:px-4 bg-background/80 backdrop-blur-xl">
+        <header className="w-full sticky top-0 inset-x-0 z-50 flex h-16 md:h-20 shrink-0 items-center justify-between border-b border-border px-3 sm:px-4 bg-background/80 backdrop-blur-xl isolate">
           <div className="font-bold shrink-0">
             <Link href="/" onClick={() => setMobileOpen(false)}>
-              <Image
-                src={vinceup_logo}
-                alt="vinceup"
-                loading="eager"
-                className="w-28 sm:w-36 md:w-44 h-auto"
-              />
+              <Image src={vinceup_logo} alt="vinceup" loading="eager" className="w-28 sm:w-36 md:w-44 h-auto" />
             </Link>
           </div>
 
@@ -78,15 +73,12 @@ const Navbar = ({ children }) => {
                     <Link
                       href={link.href}
                       className={`transition-colors p-3 py-3 ${
-                        isActive(link.href)
-                          ? "text-primary font-bold"
-                          : "text-foreground hover:text-primary"
+                        isActive(link.href) ? "text-primary font-bold" : "text-foreground hover:text-primary"
                       }`}
                     >
                       {link.label}
                     </Link>
-                    {(hoveredHref ?? pathname) === link.href ||
-                    (!hoveredHref && isActive(link.href)) ? (
+                    {(hoveredHref ?? pathname) === link.href || (!hoveredHref && isActive(link.href)) ? (
                       <motion.span
                         layoutId="underline"
                         className="absolute left-0 bottom-0 h-0.5 w-full bg-primary"
@@ -138,9 +130,7 @@ const Navbar = ({ children }) => {
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
                     className={`px-3 py-2 rounded-md transition-colors ${
-                      isActive(link.href)
-                        ? "text-primary font-bold bg-muted"
-                        : "text-foreground hover:text-primary hover:bg-muted"
+                      isActive(link.href) ? "text-primary font-bold bg-muted" : "text-foreground hover:text-primary hover:bg-muted"
                     }`}
                   >
                     {link.label}
@@ -165,7 +155,7 @@ const Navbar = ({ children }) => {
               <AppSidebar />
             </motion.div>
           )}
-          <section className="grow min-w-0">{children}</section>
+          <section className="grow min-w-0 bg-[#F9FAFB]">{children}</section>
         </main>
         {isPublic && <Footer />}
       </div>

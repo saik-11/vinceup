@@ -9,11 +9,5 @@ export default function Error({ error, unstable_retry }) {
     console.error(error);
   }, [error]);
 
-  return (
-    <DashboardErrorState
-      error={error}
-      retryLabel="Retry dashboard"
-      onRetry={() => unstable_retry()}
-    />
-  );
+  return <DashboardErrorState error={error} retryLabel="Retry dashboard" onRetry={() => unstable_retry()} />;
 }

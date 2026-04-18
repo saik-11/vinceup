@@ -51,12 +51,8 @@ const HowItWorks = () => {
     <section className="bg-white py-20">
       <div className="mx-auto max-w-3xl px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            How VinceUp Works
-          </h2>
-          <p className="mt-3 text-muted-foreground text-sm">
-            From first click to measurable career progress in 5 simple steps.
-          </p>
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">How VinceUp Works</h2>
+          <p className="mt-3 text-muted-foreground text-sm">From first click to measurable career progress in 5 simple steps.</p>
         </div>
 
         {/* Zigzag steps */}
@@ -65,8 +61,7 @@ const HowItWorks = () => {
           <div
             className="absolute left-1/2 top-8 bottom-8 w-px -translate-x-1/2 hidden md:block"
             style={{
-              backgroundImage:
-                "repeating-linear-gradient(to bottom, transparent, transparent 6px, #c4b5fd 6px, #c4b5fd 12px)",
+              backgroundImage: "repeating-linear-gradient(to bottom, transparent, transparent 6px, #c4b5fd 6px, #c4b5fd 12px)",
             }}
           />
 
@@ -77,21 +72,14 @@ const HowItWorks = () => {
               // isEven: number on left, text on right
 
               return (
-                <div
-                  key={s.step}
-                  className="relative flex flex-col items-center gap-4 md:flex-row md:items-start md:gap-0"
-                >
+                <div key={s.step} className="relative flex flex-col items-center gap-4 md:flex-row md:items-start md:gap-0">
                   {/* LEFT half */}
                   <div className="flex-1 flex justify-end md:pr-12">
                     {isOdd ? (
                       // Text on left
                       <div className="text-center md:text-right max-w-xs">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          {s.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {s.desc}
-                        </p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{s.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
                       </div>
                     ) : (
                       // Number on left
@@ -146,12 +134,8 @@ const HowItWorks = () => {
                     ) : (
                       // Text on right
                       <div className="text-center md:text-left max-w-xs">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          {s.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {s.desc}
-                        </p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{s.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
                       </div>
                     )}
                   </div>
