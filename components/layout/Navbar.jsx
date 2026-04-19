@@ -155,7 +155,7 @@ const Navbar = ({ children }) => {
               <AppSidebar />
             </motion.div>
           )}
-          <section className="grow min-w-0 bg-[#F9FAFB]">{children}</section>
+          <section className="grow min-w-0 bg-background">{children}</section>
         </main>
         {isPublic && <Footer />}
       </div>

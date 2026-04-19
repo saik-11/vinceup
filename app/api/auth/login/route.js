@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { AUTH_COOKIE_NAME, createAuthSession, getAuthCookieOptions } from "@/lib/auth-session";
 import { getApiBaseUrl } from "@/lib/api-base-url";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -30,7 +31,8 @@ export async function POST(request) {
   if (!token) {
     return NextResponse.json({ message: "No token in auth response." }, { status: 502 });
   }
-
+  const cookieStore = await cookies();
+  cookieStore.set("role", data.user?.role);
   const response = NextResponse.json({
     authenticated: true,
     token,

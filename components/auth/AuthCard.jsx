@@ -10,7 +10,7 @@ export default function AuthCard({ maxWidth = "lg", className, children }) {
   return (
     <div
       className={cn(
-        "w-full rounded-2xl bg-white dark:bg-gray-900 p-8 shadow-xl shadow-gray-200/60 dark:shadow-gray-900/40",
+        "w-full rounded-2xl bg-background p-8 shadow-xl shadow-gray-200/60 dark:shadow-gray-900/40",
         widths[maxWidth],
         className,
       )}

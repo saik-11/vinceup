@@ -17,7 +17,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { SIDEBAR_GROUPS } from "@/config/navigation";
+import { getSidebarGroups } from "@/config/navigation";
+import { useRole } from "@/hooks/useRole";
 import { AnimatePresence, motion } from "framer-motion";
 import vinceup_logo from "../../public/assets/vinceup_logo.svg";
 
@@ -46,8 +47,10 @@ export default function AppSidebar() {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
   const { setOpenMobile } = useSidebar();
+  const { role } = useRole();
+  const sidebarGroups = getSidebarGroups(role);
   const isLoggedIn = !!isAuthenticated;
-  
+
   // Close mobile sidebar drawer on every route change
   useEffect(() => {
     setOpenMobile(false);
@@ -98,7 +101,7 @@ export default function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className="px-3 pt-4 pb-2">
-              {SIDEBAR_GROUPS.map((group) => (
+              {sidebarGroups.map((group) => (
                 <SidebarGroup key={group.label} className="mb-1">
                   <motion.div variants={groupLabelVariant} initial="hidden" animate="visible">
                     <SidebarGroupLabel className={`text-xs font-semibold uppercase tracking-wider px-3 mb-1 ${group?.class || ""}`}>

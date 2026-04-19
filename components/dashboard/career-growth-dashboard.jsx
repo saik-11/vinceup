@@ -2,7 +2,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Bell,
   BrainCircuit,
   BriefcaseBusiness,
   CalendarDays,
@@ -11,7 +10,6 @@ import {
   CircleAlert,
   Clock3,
   LayoutDashboard,
-  Search,
   ShieldCheck,
   Sparkles,
   Target,
@@ -24,10 +22,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+
+import {
+  dashboardThemeClass,
+  DashboardShell,
+  interactivePanelClass,
+  metaTextClass,
+  panelClass,
+  sectionActionClass,
+  sectionTitleClass,
+  SectionHeading,
+  subCardClass,
+} from "@/components/dashboard/dashboard-shared";
 
 const statAccentStyles = {
   blue: {
@@ -78,53 +87,8 @@ const priorityTone = {
   low: "border-emerald-200/80 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/12 dark:text-emerald-200",
 };
 
-const dashboardThemeClass = cn(
-  "[--dashboard-bg:#f4f7fb]",
-  "[--dashboard-bg-bottom:#edf2ff]",
-  "[--dashboard-panel:rgba(255,255,255,0.82)]",
-  "[--dashboard-panel-strong:#ffffff]",
-  "[--dashboard-panel-muted:#f8fafc]",
-  "[--dashboard-border:rgba(15,23,42,0.08)]",
-  "[--dashboard-border-strong:rgba(15,23,42,0.12)]",
-  "[--dashboard-text:#0f172a]",
-  "[--dashboard-muted:#475569]",
-  "[--dashboard-subtle:#64748b]",
-  "[--dashboard-shadow:0_18px_48px_-30px_rgba(15,23,42,0.18)]",
-  "[--dashboard-shadow-hover:0_24px_60px_-32px_rgba(15,23,42,0.22)]",
-  "[--dashboard-inner-shadow:0_14px_32px_-28px_rgba(15,23,42,0.34)]",
-  "[--dashboard-purple:#7c3aed]",
-  "[--dashboard-blue:#3b82f6]",
-  "[--dashboard-green:#12b76a]",
-  "[--dashboard-orange:#f97316]",
-  "dark:[--dashboard-bg:#0b1120]",
-  "dark:[--dashboard-bg-bottom:#080d18]",
-  "dark:[--dashboard-panel:rgba(15,23,42,0.84)]",
-  "dark:[--dashboard-panel-strong:#111827]",
-  "dark:[--dashboard-panel-muted:#0f172a]",
-  "dark:[--dashboard-border:rgba(148,163,184,0.18)]",
-  "dark:[--dashboard-border-strong:rgba(148,163,184,0.24)]",
-  "dark:[--dashboard-text:#f8fafc]",
-  "dark:[--dashboard-muted:#cbd5e1]",
-  "dark:[--dashboard-subtle:#94a3b8]",
-  "dark:[--dashboard-shadow:0_22px_56px_-32px_rgba(2,8,23,0.72)]",
-  "dark:[--dashboard-shadow-hover:0_30px_72px_-34px_rgba(2,8,23,0.82)]",
-  "dark:[--dashboard-inner-shadow:0_16px_36px_-30px_rgba(2,8,23,0.68)]",
-);
-
-const panelClass =
-  "overflow-visible rounded-[24px] border border-[var(--dashboard-border)] bg-[var(--dashboard-panel)] text-[var(--dashboard-text)] shadow-[var(--dashboard-shadow)] ring-0 backdrop-blur-xl";
-
-const interactivePanelClass =
-  "transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[var(--dashboard-shadow-hover)]";
-
-const subCardClass =
-  "rounded-[20px] border border-[var(--dashboard-border)] bg-[var(--dashboard-panel-strong)] shadow-[var(--dashboard-inner-shadow)] transition-[border-color,background-color,box-shadow,transform] duration-200 ease-out";
-
-const sectionActionClass =
-  "h-9 shrink-0 rounded-full px-3 text-sm font-medium text-[var(--dashboard-purple)] hover:bg-[var(--dashboard-panel-muted)] hover:text-[var(--dashboard-purple)] dark:hover:bg-white/6";
-
-const metaTextClass = "text-sm leading-6 text-[var(--dashboard-subtle)]";
-const sectionTitleClass = "text-xl font-semibold tracking-[-0.03em] text-[var(--dashboard-text)]";
+// dashboardThemeClass, panelClass, interactivePanelClass, subCardClass,
+// sectionActionClass, metaTextClass, sectionTitleClass — imported from dashboard-shared.jsx
 
 function formatMetric(stat) {
   if (stat?.value == null) {
@@ -151,19 +115,7 @@ function getInitials(name) {
     .join("");
 }
 
-function DashboardShell({ children }) {
-  return (
-    <section
-      aria-label="Career growth dashboard"
-      className={cn(
-        dashboardThemeClass,
-        "career-dashboard min-h-full bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.11),transparent_26%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)] px-4 py-4 sm:px-6 sm:py-6 xl:px-8 xl:py-8 dark:bg-[radial-gradient(circle_at_top,rgba(124,58,237,0.16),transparent_24%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)]",
-      )}
-    >
-      <div className="mx-auto flex w-full max-w-350 flex-col gap-6">{children}</div>
-    </section>
-  );
-}
+// DashboardShell — imported from dashboard-shared.jsx
 
 function DashboardHeader({ user, activeScenario }) {
   return (
@@ -269,25 +221,7 @@ function StatsGrid({ stats }) {
   );
 }
 
-function SectionHeading({ title, description, actionLabel, actionHref }) {
-  return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <h2 className={sectionTitleClass}>{title}</h2>
-        {description ? <p className={metaTextClass}>{description}</p> : null}
-      </div>
-
-      {actionLabel && actionHref ? (
-        <Button asChild variant="ghost" className={sectionActionClass}>
-          <Link href={actionHref}>
-            {actionLabel}
-            <ChevronRight className="size-4" />
-          </Link>
-        </Button>
-      ) : null}
-    </div>
-  );
-}
+// SectionHeading — imported from dashboard-shared.jsx
 
 function EmptyBlock({ icon: Icon, title, description, ctaLabel, ctaHref }) {
   return (
