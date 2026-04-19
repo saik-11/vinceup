@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { AlertCircle, CalendarIcon } from "lucide-react";
@@ -7,28 +8,63 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { mentorApi } from "@/services/service";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 
-export default function BlockTimeForm({ onBack, onSubmit }) {
+export default function BlockTimeForm({ onBack, onSubmit, selectedDate }) {
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      date: null,
+      date: selectedDate || null,
       startTime: "",
       endTime: "",
     },
   });
 
+  useEffect(() => {
+    reset({
+      date: selectedDate || null,
+      startTime: "",
+      endTime: "",
+    });
+  }, [selectedDate, reset]);
+
   const doSubmit = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    onSubmit?.(data);
+    try {
+      if (!data.date || !data.startTime || !data.endTime) {
+        toast.error("Please complete the required date and time entries.");
+        return;
+      }
+      
+      const payload = {
+        slots: [
+          {
+            date: format(data.date, "yyyy-MM-dd"),
+            start_time: data.startTime,
+            end_time: data.endTime,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+            service_type: null,
+            status: "Blocked"
+          }
+        ]
+      };
+      
+      await mentorApi.createAvailability(payload);
+      toast.success("Time successfully blocked!");
+      onSubmit?.();
+    } catch (err) {
+      console.error("Availability save failed:", err);
+      toast.error(err.response?.data?.message || err.message || "Failed to block time.");
+    }
   };
 
   const labelClass = "text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5 inline-block";

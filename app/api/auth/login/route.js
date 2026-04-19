@@ -42,7 +42,7 @@ export async function POST(request) {
 
   // app/api/auth/login/route.js  (add after setting AUTH_COOKIE_NAME)
 
-  response.cookies.set(AUTH_COOKIE_NAME, createAuthSession(token, data.user ?? null), getAuthCookieOptions());
+  response.cookies.set(AUTH_COOKIE_NAME, createAuthSession(token, data.user ?? null, data.expires_in ?? 3600), getAuthCookieOptions());
 
   return response;
 }

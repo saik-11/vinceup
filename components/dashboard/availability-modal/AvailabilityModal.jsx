@@ -17,7 +17,7 @@ const SCREEN_TITLES = {
   block: "Block Time",
 };
 
-export default function AvailabilityModal({ isOpen, onClose, initialScreen = "options" }) {
+export default function AvailabilityModal({ isOpen, onClose, initialScreen = "options", selectedDate = null }) {
   const [prevInitial, setPrevInitial] = useState(initialScreen);
   const [activeScreen, setActiveScreen] = useState(initialScreen);
 
@@ -29,9 +29,8 @@ export default function AvailabilityModal({ isOpen, onClose, initialScreen = "op
 
   const handleBack = () => setActiveScreen("options");
 
-  const handleSubmit = (data) => {
-    console.log("Submitted data for:", activeScreen, data);
-    onClose();
+  const handleSubmit = () => {
+    onClose(true);
   };
 
   const handleOpenChange = (open) => {
@@ -50,13 +49,12 @@ export default function AvailabilityModal({ isOpen, onClose, initialScreen = "op
           <DialogTitle className="text-[17px] font-bold text-slate-900 dark:text-slate-100">{SCREEN_TITLES[activeScreen]}</DialogTitle>
         </DialogHeader>
 
-        {/* Scrollable Body */}
         <div className="overflow-y-auto px-6 pb-6 pt-2 custom-scrollbar" style={{ maxHeight: "calc(100vh - 120px)" }}>
           <AnimatePresence mode="wait" initial={false}>
             {activeScreen === "options" && <AvailabilityOptions key="options" onSelectOption={setActiveScreen} />}
-            {activeScreen === "single" && <SingleDayForm key="single" onBack={handleBack} onSubmit={handleSubmit} />}
-            {activeScreen === "recurring" && <RecurringForm key="recurring" onBack={handleBack} onSubmit={handleSubmit} />}
-            {activeScreen === "block" && <BlockTimeForm key="block" onBack={handleBack} onSubmit={handleSubmit} />}
+            {activeScreen === "single" && <SingleDayForm key={`single-${selectedDate?.getTime() || "new"}`} onBack={handleBack} onSubmit={handleSubmit} selectedDate={selectedDate} />}
+            {activeScreen === "recurring" && <RecurringForm key={`recurring-${selectedDate?.getTime() || "new"}`} onBack={handleBack} onSubmit={handleSubmit} selectedDate={selectedDate} />}
+            {activeScreen === "block" && <BlockTimeForm key={`block-${selectedDate?.getTime() || "new"}`} onBack={handleBack} onSubmit={handleSubmit} selectedDate={selectedDate} />}
           </AnimatePresence>
         </div>
       </DialogContent>

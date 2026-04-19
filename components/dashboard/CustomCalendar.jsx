@@ -27,6 +27,7 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
+  startOfDay,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,27 +61,27 @@ function getMonthStyles(status) {
 
 // ─── DayCell ──────────────────────────────────────────────────────────────────
 
-function DayCell({ date, status, isCurrentMonth, isSelected, onSelect }) {
+function DayCell({ date, status, isCurrentMonth, isSelected, isPast, onSelect }) {
   if (!date) {
     return <div className="aspect-square rounded-xl" aria-hidden="true" />;
   }
 
   const today = isToday(date);
-  const styles = getMonthStyles(isCurrentMonth ? status : null);
+  const styles = getMonthStyles(isCurrentMonth && !isPast ? status : null);
 
   return (
     <button
       type="button"
       aria-label={format(date, "MMMM d, yyyy") + (status ? `, ${status}` : "") + (today ? ", today" : "")}
       aria-pressed={isSelected}
-      onClick={() => isCurrentMonth && onSelect?.(date)}
+      onClick={() => isCurrentMonth && !isPast && onSelect?.(date)}
       className={cn(
         "group relative flex flex-col items-center justify-center aspect-square rounded-xl border text-sm font-semibold transition-all duration-150",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 gap-0.5",
-        isCurrentMonth ? styles.cell : "opacity-30 bg-white/40 text-slate-400 border-transparent dark:bg-white/4 cursor-default",
-        // Selected ring (no longer used for today)
-        isSelected && isCurrentMonth && "ring-2 ring-offset-1 ring-violet-700 dark:ring-violet-300 scale-[1.08]",
-        !isCurrentMonth && "pointer-events-none",
+        isCurrentMonth && !isPast ? styles.cell : "opacity-40 bg-slate-50/50 text-slate-400 border-transparent dark:bg-white/4 cursor-default",
+        isPast && isCurrentMonth && "text-slate-400 opacity-50 bg-slate-50/50 border-slate-100 cursor-not-allowed pointer-events-none dark:border-white/5",
+        isSelected && isCurrentMonth && !isPast && "ring-2 ring-offset-1 ring-violet-700 dark:ring-violet-300 scale-[1.08]",
+        (!isCurrentMonth || isPast) && "pointer-events-none",
       )}
     >
       {/* Today: filled purple circle on the number — matches week view treatment */}
@@ -91,7 +92,7 @@ function DayCell({ date, status, isCurrentMonth, isSelected, onSelect }) {
       ) : (
         <span className="leading-none">{format(date, "d")}</span>
       )}
-      {isCurrentMonth && styles.dot && <span className={cn("size-1 rounded-full shrink-0", styles.dot)} />}
+      {isCurrentMonth && !isPast && styles.dot && <span className={cn("size-1 rounded-full shrink-0", styles.dot)} />}
     </button>
   );
 }
@@ -136,6 +137,8 @@ export default function CustomCalendar({
     while (days.length < 42) days.push(null);
     return days;
   }, [viewDate]);
+
+  const todayNorm = useMemo(() => startOfDay(new Date()), []);
 
   // Navigation — delegated to parent via onFocusDateChange
   const goToPrevMonth = useCallback(() => {
@@ -210,9 +213,10 @@ export default function CustomCalendar({
             const status = statusMap.get(key) ?? null;
             const inMonth = isSameMonth(date, viewDate);
             const isSelected = selectedDate ? isSameDay(date, selectedDate) : false;
+            const isPast = date < todayNorm;
 
             return (
-              <DayCell key={key} date={date} status={status} isCurrentMonth={inMonth} isSelected={isSelected} onSelect={handleDateSelect} />
+              <DayCell key={key} date={date} status={status} isCurrentMonth={inMonth} isSelected={isSelected} isPast={isPast} onSelect={handleDateSelect} />
             );
           })}
         </div>

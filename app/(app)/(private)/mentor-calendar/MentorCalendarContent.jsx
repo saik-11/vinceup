@@ -1,34 +1,18 @@
 "use client";
 // ← Client component; metadata lives in page.jsx (Server Component).
 
-import { useState, useMemo } from "react";
-import { CalendarDays, Sparkles, Repeat, Ban } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { CalendarDays, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import {
-  DashboardShell,
-  panelClass,
-  subCardClass,
-  sectionTitleClass,
-  metaTextClass,
-} from "@/components/dashboard/dashboard-shared";
+import { DashboardShell, panelClass, subCardClass, sectionTitleClass, metaTextClass } from "@/components/dashboard/dashboard-shared";
 import CustomCalendar from "@/components/dashboard/CustomCalendar";
 import WeeklyCalendar from "@/components/dashboard/WeeklyCalendar";
 import AvailabilityModal from "@/components/dashboard/availability-modal/AvailabilityModal";
-import {
-  ALL_SLOTS,
-  buildMonthStatusMap,
-  buildWeekSlotMap,
-  getUpcomingBookings,
-  INSIGHTS,
-  QUICK_ACTIONS,
-} from "@/lib/calendar-data";
-import { formatDateKey } from "@/lib/calendar-utils";
-
-// ─── Derived data (computed once at module level — stable references) ──────────
-
-const MONTH_STATUS_MAP = buildMonthStatusMap(ALL_SLOTS);
-const WEEK_SLOT_MAP    = buildWeekSlotMap(ALL_SLOTS);
+import { INSIGHTS, QUICK_ACTIONS } from "@/lib/calendar-data";
+import { formatDateKey, formatTimeWithTimezone } from "@/lib/calendar-utils";
+import { mentorApi } from "@/services/service";
+import { useAuth } from "@/hooks/useAuth";
 
 // ─── VEGA Scheduling Insights ─────────────────────────────────────────────────
 
@@ -55,9 +39,7 @@ function VegaInsightsCard({ view }) {
         <div className="flex size-10 items-center justify-center rounded-[14px] bg-[linear-gradient(135deg,#7c3aed,#c026d3)] shadow-[0_8px_20px_-6px_rgba(124,58,237,0.5)]">
           <Sparkles className="size-5 text-white" strokeWidth={2} />
         </div>
-        <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-(--dashboard-text)">
-          ✨ VEGA Scheduling Insights
-        </h2>
+        <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-(--dashboard-text)">✨ VEGA Scheduling Insights</h2>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {insights.map((ins) => (
@@ -72,12 +54,7 @@ function VegaInsightsCard({ view }) {
 
 function BookingItem({ booking }) {
   return (
-    <div
-      className={cn(
-        subCardClass,
-        "flex flex-col gap-1 p-3.5 hover:border-[rgba(124,58,237,0.2)] hover:shadow-[0_8px_20px_-12px_rgba(124,58,237,0.2)]",
-      )}
-    >
+    <div className={cn(subCardClass, "flex flex-col gap-1 p-3.5 hover:border-[rgba(124,58,237,0.2)] hover:shadow-[0_8px_20px_-12px_rgba(124,58,237,0.2)]")}>
       <div className="flex items-center gap-1.5 text-xs font-semibold text-(--dashboard-subtle)">
         <CalendarDays className="size-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
         <span>
@@ -99,9 +76,13 @@ function RightPanel({ upcomingBookings, onQuickAction }) {
         <section aria-label="Upcoming bookings" className="space-y-3">
           <h2 className={cn(sectionTitleClass, "text-base")}>Upcoming Bookings</h2>
           <div className="flex flex-col gap-2.5">
-            {upcomingBookings.map((bk) => (
-              <BookingItem key={`${bk.date}-${bk.hour ?? bk.time}`} booking={bk} />
-            ))}
+            {upcomingBookings.length > 0 ? (
+              upcomingBookings.map((bk) => (
+                <BookingItem key={bk.id} booking={bk} />
+              ))
+            ) : (
+              <p className="text-sm text-(--dashboard-subtle) italic px-2">No upcoming bookings.</p>
+            )}
           </div>
         </section>
 
@@ -148,9 +129,7 @@ function PageHeader({ view, setView, onSetAvailability }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-(--dashboard-text) sm:text-4xl">
-          Calendar
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight text-(--dashboard-text) sm:text-4xl">Calendar</h1>
         <p className={cn(metaTextClass, "mt-1")}>Manage your availability and bookings</p>
       </div>
 
@@ -165,9 +144,7 @@ function PageHeader({ view, setView, onSetAvailability }) {
               onClick={() => setView(v)}
               className={cn(
                 "px-3.5 py-1.5 text-sm font-medium rounded-[10px] capitalize transition-all duration-150",
-                view === v
-                  ? "bg-[#7c3aed] text-white shadow-sm"
-                  : "text-(--dashboard-subtle) hover:text-(--dashboard-muted)",
+                view === v ? "bg-[#7c3aed] text-white shadow-sm" : "text-(--dashboard-subtle) hover:text-(--dashboard-muted)",
               )}
             >
               {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -192,31 +169,118 @@ function PageHeader({ view, setView, onSetAvailability }) {
 
 export function MentorCalendarContent() {
   // ── Shared state ───────────────────────────────────────────────────────────
-  // ONE date object drives both views.
-  // Month view shows the month containing focusDate.
-  // Week view shows the week (Mon-Sun) containing focusDate.
-  const [view, setView]           = useState("month");
-  const [focusDate, setFocusDate] = useState(() => new Date(2026, 5, 15)); // Jun 15 2026
+  const [view, setView] = useState("month");
+  const [focusDate, setFocusDate] = useState(() => new Date()); 
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // Upcoming bookings — filtered from the canonical dataset
-  // Show bookings from focusDate's month onwards so sidebar stays relevant
-  const upcomingBookings = useMemo(
-    () => getUpcomingBookings(ALL_SLOTS, focusDate),
-    [focusDate],
-  );
-
-  // Modal flow state
   const [modalState, setModalState] = useState({ isOpen: false, screen: "options" });
   
+  const [apiSlots, setApiSlots] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const openModal = (screen = "options") => setModalState({ isOpen: true, screen });
-  const closeModal = () => setModalState((prev) => ({ ...prev, isOpen: false }));
+  const closeModal = (didChange = false) => {
+    setModalState((prev) => ({ ...prev, isOpen: false }));
+    setSelectedDate(null);
+    if (didChange === true) {
+      fetchSlots();
+    }
+  };
+  
+  // Safe timezone-agnostic date parsing from YYYY-MM-DD
+  const parseLocalDate = (dateStr) => {
+    if (!dateStr) return new Date();
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  const { isAuthenticated } = useAuth();
 
   const handleQuickAction = (id) => {
     if (id === "qa_recurring") openModal("recurring");
     else if (id === "qa_block") openModal("block");
     else console.log("Unmapped quick action:", id);
   };
+
+  const fetchSlots = () => {
+    setIsLoading(true);
+    mentorApi.getAvailability()
+      .then((res) => {
+        const dataSlots = res.slots || (res.data && res.data.slots) || [];
+        setApiSlots(dataSlots);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message || "Failed to fetch calendar slots.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchSlots();
+  }, []);
+
+  const { monthStatusMap, weekSlotMap } = useMemo(() => {
+    const monthMap = new Map();
+    const weekMap = {};
+    const PRIORITY = { booked: 4, blocked: 2, available: 1 };
+
+    for (const s of apiSlots) {
+      const status = s.is_booked ? "booked" : "available";
+      
+      const prevPriority = PRIORITY[monthMap.get(s.date)] || 0;
+      const nextPriority = PRIORITY[status] || 0;
+      if (nextPriority > prevPriority) monthMap.set(s.date, status);
+
+      const timeParts = (s.start_time || "00:00").split(":");
+      const hourNum = parseInt(timeParts[0], 10);
+      if (!isNaN(hourNum)) {
+        if (!weekMap[s.date]) weekMap[s.date] = {};
+        
+        let timeLabel = formatTimeWithTimezone(s.start_time, s.timezone);
+
+        weekMap[s.date][hourNum] = {
+           id: s.id,
+           date: s.date,
+           hour: hourNum,
+           status: status,
+           name: "Booked Session", 
+           type: s.service_type || "Session", 
+           time: timeLabel
+        };
+      }
+    }
+    return { monthStatusMap: monthMap, weekSlotMap: weekMap };
+  }, [apiSlots]);
+
+  const upcomingBookings = useMemo(() => {
+    const y = focusDate.getFullYear();
+    const m = String(focusDate.getMonth() + 1).padStart(2, "0");
+    const d = String(focusDate.getDate()).padStart(2, "0");
+    const fromKey = `${y}-${m}-${d}`;
+
+    const filtered = apiSlots.filter((s) => s.is_booked && s.date >= fromKey);
+    return filtered.map((s) => {
+      const timeParts = (s.start_time || "00:00").split(":");
+      const hourNum = parseInt(timeParts[0], 10) || 0;
+      let timeLabel = formatTimeWithTimezone(s.start_time, s.timezone);
+
+      return {
+         id: s.id,
+         date: s.date,
+         hour: hourNum,
+         time: timeLabel,
+         name: s.service_type || "Booked Session",
+         type: s.service_type || "Session"
+      };
+    }).sort((a, b) => {
+       if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+       return a.hour - b.hour;
+    }).slice(0, 5);
+  }, [apiSlots, focusDate]);
 
   return (
     <DashboardShell ariaLabel="Mentor calendar availability dashboard" maxWidth="max-w-6xl">
@@ -226,24 +290,50 @@ export function MentorCalendarContent() {
       <VegaInsightsCard view={view} />
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-        {view === "week" ? (
+        {isLoading ? (
+          <div className="flex-1 min-w-0 flex items-center justify-center min-h-[400px] border border-(--dashboard-border) rounded-[20px] bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(15,23,42,0.4)] shadow-sm backdrop-blur-md">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="size-10 animate-spin text-[#7c3aed]" />
+              <p className="text-sm font-semibold text-(--dashboard-muted)">Loading your schedule...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex-1 min-w-0 flex items-center justify-center min-h-[400px] border border-red-500/20 rounded-[20px] bg-red-50/50 dark:bg-red-500/5 shadow-sm backdrop-blur-md">
+            <div className="flex flex-col items-center gap-3">
+              <AlertCircle className="size-10 text-red-500" />
+              <p className="text-sm font-semibold text-red-600 dark:text-red-400">{error}</p>
+              <button onClick={() => window.location.reload()} className="mt-3 text-xs font-bold px-5 py-2.5 bg-red-100 hover:bg-red-200 dark:bg-red-500/20 dark:hover:bg-red-500/30 rounded-[14px] text-red-700 dark:text-red-300 transition-colors shadow-sm">
+                Try Again
+              </button>
+            </div>
+          </div>
+        ) : view === "week" ? (
           // ── Week view ── focusDate controls which week is shown
           <WeeklyCalendar
-            slotMap={WEEK_SLOT_MAP}
+            slotMap={weekSlotMap}
             focusDate={focusDate}
             onFocusDateChange={setFocusDate}
-            onSlotClick={(slot) => console.log("Slot:", slot)}
-            onEmptySlotClick={(info) => console.log("Empty:", info)}
+            onSlotClick={(slot) => {
+              setSelectedDate(parseLocalDate(slot.date));
+              openModal("options");
+            }}
+            onEmptySlotClick={(info) => {
+              setSelectedDate(parseLocalDate(info.dateKey));
+              openModal("options");
+            }}
             className="flex-1 min-w-0"
           />
         ) : (
           // ── Month view ── focusDate controls which month is shown
           <CustomCalendar
-            statusMap={MONTH_STATUS_MAP}
+            statusMap={monthStatusMap}
             focusDate={focusDate}
             onFocusDateChange={setFocusDate}
             selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
+            onDateSelect={(d) => {
+              setSelectedDate(d);
+              openModal("options");
+            }}
             showLegend
             showTodayButton
             className="flex-1 min-w-0"
@@ -253,11 +343,7 @@ export function MentorCalendarContent() {
         <RightPanel upcomingBookings={upcomingBookings} onQuickAction={handleQuickAction} />
       </div>
 
-      <AvailabilityModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        initialScreen={modalState.screen}
-      />
+      <AvailabilityModal isOpen={modalState.isOpen} onClose={closeModal} initialScreen={modalState.screen} selectedDate={selectedDate} />
     </DashboardShell>
   );
 }

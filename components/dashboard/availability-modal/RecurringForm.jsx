@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { CheckCircle2, CalendarIcon } from "lucide-react";
@@ -25,8 +25,14 @@ const DAYS = [
   { id: "sun", label: "Sun" },
 ];
 
-export default function RecurringForm({ onBack, onSubmit }) {
-  const [selectedDays, setSelectedDays] = useState(["mon", "tue", "wed"]);
+export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
+  const [selectedDays, setSelectedDays] = useState(() => {
+    if (selectedDate) {
+      const dayMap = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+      return [dayMap[selectedDate.getDay()]];
+    }
+    return ["mon", "tue", "wed"];
+  });
 
   const {
     handleSubmit,
@@ -43,11 +49,27 @@ export default function RecurringForm({ onBack, onSubmit }) {
     },
   });
 
-  // const repeatIndefinitely = watch("repeatIndefinitely");
   const repeatIndefinitely = useWatch({
     control,
     name: "repeatIndefinitely",
   });
+
+  useEffect(() => {
+    if (selectedDate) {
+      const dayMap = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+      setSelectedDays([dayMap[selectedDate.getDay()]]);
+    } else {
+      setSelectedDays(["mon", "tue", "wed"]);
+    }
+    reset({
+      startTime: "",
+      endTime: "",
+      slotDuration: "30m",
+      bufferTime: "0m",
+      repeatIndefinitely: false,
+      endDate: null,
+    });
+  }, [selectedDate, reset]);
 
   const toggleDay = (id) => {
     setSelectedDays((prev) => (prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]));

@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useForm, Controller } from "react-hook-form";
 import { CheckCircle2, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import { mentorApi } from "@/services/service";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -13,14 +16,17 @@ import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 
-export default function SingleDayForm({ onBack, onSubmit }) {
+export default function SingleDayForm({ onBack, onSubmit, selectedDate }) {
   const {
     handleSubmit,
     control,
+    reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      date: null,
+      date: selectedDate || null,
       startTime: "",
       endTime: "",
       slotDuration: "30m",
@@ -30,10 +36,55 @@ export default function SingleDayForm({ onBack, onSubmit }) {
     },
   });
 
+  const startTime = watch("startTime");
+
+  // Auto-calculate end time 1 hour after start time securely mapping selections.
+  useEffect(() => {
+    if (startTime) {
+      const [h, m] = startTime.split(":");
+      const nextH = (parseInt(h, 10) + 1).toString().padStart(2, "0");
+      setValue("endTime", `${nextH}:${m}`, { shouldValidate: true });
+    }
+  }, [startTime, setValue]);
+
+  useEffect(() => {
+    reset({
+      date: selectedDate || null,
+      startTime: "",
+      endTime: "",
+      slotDuration: "30m",
+      bufferTime: "0m",
+      breakStart: "",
+      breakEnd: "",
+    });
+  }, [selectedDate, reset]);
+
   const doSubmit = async (data) => {
-    // Format date specifically for submission if needed, but passing object is fine for now
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    onSubmit?.(data);
+    try {
+      if (!data.date || !data.startTime || !data.endTime) {
+        toast.error("Please complete the required date and time entries.");
+        return;
+      }
+      
+      const payload = {
+        slots: [
+          {
+            date: format(data.date, "yyyy-MM-dd"),
+            start_time: data.startTime,
+            end_time: data.endTime,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+            service_type: null
+          }
+        ]
+      };
+      
+      await mentorApi.createAvailability(payload);
+      toast.success("Availability successfully saved!");
+      onSubmit?.();
+    } catch (err) {
+      console.error("Availability save failed:", err);
+      toast.error(err.response?.data?.message || err.message || "Failed to create availability block.");
+    }
   };
 
   const labelClass = "text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5 inline-block";
