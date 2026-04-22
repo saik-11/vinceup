@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Purchase History",
+  description: "View your invoices, receipts, and payment history on VinceUP.",
+  robots: { index: false, follow: false },
+};
+
+
 export default function PurchaseHistoryPage() {
   return (
     <StatusPage

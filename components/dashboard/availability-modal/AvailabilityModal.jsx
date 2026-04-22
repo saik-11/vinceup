@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import AvailabilityOptions from "./AvailabilityOptions";
@@ -21,11 +21,12 @@ export default function AvailabilityModal({ isOpen, onClose, initialScreen = "op
   const [prevInitial, setPrevInitial] = useState(initialScreen);
   const [activeScreen, setActiveScreen] = useState(initialScreen);
 
-  // Derive activeScreen from initialScreen securely during render
-  if (initialScreen !== prevInitial) {
-    setPrevInitial(initialScreen);
-    setActiveScreen(initialScreen);
-  }
+  useEffect(() => {
+    if (isOpen) {
+      setActiveScreen(initialScreen);
+      setPrevInitial(initialScreen);
+    }
+  }, [isOpen, initialScreen]);
 
   const handleBack = () => setActiveScreen("options");
 
@@ -41,10 +42,7 @@ export default function AvailabilityModal({ isOpen, onClose, initialScreen = "op
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent
-        className="w-full max-w-[480px] p-0 flex flex-col gap-0 overflow-hidden border-slate-100 dark:border-slate-800 bg-background/95 sm:rounded-[24px]"
-        showCloseButton={true}
-      >
+      <DialogContent className="w-full max-w-[480px] p-0 flex flex-col gap-0 overflow-hidden border-slate-100 dark:border-slate-800 bg-background/95 sm:rounded-[24px]" showCloseButton={true}>
         <DialogHeader className="p-6 pb-4 border-b border-transparent">
           <DialogTitle className="text-[17px] font-bold text-slate-900 dark:text-slate-100">{SCREEN_TITLES[activeScreen]}</DialogTitle>
         </DialogHeader>

@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Help Center",
+  description: "Find answers, FAQs, and support resources for your VinceUP account.",
+  robots: { index: false, follow: false },
+};
+
+
 export default function HelpPage() {
   return (
     <StatusPage

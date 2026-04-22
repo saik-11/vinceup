@@ -20,23 +20,14 @@ function Avatar({ className, size = "default", ...props }) {
 }
 
 function AvatarImage({ className, ...props }) {
-  return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full rounded-full object-cover", className)}
-      {...props}
-    />
-  );
+  return <AvatarPrimitive.Image data-slot="avatar-image" className={cn("aspect-square size-full rounded-full object-cover", className)} {...props} />;
 }
 
 function AvatarFallback({ className, ...props }) {
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
-      className={cn(
-        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs",
-        className,
-      )}
+      className={cn("flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs", className)}
       {...props}
     />
   );
@@ -59,13 +50,7 @@ function AvatarBadge({ className, ...props }) {
 }
 
 function AvatarGroup({ className, ...props }) {
-  return (
-    <div
-      data-slot="avatar-group"
-      className={cn("group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background", className)}
-      {...props}
-    />
-  );
+  return <div data-slot="avatar-group" className={cn("group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background", className)} {...props} />;
 }
 
 function AvatarGroupCount({ className, ...props }) {

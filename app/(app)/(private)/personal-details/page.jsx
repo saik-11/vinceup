@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Personal Details",
+  description: "Manage your personal profile information on VinceUP.",
+  robots: { index: false, follow: false },
+};
+
+
 export default function PersonalDetailsPage() {
   return (
     <StatusPage

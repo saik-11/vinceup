@@ -1,16 +1,5 @@
 "use client";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarHeader,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarHeader, useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, X } from "lucide-react";
 import Link from "next/link";
@@ -152,10 +141,7 @@ export default function AppSidebar() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.3, ease: "easeOut" }}>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={handleLogout}
-                      className="gap-3 h-10 rounded-lg cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
-                    >
+                    <SidebarMenuButton onClick={handleLogout} className="gap-3 h-10 rounded-lg cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors">
                       <LogOut className="size-4.5" />
                       <span>Logout</span>
                     </SidebarMenuButton>

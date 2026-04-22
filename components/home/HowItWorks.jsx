@@ -84,20 +84,8 @@ const HowItWorks = () => {
                     ) : (
                       // Number on left
                       <div className="relative inline-flex items-center justify-center">
-                        <span
-                          className={cn(
-                            "text-7xl sm:text-8xl font-black bg-linear-to-br bg-clip-text text-transparent select-none leading-none",
-                            s.gradient,
-                          )}
-                        >
-                          {s.step}
-                        </span>
-                        <div
-                          className={cn(
-                            "absolute -bottom-1 -right-2 flex h-9 w-9 items-center justify-center rounded-full text-white shadow-lg",
-                            s.iconBg,
-                          )}
-                        >
+                        <span className={cn("text-7xl sm:text-8xl font-black bg-linear-to-br bg-clip-text text-transparent select-none leading-none", s.gradient)}>{s.step}</span>
+                        <div className={cn("absolute -bottom-1 -right-2 flex h-9 w-9 items-center justify-center rounded-full text-white shadow-lg", s.iconBg)}>
                           <s.icon className="h-4 w-4" />
                         </div>
                       </div>
@@ -114,20 +102,8 @@ const HowItWorks = () => {
                     {isOdd ? (
                       // Number on right
                       <div className="relative inline-flex items-center justify-center">
-                        <span
-                          className={cn(
-                            "text-7xl sm:text-8xl font-black bg-linear-to-br bg-clip-text text-transparent select-none leading-none",
-                            s.gradient,
-                          )}
-                        >
-                          {s.step}
-                        </span>
-                        <div
-                          className={cn(
-                            "absolute -bottom-1 -right-2 flex h-9 w-9 items-center justify-center rounded-full text-white shadow-lg",
-                            s.iconBg,
-                          )}
-                        >
+                        <span className={cn("text-7xl sm:text-8xl font-black bg-linear-to-br bg-clip-text text-transparent select-none leading-none", s.gradient)}>{s.step}</span>
+                        <div className={cn("absolute -bottom-1 -right-2 flex h-9 w-9 items-center justify-center rounded-full text-white shadow-lg", s.iconBg)}>
                           <s.icon className="h-4 w-4" />
                         </div>
                       </div>

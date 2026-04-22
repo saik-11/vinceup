@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Terms of Service",
+  description: "Read VinceUP's terms of service governing the use of our mentorship platform and services.",
+  robots: { index: true, follow: false },
+};
+
+
 export default function TermsOfServicePage() {
   return (
     <StatusPage

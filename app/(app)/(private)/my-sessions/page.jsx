@@ -2,14 +2,14 @@ import { Calendar, Sparkles, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  DashboardShell,
-  panelClass,
-  interactivePanelClass,
-  metaTextClass,
-  sectionTitleClass,
-  SectionHeading,
-} from "@/components/dashboard/dashboard-shared";
+import { DashboardShell, panelClass, interactivePanelClass, metaTextClass, sectionTitleClass, SectionHeading } from "@/components/dashboard/dashboard-shared";
+
+export const metadata = {
+  title: "My Sessions",
+  description: "View your upcoming and completed mentorship sessions on VinceUP.",
+  robots: { index: false, follow: false },
+};
+
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 

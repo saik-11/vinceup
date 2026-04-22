@@ -98,13 +98,7 @@ const BookSession = () => {
 
           {step === 4 && (
             <motion.div key="step-4" variants={pageVariants} initial="enter" animate="center" exit="exit">
-              <StepPaymentSuccess
-                selectedService={selectedService}
-                selectedDate={selectedDate}
-                selectedTime={selectedTime}
-                selectedMentor={selectedMentor}
-                totalPaid={totalPaid}
-              />
+              <StepPaymentSuccess selectedService={selectedService} selectedDate={selectedDate} selectedTime={selectedTime} selectedMentor={selectedMentor} totalPaid={totalPaid} />
             </motion.div>
           )}
         </AnimatePresence>

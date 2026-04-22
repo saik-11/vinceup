@@ -77,9 +77,7 @@ function RightPanel({ upcomingBookings, onQuickAction }) {
           <h2 className={cn(sectionTitleClass, "text-base")}>Upcoming Bookings</h2>
           <div className="flex flex-col gap-2.5">
             {upcomingBookings.length > 0 ? (
-              upcomingBookings.map((bk) => (
-                <BookingItem key={bk.id} booking={bk} />
-              ))
+              upcomingBookings.map((bk) => <BookingItem key={bk.id} booking={bk} />)
             ) : (
               <p className="text-sm text-(--dashboard-subtle) italic px-2">No upcoming bookings.</p>
             )}
@@ -170,11 +168,11 @@ function PageHeader({ view, setView, onSetAvailability }) {
 export function MentorCalendarContent() {
   // ── Shared state ───────────────────────────────────────────────────────────
   const [view, setView] = useState("month");
-  const [focusDate, setFocusDate] = useState(() => new Date()); 
+  const [focusDate, setFocusDate] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(null);
 
   const [modalState, setModalState] = useState({ isOpen: false, screen: "options" });
-  
+
   const [apiSlots, setApiSlots] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -187,7 +185,7 @@ export function MentorCalendarContent() {
       fetchSlots();
     }
   };
-  
+
   // Safe timezone-agnostic date parsing from YYYY-MM-DD
   const parseLocalDate = (dateStr) => {
     if (!dateStr) return new Date();
@@ -205,7 +203,8 @@ export function MentorCalendarContent() {
 
   const fetchSlots = () => {
     setIsLoading(true);
-    mentorApi.getAvailability()
+    mentorApi
+      .getAvailability()
       .then((res) => {
         const dataSlots = res.slots || (res.data && res.data.slots) || [];
         setApiSlots(dataSlots);
@@ -230,7 +229,7 @@ export function MentorCalendarContent() {
 
     for (const s of apiSlots) {
       const status = s.is_booked ? "booked" : "available";
-      
+
       const prevPriority = PRIORITY[monthMap.get(s.date)] || 0;
       const nextPriority = PRIORITY[status] || 0;
       if (nextPriority > prevPriority) monthMap.set(s.date, status);
@@ -239,17 +238,17 @@ export function MentorCalendarContent() {
       const hourNum = parseInt(timeParts[0], 10);
       if (!isNaN(hourNum)) {
         if (!weekMap[s.date]) weekMap[s.date] = {};
-        
+
         let timeLabel = formatTimeWithTimezone(s.start_time, s.timezone);
 
         weekMap[s.date][hourNum] = {
-           id: s.id,
-           date: s.date,
-           hour: hourNum,
-           status: status,
-           name: "Booked Session", 
-           type: s.service_type || "Session", 
-           time: timeLabel
+          id: s.id,
+          date: s.date,
+          hour: hourNum,
+          status: status,
+          name: "Booked Session",
+          type: s.service_type || "Session",
+          time: timeLabel,
         };
       }
     }
@@ -263,23 +262,26 @@ export function MentorCalendarContent() {
     const fromKey = `${y}-${m}-${d}`;
 
     const filtered = apiSlots.filter((s) => s.is_booked && s.date >= fromKey);
-    return filtered.map((s) => {
-      const timeParts = (s.start_time || "00:00").split(":");
-      const hourNum = parseInt(timeParts[0], 10) || 0;
-      let timeLabel = formatTimeWithTimezone(s.start_time, s.timezone);
+    return filtered
+      .map((s) => {
+        const timeParts = (s.start_time || "00:00").split(":");
+        const hourNum = parseInt(timeParts[0], 10) || 0;
+        let timeLabel = formatTimeWithTimezone(s.start_time, s.timezone);
 
-      return {
-         id: s.id,
-         date: s.date,
-         hour: hourNum,
-         time: timeLabel,
-         name: s.service_type || "Booked Session",
-         type: s.service_type || "Session"
-      };
-    }).sort((a, b) => {
-       if (a.date !== b.date) return a.date < b.date ? -1 : 1;
-       return a.hour - b.hour;
-    }).slice(0, 5);
+        return {
+          id: s.id,
+          date: s.date,
+          hour: hourNum,
+          time: timeLabel,
+          name: s.service_type || "Booked Session",
+          type: s.service_type || "Session",
+        };
+      })
+      .sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+        return a.hour - b.hour;
+      })
+      .slice(0, 5);
   }, [apiSlots, focusDate]);
 
   return (
@@ -302,7 +304,10 @@ export function MentorCalendarContent() {
             <div className="flex flex-col items-center gap-3">
               <AlertCircle className="size-10 text-red-500" />
               <p className="text-sm font-semibold text-red-600 dark:text-red-400">{error}</p>
-              <button onClick={() => window.location.reload()} className="mt-3 text-xs font-bold px-5 py-2.5 bg-red-100 hover:bg-red-200 dark:bg-red-500/20 dark:hover:bg-red-500/30 rounded-[14px] text-red-700 dark:text-red-300 transition-colors shadow-sm">
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-3 text-xs font-bold px-5 py-2.5 bg-red-100 hover:bg-red-200 dark:bg-red-500/20 dark:hover:bg-red-500/30 rounded-[14px] text-red-700 dark:text-red-300 transition-colors shadow-sm"
+              >
                 Try Again
               </button>
             </div>

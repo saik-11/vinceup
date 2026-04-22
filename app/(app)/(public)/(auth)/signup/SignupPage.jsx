@@ -10,7 +10,7 @@ import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthFooterLink from "@/components/auth/AuthFooterLink";
 import SocialButtons from "@/components/auth/SocialButtons";
-import CountryPicker from "@/components/CountryPicker";
+import { CountrySelect, StateSelect, CitySelect } from "@/components/shared/LocationPicker";
 import FieldFeedback from "@/components/FieldFeedback";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,17 +19,8 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSignupMentee } from "@/hooks/useSignupMentee";
-import { useCountries } from "@/services/Usecountries";
 
-const EDUCATION_OPTIONS = [
-  "High School",
-  "Diploma",
-  "Associate's Degree",
-  "Bachelor's Degree",
-  "Master's Degree",
-  "Doctorate (PhD)",
-  "Other",
-];
+const EDUCATION_OPTIONS = ["High School", "Diploma", "Associate's Degree", "Bachelor's Degree", "Master's Degree", "Doctorate (PhD)", "Other"];
 const EXPERIENCE_OPTIONS = [
   { value: "<1", label: "Less than 1 year" },
   { value: "1 to 3", label: "1 to 3 years" },
@@ -44,7 +35,6 @@ const SignupPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [showPasswordHints, setShowPasswordHints] = useState(false);
-  const { data: countries = [], isLoading: countriesLoading } = useCountries();
   const { mutate: signup, isPending } = useSignupMentee({
     onSuccess: () => router.push("/login?registered=true"),
     onError: (message) => setApiError(message),
@@ -72,6 +62,8 @@ const SignupPage = () => {
   const occupation = useWatch({ control: form.control, name: "occupation" });
   const passwordValue = useWatch({ control: form.control, name: "password" }) ?? "";
   const confirmValue = useWatch({ control: form.control, name: "confirmPassword" }) ?? "";
+  const countryValue = useWatch({ control: form.control, name: "country" });
+  const stateValue = useWatch({ control: form.control, name: "state" });
 
   const passwordChecks = {
     length: passwordValue.length >= 8,
@@ -116,13 +108,7 @@ const SignupPage = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="signup-first-name">First name</FieldLabel>
-                    <Input
-                      {...field}
-                      id="signup-first-name"
-                      placeholder="John"
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="given-name"
-                    />
+                    <Input {...field} id="signup-first-name" placeholder="John" aria-invalid={fieldState.invalid} autoComplete="given-name" />
                     <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                   </Field>
                 )}
@@ -134,13 +120,7 @@ const SignupPage = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="signup-last-name">Last name</FieldLabel>
-                    <Input
-                      {...field}
-                      id="signup-last-name"
-                      placeholder="Doe"
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="family-name"
-                    />
+                    <Input {...field} id="signup-last-name" placeholder="Doe" aria-invalid={fieldState.invalid} autoComplete="family-name" />
                     <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                   </Field>
                 )}
@@ -159,15 +139,7 @@ const SignupPage = () => {
                   <FieldLabel htmlFor="signup-email">Email</FieldLabel>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      {...field}
-                      id="signup-email"
-                      type="email"
-                      placeholder="your@email.com"
-                      className="pl-10"
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="email"
-                    />
+                    <Input {...field} id="signup-email" type="email" placeholder="your@email.com" className="pl-10" aria-invalid={fieldState.invalid} autoComplete="email" />
                   </div>
                   <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                 </Field>
@@ -292,14 +264,11 @@ const SignupPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="signup-country">Country</FieldLabel>
-                  <CountryPicker
-                    id="signup-country"
-                    countries={countries}
-                    isLoading={countriesLoading}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="e.g., US"
-                  />
+                  <CountrySelect id="signup-country" value={field.value} onChange={(val) => {
+                    field.onChange(val);
+                    form.setValue("state", "", { shouldValidate: true });
+                    form.setValue("city", "", { shouldValidate: true });
+                  }} placeholder="e.g., US" />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -311,7 +280,10 @@ const SignupPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="signup-state">Province/State</FieldLabel>
-                  <Input {...field} id="signup-state" placeholder="e.g., California" aria-invalid={fieldState.invalid} />
+                  <StateSelect id="signup-state" countryName={countryValue} value={field.value} onChange={(val) => {
+                    field.onChange(val);
+                    form.setValue("city", "", { shouldValidate: true });
+                  }} placeholder="e.g., California" />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -323,7 +295,7 @@ const SignupPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="signup-city">City</FieldLabel>
-                  <Input {...field} id="signup-city" placeholder="e.g., San Francisco" aria-invalid={fieldState.invalid} />
+                  <CitySelect id="signup-city" countryName={countryValue} stateName={stateValue} value={field.value} onChange={field.onChange} placeholder="e.g., San Francisco" />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -379,12 +351,7 @@ const SignupPage = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="signup-experience">Work Experience</FieldLabel>
-                    <Select
-                      name={field.name}
-                      value={field.value || ""}
-                      onValueChange={field.onChange}
-                      onOpenChange={(o) => !o && field.onBlur()}
-                    >
+                    <Select name={field.name} value={field.value || ""} onValueChange={field.onChange} onOpenChange={(o) => !o && field.onBlur()}>
                       <SelectTrigger id="signup-experience" aria-invalid={fieldState.invalid}>
                         <SelectValue placeholder="Select your experience" />
                       </SelectTrigger>
@@ -465,12 +432,7 @@ const SignupPage = () => {
       <SocialButtons />
       <AuthFooterLink text="Already have an account?" href="/login" label="Sign in" />
 
-      <Button
-        asChild
-        variant="outline"
-        className="mt-3 w-full cursor-pointer border-primary! text-primary! border-0 bg-gray-100 hover:bg-gray-200"
-        size="lg"
-      >
+      <Button asChild variant="outline" className="mt-3 w-full cursor-pointer border-primary! text-primary! border-0 bg-gray-100 hover:bg-gray-200" size="lg">
         <Link href="/mentor-signup">
           Want to become a Mentor? <span className="font-semibold">Sign Up</span>
         </Link>

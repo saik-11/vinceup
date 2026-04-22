@@ -131,12 +131,7 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)",
-                      errors.startTime && "border-red-500",
-                    )}
-                  >
+                  <SelectTrigger className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.startTime && "border-red-500")}>
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -157,9 +152,7 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger
-                    className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.endTime && "border-red-500")}
-                  >
+                  <SelectTrigger className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.endTime && "border-red-500")}>
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -231,14 +224,7 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
             <Controller
               control={control}
               name="repeatIndefinitely"
-              render={({ field }) => (
-                <Checkbox
-                  id="repeat-indef"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  className="rounded text-purple-600 focus:ring-purple-500"
-                />
-              )}
+              render={({ field }) => <Checkbox id="repeat-indef" checked={field.value} onCheckedChange={field.onChange} className="rounded text-purple-600 focus:ring-purple-500" />}
             />
             <Label htmlFor="repeat-indef" className="text-sm font-semibold text-slate-800 dark:text-slate-200 cursor-pointer select-none">
               Repeat indefinitely
@@ -246,12 +232,7 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
           </div>
 
           {!repeatIndefinitely && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
               <Label className={labelClass}>End Date</Label>
               <Controller
                 control={control}

@@ -5,15 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
 
 function Pagination({ className, ...props }) {
-  return (
-    <nav
-      role="navigation"
-      aria-label="pagination"
-      data-slot="pagination"
-      className={cn("mx-auto flex w-full justify-center", className)}
-      {...props}
-    />
-  );
+  return <nav role="navigation" aria-label="pagination" data-slot="pagination" className={cn("mx-auto flex w-full justify-center", className)} {...props} />;
 }
 
 function PaginationContent({ className, ...props }) {
@@ -52,12 +44,7 @@ function PaginationNext({ className, text = "Next", ...props }) {
 
 function PaginationEllipsis({ className, ...props }) {
   return (
-    <span
-      aria-hidden
-      data-slot="pagination-ellipsis"
-      className={cn("flex size-9 items-center justify-center [&_svg:not([class*='size-'])]:size-4", className)}
-      {...props}
-    >
+    <span aria-hidden data-slot="pagination-ellipsis" className={cn("flex size-9 items-center justify-center [&_svg:not([class*='size-'])]:size-4", className)} {...props}>
       <MoreHorizontalIcon />
       <span className="sr-only">More pages</span>
     </span>

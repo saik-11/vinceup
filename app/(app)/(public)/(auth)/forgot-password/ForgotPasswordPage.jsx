@@ -95,14 +95,7 @@ const ForgotPage = () => {
                       <FieldLabel>Email Address</FieldLabel>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          type="email"
-                          suppressHydrationWarning
-                          placeholder="your@email.com"
-                          className="pl-10"
-                          aria-invalid={fieldState.invalid}
-                        />
+                        <Input {...field} type="email" suppressHydrationWarning placeholder="your@email.com" className="pl-10" aria-invalid={fieldState.invalid} />
                       </div>
                       <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                     </Field>
@@ -161,9 +154,7 @@ const ForgotPage = () => {
           </div>
 
           {/* ── Help Text ── */}
-          <div className="mt-4 rounded-lg bg-gray-100 p-3 text-center text-sm text-muted-foreground">
-            {`Didn't`} receive the email? Check your spam folder or try resending.
-          </div>
+          <div className="mt-4 rounded-lg bg-gray-100 p-3 text-center text-sm text-muted-foreground">{`Didn't`} receive the email? Check your spam folder or try resending.</div>
         </>
       )}
     </AuthCard>

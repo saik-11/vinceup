@@ -16,8 +16,14 @@
 
 function getRoleCookie() {
   if (typeof document === "undefined") return null; // SSR guard
-  const match = document.cookie.match(/(?:^|;\s*)role=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
+  const match = document.cookie.match(/(?:^|;\s*)auth_user=([^;]*)/);
+  if (!match) return null;
+  try {
+    const user = JSON.parse(decodeURIComponent(match[1]));
+    return user?.role || null;
+  } catch (e) {
+    return null;
+  }
 }
 
 export function useRole() {

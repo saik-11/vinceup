@@ -6,14 +6,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
 function ItemGroup({ className, ...props }) {
-  return (
-    <div
-      role="list"
-      data-slot="item-group"
-      className={cn("group/item-group flex w-full flex-col gap-4 has-data-[size=sm]:gap-2.5 has-data-[size=xs]:gap-2", className)}
-      {...props}
-    />
-  );
+  return <div role="list" data-slot="item-group" className={cn("group/item-group flex w-full flex-col gap-4 has-data-[size=sm]:gap-2.5 has-data-[size=xs]:gap-2", className)} {...props} />;
 }
 
 function ItemSeparator({ className, ...props }) {
@@ -44,9 +37,7 @@ const itemVariants = cva(
 
 function Item({ className, variant = "default", size = "default", asChild = false, ...props }) {
   const Comp = asChild ? Slot.Root : "div";
-  return (
-    <Comp data-slot="item" data-variant={variant} data-size={size} className={cn(itemVariants({ variant, size, className }))} {...props} />
-  );
+  return <Comp data-slot="item" data-variant={variant} data-size={size} className={cn(itemVariants({ variant, size, className }))} {...props} />;
 }
 
 const itemMediaVariants = cva(
@@ -56,8 +47,7 @@ const itemMediaVariants = cva(
       variant: {
         default: "bg-transparent",
         icon: "[&_svg:not([class*='size-'])]:size-4",
-        image:
-          "size-10 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover",
+        image: "size-10 overflow-hidden rounded-sm group-data-[size=sm]/item:size-8 group-data-[size=xs]/item:size-6 [&_img]:size-full [&_img]:object-cover",
       },
     },
     defaultVariants: {
@@ -71,26 +61,11 @@ function ItemMedia({ className, variant = "default", ...props }) {
 }
 
 function ItemContent({ className, ...props }) {
-  return (
-    <div
-      data-slot="item-content"
-      className={cn("flex flex-1 flex-col gap-1 group-data-[size=xs]/item:gap-0 [&+[data-slot=item-content]]:flex-none", className)}
-      {...props}
-    />
-  );
+  return <div data-slot="item-content" className={cn("flex flex-1 flex-col gap-1 group-data-[size=xs]/item:gap-0 [&+[data-slot=item-content]]:flex-none", className)} {...props} />;
 }
 
 function ItemTitle({ className, ...props }) {
-  return (
-    <div
-      data-slot="item-title"
-      className={cn(
-        "font-heading line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4",
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <div data-slot="item-title" className={cn("font-heading line-clamp-1 flex w-fit items-center gap-2 text-sm leading-snug font-medium underline-offset-4", className)} {...props} />;
 }
 
 function ItemDescription({ className, ...props }) {

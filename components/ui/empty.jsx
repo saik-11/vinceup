@@ -3,16 +3,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 function Empty({ className, ...props }) {
-  return (
-    <div
-      data-slot="empty"
-      className={cn(
-        "flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-lg border-dashed p-12 text-center text-balance",
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <div data-slot="empty" className={cn("flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-lg border-dashed p-12 text-center text-balance", className)} {...props} />;
 }
 
 function EmptyHeader({ className, ...props }) {
@@ -40,23 +31,11 @@ function EmptyTitle({ className, ...props }) {
 }
 
 function EmptyDescription({ className, ...props }) {
-  return (
-    <div
-      data-slot="empty-description"
-      className={cn("text-sm/relaxed text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", className)}
-      {...props}
-    />
-  );
+  return <div data-slot="empty-description" className={cn("text-sm/relaxed text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary", className)} {...props} />;
 }
 
 function EmptyContent({ className, ...props }) {
-  return (
-    <div
-      data-slot="empty-content"
-      className={cn("flex w-full max-w-sm min-w-0 flex-col items-center gap-4 text-sm text-balance", className)}
-      {...props}
-    />
-  );
+  return <div data-slot="empty-content" className={cn("flex w-full max-w-sm min-w-0 flex-col items-center gap-4 text-sm text-balance", className)} {...props} />;
 }
 
 export { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia };

@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Mentor Guidelines",
+  description: "Understand VinceUP's mentor guidelines, quality standards, and community expectations.",
+  robots: { index: true, follow: true },
+};
+
+
 export default function MentorGuidelinesPage() {
   return (
     <StatusPage

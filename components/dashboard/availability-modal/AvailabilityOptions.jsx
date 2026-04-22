@@ -5,13 +5,7 @@ import { Sparkles, CalendarDays, Repeat, AlertCircle } from "lucide-react";
 
 export default function AvailabilityOptions({ onSelectOption }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.2 }}
-      className="flex flex-col space-y-6"
-    >
+    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }} className="flex flex-col space-y-6">
       {/* Recommendations Box */}
       <div className="rounded-[16px] border border-purple-100 bg-purple-50/50 p-4 shadow-sm dark:border-purple-900/30 dark:bg-purple-900/10">
         <div className="flex items-start gap-3">
@@ -74,15 +68,9 @@ function OptionCard({ icon, iconBg, title, subtitle, onClick }) {
       onClick={onClick}
       className="group flex w-full items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:border-purple-300 hover:shadow-md dark:border-slate-800 dark:bg-(--dashboard-panel) dark:hover:border-purple-500/50"
     >
-      <div
-        className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${iconBg} transition-transform duration-200 group-hover:scale-110`}
-      >
-        {icon}
-      </div>
+      <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${iconBg} transition-transform duration-200 group-hover:scale-110`}>{icon}</div>
       <div>
-        <h4 className="text-[15px] font-bold text-slate-900 dark:text-slate-100 mb-1 transition-colors group-hover:text-purple-700 dark:group-hover:text-purple-400">
-          {title}
-        </h4>
+        <h4 className="text-[15px] font-bold text-slate-900 dark:text-slate-100 mb-1 transition-colors group-hover:text-purple-700 dark:group-hover:text-purple-400">{title}</h4>
         <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
       </div>
     </button>

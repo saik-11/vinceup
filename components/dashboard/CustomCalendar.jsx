@@ -15,20 +15,7 @@
  */
 
 import { useMemo, useCallback } from "react";
-import {
-  addMonths,
-  subMonths,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  format,
-  isSameMonth,
-  isSameDay,
-  isToday,
-  startOfDay,
-} from "date-fns";
+import { addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, isSameMonth, isSameDay, isToday, startOfDay } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -86,9 +73,7 @@ function DayCell({ date, status, isCurrentMonth, isSelected, isPast, onSelect })
     >
       {/* Today: filled purple circle on the number — matches week view treatment */}
       {today && isCurrentMonth ? (
-        <span className="inline-flex size-7 items-center justify-center rounded-full bg-[#7c3aed] text-white text-sm font-bold leading-none">
-          {format(date, "d")}
-        </span>
+        <span className="inline-flex size-7 items-center justify-center rounded-full bg-[#7c3aed] text-white text-sm font-bold leading-none">{format(date, "d")}</span>
       ) : (
         <span className="leading-none">{format(date, "d")}</span>
       )}
@@ -114,16 +99,7 @@ function NavBtn({ onClick, ariaLabel, children }) {
 
 // ─── CustomCalendar ───────────────────────────────────────────────────────────
 
-export default function CustomCalendar({
-  statusMap = new Map(),
-  focusDate,
-  onFocusDateChange,
-  selectedDate = null,
-  onDateSelect,
-  showLegend = true,
-  showTodayButton = true,
-  className,
-}) {
+export default function CustomCalendar({ statusMap = new Map(), focusDate, onFocusDateChange, selectedDate = null, onDateSelect, showLegend = true, showTodayButton = true, className }) {
   // Derive the month to display from the controlled focusDate
   const viewDate = useMemo(() => startOfMonth(focusDate ?? new Date()), [focusDate]);
 
@@ -193,11 +169,7 @@ export default function CustomCalendar({
         {/* Day-of-week headers */}
         <div className="grid grid-cols-7 gap-1.5" role="row">
           {WEEK_DAYS.map((d) => (
-            <div
-              key={d}
-              role="columnheader"
-              className="text-center text-[11px] font-semibold uppercase tracking-wide text-(--dashboard-subtle) py-1 select-none"
-            >
+            <div key={d} role="columnheader" className="text-center text-[11px] font-semibold uppercase tracking-wide text-(--dashboard-subtle) py-1 select-none">
               {d}
             </div>
           ))}
@@ -215,9 +187,7 @@ export default function CustomCalendar({
             const isSelected = selectedDate ? isSameDay(date, selectedDate) : false;
             const isPast = date < todayNorm;
 
-            return (
-              <DayCell key={key} date={date} status={status} isCurrentMonth={inMonth} isSelected={isSelected} isPast={isPast} onSelect={handleDateSelect} />
-            );
+            return <DayCell key={key} date={date} status={status} isCurrentMonth={inMonth} isSelected={isSelected} isPast={isPast} onSelect={handleDateSelect} />;
           })}
         </div>
 

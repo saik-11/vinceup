@@ -139,9 +139,7 @@ export default function ResetPasswordPage() {
 
           <h1 className="mb-2 text-lg font-semibold tracking-tight">Reset link expired or invalid</h1>
 
-          <p className="mb-6 max-w-70 text-sm text-muted-foreground">
-            Password reset links are valid for 1 hour. This link may have expired, been used already, or contains an invalid token.
-          </p>
+          <p className="mb-6 max-w-70 text-sm text-muted-foreground">Password reset links are valid for 1 hour. This link may have expired, been used already, or contains an invalid token.</p>
 
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
             <Button asChild variant="outline" size="sm">
@@ -255,12 +253,7 @@ export default function ResetPasswordPage() {
                             {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
                         </div>
-                        {showError ? (
-                          <FieldFeedback
-                            variant="error"
-                            message={fieldState.error?.message ?? confirmError?.message ?? "Passwords do not match"}
-                          />
-                        ) : null}
+                        {showError ? <FieldFeedback variant="error" message={fieldState.error?.message ?? confirmError?.message ?? "Passwords do not match"} /> : null}
                         {showSuccess ? <FieldFeedback variant="success" message="Passwords match" /> : null}
                       </Field>
                     );

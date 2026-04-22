@@ -1,32 +1,12 @@
 "use client";
 
 import { memo } from "react";
-import {
-  Bell,
-  Calendar,
-  ChevronDown,
-  Globe,
-  HelpCircle,
-  LayoutDashboard,
-  LogOut,
-  Moon,
-  Settings,
-  ShoppingBag,
-  Sun,
-  UserCircle,
-  UserIcon,
-} from "lucide-react";
+import { Bell, Calendar, ChevronDown, Globe, HelpCircle, LayoutDashboard, LogOut, Moon, Settings, ShoppingBag, Sun, UserCircle, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar as ShadcnAvatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -69,12 +49,7 @@ function NotificationBell() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative cursor-pointer text-muted-foreground hover:text-foreground"
-          aria-label="Notifications"
-        >
+        <Button variant="ghost" size="icon" className="relative cursor-pointer text-muted-foreground hover:text-foreground" aria-label="Notifications">
           <Bell className="size-5" />
           <span className="absolute right-2.5 top-2 size-2 rounded-full bg-red-500 ring-2 ring-background" />
         </Button>
@@ -135,12 +110,7 @@ function UserMenu({ user, onLogout, isLight, setTheme }) {
         >
           {isLight ? <Sun className="size-4" /> : <Moon className="size-4" />}
           <span className="flex-1">Theme</span>
-          <Switch
-            checked={!isLight}
-            onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-            onClick={(event) => event.stopPropagation()}
-            className="cursor-pointer"
-          />
+          <Switch checked={!isLight} onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} onClick={(event) => event.stopPropagation()} className="cursor-pointer" />
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

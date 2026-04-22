@@ -53,37 +53,14 @@ const Navbar = ({ children }) => {
           {/* Desktop nav */}
           <AnimatePresence mode="wait" initial={false}>
             {isPublic && (
-              <motion.ul
-                key="nav-links"
-                className="hidden md:flex items-center gap-2 list-none"
-                variants={stagger}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-              >
+              <motion.ul key="nav-links" className="hidden md:flex items-center gap-2 list-none" variants={stagger} initial="hidden" animate="visible" exit="hidden">
                 {NAV_LINKS.map((link) => (
-                  <motion.li
-                    key={link.href}
-                    className="relative py-2"
-                    variants={fadeSlideUp}
-                    exit="hidden"
-                    onMouseEnter={() => setHoveredHref(link.href)}
-                    onMouseLeave={() => setHoveredHref(null)}
-                  >
-                    <Link
-                      href={link.href}
-                      className={`transition-colors p-3 py-3 ${
-                        isActive(link.href) ? "text-primary font-bold" : "text-foreground hover:text-primary"
-                      }`}
-                    >
+                  <motion.li key={link.href} className="relative py-2" variants={fadeSlideUp} exit="hidden" onMouseEnter={() => setHoveredHref(link.href)} onMouseLeave={() => setHoveredHref(null)}>
+                    <Link href={link.href} className={`transition-colors p-3 py-3 ${isActive(link.href) ? "text-primary font-bold" : "text-foreground hover:text-primary"}`}>
                       {link.label}
                     </Link>
                     {(hoveredHref ?? pathname) === link.href || (!hoveredHref && isActive(link.href)) ? (
-                      <motion.span
-                        layoutId="underline"
-                        className="absolute left-0 bottom-0 h-0.5 w-full bg-primary"
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      />
+                      <motion.span layoutId="underline" className="absolute left-0 bottom-0 h-0.5 w-full bg-primary" transition={{ type: "spring", stiffness: 500, damping: 30 }} />
                     ) : null}
                   </motion.li>
                 ))}
@@ -129,9 +106,7 @@ const Navbar = ({ children }) => {
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`px-3 py-2 rounded-md transition-colors ${
-                      isActive(link.href) ? "text-primary font-bold bg-muted" : "text-foreground hover:text-primary hover:bg-muted"
-                    }`}
+                    className={`px-3 py-2 rounded-md transition-colors ${isActive(link.href) ? "text-primary font-bold bg-muted" : "text-foreground hover:text-primary hover:bg-muted"}`}
                   >
                     {link.label}
                   </Link>
@@ -146,12 +121,7 @@ const Navbar = ({ children }) => {
 
         <main className="flex flex-row flex-1 relative bg-background">
           {!isPublic && (
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: 257 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="shrink-0 overflow-hidden hidden md:block"
-            >
+            <motion.div initial={{ width: 0 }} animate={{ width: 257 }} transition={{ duration: 0.3, ease: "easeOut" }} className="shrink-0 overflow-hidden hidden md:block">
               <AppSidebar />
             </motion.div>
           )}

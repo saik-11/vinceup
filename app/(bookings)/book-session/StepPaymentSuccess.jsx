@@ -7,11 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const WHATS_NEXT = [
-  "A confirmation email has been sent to your inbox",
-  "VEGA will prepare personalized insights for your session",
-  "You'll receive a reminder 24 hours before your session",
-];
+const WHATS_NEXT = ["A confirmation email has been sent to your inbox", "VEGA will prepare personalized insights for your session", "You'll receive a reminder 24 hours before your session"];
 
 function generateTxnId() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -80,12 +76,7 @@ export default function StepPaymentSuccess({ selectedService, selectedDate, sele
       </div>
 
       {/* ── Checkmark ── */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="flex justify-center mb-6"
-      >
+      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15 }} className="flex justify-center mb-6">
         <div className="flex size-20 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
           <CheckCircle2 className="size-10" />
         </div>
@@ -152,12 +143,7 @@ export default function StepPaymentSuccess({ selectedService, selectedDate, sele
         </Button>
       </motion.div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="mt-4 text-center text-sm text-muted-foreground"
-      >
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-4 text-center text-sm text-muted-foreground">
         Redirecting to dashboard in {seconds} seconds…
       </motion.p>
     </div>

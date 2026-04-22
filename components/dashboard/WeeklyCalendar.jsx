@@ -18,19 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { panelClass, sectionTitleClass } from "@/components/dashboard/dashboard-shared";
 import CalendarLegend from "@/components/dashboard/CalendarLegend";
-import {
-  MONTH_NAMES,
-  CALENDAR_HOURS,
-  ROW_HEIGHT_PX,
-  STATUS_STYLES,
-  addDays,
-  getMonday,
-  toDateKey,
-  formatHour,
-  formatWeekRange,
-  startOfDay,
-  isSameDaySimple,
-} from "@/lib/calendar-utils";
+import { MONTH_NAMES, CALENDAR_HOURS, ROW_HEIGHT_PX, STATUS_STYLES, addDays, getMonday, toDateKey, formatHour, formatWeekRange, startOfDay, isSameDaySimple } from "@/lib/calendar-utils";
 
 // ─── Day column labels ─────────────────────────────────────────────────────────
 
@@ -162,20 +150,11 @@ export default function WeeklyCalendar({ slotMap = {}, focusDate, onFocusDateCha
                 const isToday = isSameDaySimple(day, todayNorm);
                 return (
                   <div key={key} className="text-center">
-                    <p
-                      className={cn(
-                        "text-[11px] font-semibold uppercase tracking-wide",
-                        isToday ? "text-(--dashboard-purple)" : "text-(--dashboard-subtle)",
-                      )}
-                    >
-                      {DAY_LABELS[idx]}
-                    </p>
+                    <p className={cn("text-[11px] font-semibold uppercase tracking-wide", isToday ? "text-(--dashboard-purple)" : "text-(--dashboard-subtle)")}>{DAY_LABELS[idx]}</p>
                     <p
                       className={cn(
                         "mt-0.5 font-bold",
-                        isToday
-                          ? "inline-flex size-7 items-center justify-center rounded-full bg-[#7c3aed] text-white mx-auto text-sm"
-                          : "text-sm text-(--dashboard-text)",
+                        isToday ? "inline-flex size-7 items-center justify-center rounded-full bg-[#7c3aed] text-white mx-auto text-sm" : "text-sm text-(--dashboard-text)",
                       )}
                     >
                       {day.getDate()}
@@ -211,11 +190,7 @@ export default function WeeklyCalendar({ slotMap = {}, focusDate, onFocusDateCha
                     const slot = slotMap[key]?.[hour];
                     return (
                       <div key={key} className="h-full">
-                        {slot ? (
-                          <SlotBlock slot={slot} onClick={onSlotClick} />
-                        ) : (
-                          <EmptyCell dateKey={key} hour={hour} onClick={onEmptySlotClick} />
-                        )}
+                        {slot ? <SlotBlock slot={slot} onClick={onSlotClick} /> : <EmptyCell dateKey={key} hour={hour} onClick={onEmptySlotClick} />}
                       </div>
                     );
                   })}

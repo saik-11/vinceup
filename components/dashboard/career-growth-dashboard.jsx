@@ -40,26 +40,22 @@ import {
 
 const statAccentStyles = {
   blue: {
-    iconWrap:
-      "bg-[linear-gradient(135deg,rgba(88,110,255,0.16),rgba(60,130,246,0.22))] text-[var(--dashboard-blue)] dark:bg-[linear-gradient(135deg,rgba(88,110,255,0.22),rgba(60,130,246,0.28))]",
+    iconWrap: "bg-[linear-gradient(135deg,rgba(88,110,255,0.16),rgba(60,130,246,0.22))] text-[var(--dashboard-blue)] dark:bg-[linear-gradient(135deg,rgba(88,110,255,0.22),rgba(60,130,246,0.28))]",
     hoverBorder: "hover:border-[rgba(59,130,246,0.22)] dark:hover:border-[rgba(96,165,250,0.32)]",
     hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(59,130,246,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(37,99,235,0.34)]",
   },
   green: {
-    iconWrap:
-      "bg-[linear-gradient(135deg,rgba(18,183,106,0.14),rgba(5,150,105,0.22))] text-[var(--dashboard-green)] dark:bg-[linear-gradient(135deg,rgba(18,183,106,0.22),rgba(5,150,105,0.3))]",
+    iconWrap: "bg-[linear-gradient(135deg,rgba(18,183,106,0.14),rgba(5,150,105,0.22))] text-[var(--dashboard-green)] dark:bg-[linear-gradient(135deg,rgba(18,183,106,0.22),rgba(5,150,105,0.3))]",
     hoverBorder: "hover:border-[rgba(18,183,106,0.22)] dark:hover:border-[rgba(52,211,153,0.32)]",
     hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(18,183,106,0.3)] dark:hover:shadow-[0_24px_60px_-32px_rgba(5,150,105,0.34)]",
   },
   purple: {
-    iconWrap:
-      "bg-[linear-gradient(135deg,rgba(124,58,237,0.14),rgba(192,38,211,0.22))] text-[var(--dashboard-purple)] dark:bg-[linear-gradient(135deg,rgba(139,92,246,0.24),rgba(217,70,239,0.28))]",
+    iconWrap: "bg-[linear-gradient(135deg,rgba(124,58,237,0.14),rgba(192,38,211,0.22))] text-[var(--dashboard-purple)] dark:bg-[linear-gradient(135deg,rgba(139,92,246,0.24),rgba(217,70,239,0.28))]",
     hoverBorder: "hover:border-[rgba(124,58,237,0.22)] dark:hover:border-[rgba(167,139,250,0.32)]",
     hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(124,58,237,0.32)] dark:hover:shadow-[0_24px_60px_-32px_rgba(124,58,237,0.36)]",
   },
   orange: {
-    iconWrap:
-      "bg-[linear-gradient(135deg,rgba(249,115,22,0.16),rgba(234,88,12,0.22))] text-[var(--dashboard-orange)] dark:bg-[linear-gradient(135deg,rgba(251,146,60,0.24),rgba(249,115,22,0.28))]",
+    iconWrap: "bg-[linear-gradient(135deg,rgba(249,115,22,0.16),rgba(234,88,12,0.22))] text-[var(--dashboard-orange)] dark:bg-[linear-gradient(135deg,rgba(251,146,60,0.24),rgba(249,115,22,0.28))]",
     hoverBorder: "hover:border-[rgba(249,115,22,0.24)] dark:hover:border-[rgba(251,146,60,0.34)]",
     hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(249,115,22,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(234,88,12,0.34)]",
   },
@@ -127,9 +123,7 @@ function DashboardHeader({ user, activeScenario }) {
             className="mt-1 border border-white/70 bg-[linear-gradient(135deg,#ede9fe,#dbeafe)] shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(76,29,149,0.9),rgba(30,41,59,0.95))]"
           >
             <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? "Vinny"} />
-            <AvatarFallback className="bg-transparent font-semibold text-slate-700 dark:text-slate-100">
-              {getInitials(user.name)}
-            </AvatarFallback>
+            <AvatarFallback className="bg-transparent font-semibold text-slate-700 dark:text-slate-100">{getInitials(user.name)}</AvatarFallback>
           </Avatar>
 
           <div className="min-w-0">
@@ -154,9 +148,7 @@ function DashboardHeader({ user, activeScenario }) {
             <h1 className="max-w-3xl text-balance text-[2rem] font-semibold leading-tight tracking-[-0.04em] text-(--dashboard-text) sm:text-[2.4rem] lg:text-[2.75rem]">
               Welcome back, {user.name ?? "Vinny"}!
             </h1>
-            <p className="mt-2 max-w-2xl text-base leading-7 text-(--dashboard-muted)">
-              {user.subtitle ?? "Here's your career growth overview"}
-            </p>
+            <p className="mt-2 max-w-2xl text-base leading-7 text-(--dashboard-muted)">{user.subtitle ?? "Here's your career growth overview"}</p>
           </div>
         </div>
 
@@ -196,19 +188,12 @@ function StatsGrid({ stats }) {
           <li key={stat.id} className="min-w-0">
             <Card className={cn(panelClass, interactivePanelClass, accentStyles.hoverBorder, accentStyles.hoverShadow, "h-full px-0 py-0")}>
               <CardContent className="flex h-full flex-col gap-4 p-4 sm:p-6">
-                <div
-                  className={cn(
-                    "flex size-12 items-center justify-center rounded-[16px] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]",
-                    accentStyles.iconWrap,
-                  )}
-                >
+                <div className={cn("flex size-12 items-center justify-center rounded-[16px] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]", accentStyles.iconWrap)}>
                   <Icon className="size-5" />
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-[1.95rem] font-semibold leading-none tracking-[-0.05em] text-(--dashboard-text)">
-                    {formatMetric(stat)}
-                  </div>
+                  <div className="text-[1.95rem] font-semibold leading-none tracking-[-0.05em] text-(--dashboard-text)">{formatMetric(stat)}</div>
                   <div className="text-sm font-medium leading-6 text-(--dashboard-muted)">{stat.label}</div>
                   {stat.helper ? <p className="text-sm leading-6 text-(--dashboard-subtle)">{stat.helper}</p> : null}
                 </div>
@@ -247,12 +232,7 @@ function SessionsCard({ sessions }) {
   return (
     <Card className={cn(panelClass, "px-0 py-0")}>
       <CardContent className="space-y-6 p-4 sm:p-6">
-        <SectionHeading
-          title="Upcoming Sessions"
-          description="Keep your coaching cadence tight and prep before each call."
-          actionLabel="View all"
-          actionHref="/my-sessions"
-        />
+        <SectionHeading title="Upcoming Sessions" description="Keep your coaching cadence tight and prep before each call." actionLabel="View all" actionHref="/my-sessions" />
 
         {sessions.length ? (
           <ul className="space-y-3" aria-label="Upcoming sessions">
@@ -270,10 +250,7 @@ function SessionsCard({ sessions }) {
                     </div>
 
                     <div className="min-w-0 space-y-2">
-                      <h3
-                        className="text-lg font-semibold leading-7 tracking-[-0.03em] text-(--dashboard-text)"
-                        title={session.title ?? "Session details pending"}
-                      >
+                      <h3 className="text-lg font-semibold leading-7 tracking-[-0.03em] text-(--dashboard-text)" title={session.title ?? "Session details pending"}>
                         {session.title ?? "Session details pending"}
                       </h3>
                       <p className="text-sm leading-6 text-(--dashboard-muted)" title={session.mentorName ?? "Mentor to be assigned"}>
@@ -333,43 +310,24 @@ function TasksCard({ tasks }) {
   return (
     <Card className={cn(panelClass, "px-0 py-0")}>
       <CardContent className="space-y-6 p-4 sm:p-6">
-        <SectionHeading
-          title="Priority Tasks"
-          description="Action items that will move your job search forward this week."
-          actionLabel="View all"
-          actionHref="/action-board"
-        />
+        <SectionHeading title="Priority Tasks" description="Action items that will move your job search forward this week." actionLabel="View all" actionHref="/action-board" />
 
         {tasks.length ? (
           <ul className="space-y-3" aria-label="Priority tasks">
             {tasks.map((task) => (
               <li key={task.id}>
-                <div
-                  className={cn(
-                    subCardClass,
-                    "flex items-start justify-between gap-3 p-4 hover:border-(--dashboard-border-strong) hover:-translate-y-0.5 sm:p-5",
-                  )}
-                >
+                <div className={cn(subCardClass, "flex items-start justify-between gap-3 p-4 hover:border-(--dashboard-border-strong) hover:-translate-y-0.5 sm:p-5")}>
                   <div className="min-w-0 flex-1">
                     <h3 className="text-base font-medium leading-7 text-(--dashboard-text)" title={task.title ?? "Task details pending"}>
                       {task.title ?? "Task details pending"}
                     </h3>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-sm leading-6 text-(--dashboard-subtle)">
-                      <Badge
-                        className={cn("rounded-full border px-2.5 py-1 text-xs font-semibold ring-0", priorityTone[task.priority ?? "low"])}
-                      >
-                        {task.priority ?? "low"}
-                      </Badge>
+                      <Badge className={cn("rounded-full border px-2.5 py-1 text-xs font-semibold ring-0", priorityTone[task.priority ?? "low"])}>{task.priority ?? "low"}</Badge>
                       <span>Due {task.dueDate ?? "TBD"}</span>
                     </div>
                   </div>
 
-                  <CheckCheck
-                    className={cn(
-                      "mt-0.5 size-5 shrink-0",
-                      task.status === "done" ? "text-emerald-500 dark:text-emerald-300" : "text-slate-300 dark:text-slate-600",
-                    )}
-                  />
+                  <CheckCheck className={cn("mt-0.5 size-5 shrink-0", task.status === "done" ? "text-emerald-500 dark:text-emerald-300" : "text-slate-300 dark:text-slate-600")} />
                 </div>
               </li>
             ))}
@@ -421,11 +379,7 @@ function VegaInsightsCard({ insights }) {
                   </div>
                   <p className="text-sm leading-6 text-white/84">{insight.body}</p>
                   {insight.ctaLabel ? (
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className="mt-3 h-9 rounded-full px-3 text-sm font-medium text-white hover:bg-white/10 hover:text-white"
-                    >
+                    <Button asChild variant="ghost" className="mt-3 h-9 rounded-full px-3 text-sm font-medium text-white hover:bg-white/10 hover:text-white">
                       <Link href={insight.ctaHref ?? "/dashboard"}>
                         {insight.ctaLabel}
                         <ArrowRight className="size-4" />
@@ -459,9 +413,7 @@ function RecentInsightsCard({ items }) {
                 <div className="text-base leading-7 text-(--dashboard-text)" title={item.summary ?? "Insight summary pending sync"}>
                   {item.summary ?? "Insight summary pending sync"}
                 </div>
-                {item.meta ? (
-                  <div className="mt-3 text-sm leading-6 text-(--dashboard-purple) dark:text-violet-300">{item.meta}</div>
-                ) : null}
+                {item.meta ? <div className="mt-3 text-sm leading-6 text-(--dashboard-purple) dark:text-violet-300">{item.meta}</div> : null}
               </div>
             </li>
           ))}
@@ -477,9 +429,7 @@ function QuickActionsCard({ actions, userRole }) {
       <CardHeader className="gap-2 px-4 pt-4 sm:px-6 sm:pt-6">
         <CardTitle className={sectionTitleClass}>Quick Actions</CardTitle>
         <CardDescription className={metaTextClass}>
-          {userRole === "admin"
-            ? "Direct links for ops, roadmap, and profile management."
-            : "Jump into the next action that advances your career plan."}
+          {userRole === "admin" ? "Direct links for ops, roadmap, and profile management." : "Jump into the next action that advances your career plan."}
         </CardDescription>
       </CardHeader>
 
@@ -666,9 +616,7 @@ export function DashboardErrorState({ error, retryLabel, onRetry }) {
           <div className="flex size-14 items-center justify-center rounded-[20px] bg-rose-50 text-rose-500 dark:bg-rose-500/12 dark:text-rose-200">
             <CircleAlert className="size-6" />
           </div>
-          <CardTitle className="text-2xl font-semibold tracking-[-0.03em] text-(--dashboard-text)">
-            Dashboard data could not be loaded
-          </CardTitle>
+          <CardTitle className="text-2xl font-semibold tracking-[-0.03em] text-(--dashboard-text)">Dashboard data could not be loaded</CardTitle>
           <CardDescription className="max-w-xl text-sm leading-6 text-(--dashboard-muted)">
             {error?.message ?? "The dashboard hit an unexpected issue while rendering your career snapshot."}
           </CardDescription>
@@ -676,22 +624,15 @@ export function DashboardErrorState({ error, retryLabel, onRetry }) {
 
         <CardContent className="space-y-5 px-6 pb-6 sm:px-8 sm:pb-8">
           <div className="rounded-[20px] border border-(--dashboard-border) bg-(--dashboard-panel-muted) p-4 text-sm leading-6 text-(--dashboard-muted)">
-            Try refreshing the route or switching back to the default scenario. Route-level errors are handled by Next 16 in this segment
-            through `error.js`, so this state is recoverable without leaving the page.
+            Try refreshing the route or switching back to the default scenario. Route-level errors are handled by Next 16 in this segment through `error.js`, so this state is recoverable without
+            leaving the page.
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              onClick={onRetry}
-              className="h-11 rounded-full bg-[linear-gradient(135deg,#7c3aed,#c026d3)] px-5 text-white shadow-[0_16px_32px_-22px_rgba(168,85,247,0.66)]"
-            >
+            <Button onClick={onRetry} className="h-11 rounded-full bg-[linear-gradient(135deg,#7c3aed,#c026d3)] px-5 text-white shadow-[0_16px_32px_-22px_rgba(168,85,247,0.66)]">
               {retryLabel}
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="h-11 rounded-full border-(--dashboard-border) bg-(--dashboard-panel-strong) px-5 text-(--dashboard-text) hover:bg-(--dashboard-panel-muted)"
-            >
+            <Button asChild variant="outline" className="h-11 rounded-full border-(--dashboard-border) bg-(--dashboard-panel-strong) px-5 text-(--dashboard-text) hover:bg-(--dashboard-panel-muted)">
               <Link href="/dashboard">Open default dashboard</Link>
             </Button>
           </div>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AUTH_COOKIE_NAME, readAuthSession } from "@/lib/auth-session";
+import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from "@/lib/auth/authSession";
 
 // ─── Auth routes (redirect to dashboard if already logged in) ─────────────────
 const AUTH_ROUTES = ["/login", "/signup", "/mentor-signup", "/forgot-password", "/reset-password"];
@@ -33,8 +33,8 @@ export function proxy(request) {
   const pathname = request.nextUrl.pathname;
 
   // ── 1. Auth check ────────────────────────────────────────────────────────────
-  const session = readAuthSession(request.cookies.get(AUTH_COOKIE_NAME)?.value);
-  const isAuthenticated = Boolean(session);
+  const sessionToken = request.cookies.get(AUTH_TOKEN_KEY)?.value;
+  const isAuthenticated = Boolean(sessionToken);
   const isAuthRoute = isRouteMatch(pathname, AUTH_ROUTES);
 
   // Already logged in → don't show login/signup pages again
@@ -51,9 +51,13 @@ export function proxy(request) {
 
   // ── 2. Role check (only for authenticated requests) ───────────────────────────
   if (isAuthenticated) {
-    // The plain `role` cookie is set server-side at login for UI/guard decisions.
-    // It is NOT httpOnly so it can also be read by client JS for sidebar rendering.
-    const role = request.cookies.get("role")?.value ?? null;
+    let role = null;
+    try {
+      const userCookie = request.cookies.get(AUTH_USER_KEY)?.value;
+      if (userCookie) {
+        role = JSON.parse(userCookie)?.role || null;
+      }
+    } catch (e) {}
 
     // Mentee (or unknown role) trying to access a mentor-only page
     if (role !== "mentor" && isRouteMatch(pathname, MENTOR_ONLY_ROUTES)) {

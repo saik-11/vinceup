@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Account Settings",
+  description: "Manage your VinceUP account preferences, notifications, and security settings.",
+  robots: { index: false, follow: false },
+};
+
+
 export default function SettingsPage() {
   return (
     <StatusPage

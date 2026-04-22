@@ -7,13 +7,7 @@ import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
 
 function Menubar({ className, ...props }) {
-  return (
-    <MenubarPrimitive.Root
-      data-slot="menubar"
-      className={cn("flex h-9 items-center gap-1 rounded-md border p-1 shadow-xs", className)}
-      {...props}
-    />
-  );
+  return <MenubarPrimitive.Root data-slot="menubar" className={cn("flex h-9 items-center gap-1 rounded-md border p-1 shadow-xs", className)} {...props} />;
 }
 
 function MenubarMenu({ ...props }) {
@@ -36,10 +30,7 @@ function MenubarTrigger({ className, ...props }) {
   return (
     <MenubarPrimitive.Trigger
       data-slot="menubar-trigger"
-      className={cn(
-        "flex items-center rounded-sm px-2 py-1 text-sm font-medium outline-hidden select-none hover:bg-muted aria-expanded:bg-muted",
-        className,
-      )}
+      className={cn("flex items-center rounded-sm px-2 py-1 text-sm font-medium outline-hidden select-none hover:bg-muted aria-expanded:bg-muted", className)}
       {...props}
     />
   );
@@ -122,14 +113,7 @@ function MenubarRadioItem({ className, children, inset, ...props }) {
 }
 
 function MenubarLabel({ className, inset, ...props }) {
-  return (
-    <MenubarPrimitive.Label
-      data-slot="menubar-label"
-      data-inset={inset}
-      className={cn("px-2 py-1.5 text-sm font-medium data-inset:ps-8", className)}
-      {...props}
-    />
-  );
+  return <MenubarPrimitive.Label data-slot="menubar-label" data-inset={inset} className={cn("px-2 py-1.5 text-sm font-medium data-inset:ps-8", className)} {...props} />;
 }
 
 function MenubarSeparator({ className, ...props }) {
@@ -137,13 +121,7 @@ function MenubarSeparator({ className, ...props }) {
 }
 
 function MenubarShortcut({ className, ...props }) {
-  return (
-    <span
-      data-slot="menubar-shortcut"
-      className={cn("ms-auto text-xs tracking-widest text-muted-foreground group-focus/menubar-item:text-accent-foreground", className)}
-      {...props}
-    />
-  );
+  return <span data-slot="menubar-shortcut" className={cn("ms-auto text-xs tracking-widest text-muted-foreground group-focus/menubar-item:text-accent-foreground", className)} {...props} />;
 }
 
 function MenubarSub({ ...props }) {

@@ -95,9 +95,7 @@ const Footer = () => {
             <Link href="/">
               <Image src={vinceup_logo} alt="VinceUp" loading="eager" className="h-10 w-auto" />
             </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-gray-400">
-              Your career growth operating system, powered by expert mentorship and AI intelligence.
-            </p>
+            <p className="max-w-xs text-sm leading-relaxed text-gray-400">Your career growth operating system, powered by expert mentorship and AI intelligence.</p>
 
             {/* Social icons */}
             <div className="flex items-center gap-3 pt-2">

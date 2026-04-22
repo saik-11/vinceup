@@ -82,11 +82,7 @@ const MentorCard = ({ mentor, isSelected, onSelect }) => (
     `}
   >
     {isSelected && (
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        className="absolute top-4 right-4 flex size-6 items-center justify-center rounded-full bg-primary text-white"
-      >
+      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-4 right-4 flex size-6 items-center justify-center rounded-full bg-primary text-white">
         <Check className="size-3.5" />
       </motion.div>
     )}
@@ -125,17 +121,7 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.05 } },
 };
 
-export default function StepSelectSlot({
-  selectedService,
-  selectedDate,
-  onDateChange,
-  selectedTime,
-  onTimeChange,
-  selectedMentor,
-  onMentorChange,
-  onBack,
-  onNext,
-}) {
+export default function StepSelectSlot({ selectedService, selectedDate, onDateChange, selectedTime, onTimeChange, selectedMentor, onMentorChange, onBack, onNext }) {
   const isComplete = selectedDate && selectedTime && selectedMentor;
   const hasDateAndTime = selectedDate && selectedTime;
 
@@ -228,13 +214,7 @@ export default function StepSelectSlot({
             <p className="text-sm text-muted-foreground py-20 text-center">Please select a date and time first</p>
           ) : (
             <AnimatePresence mode="wait">
-              <motion.div
-                key="mentor-list"
-                className="space-y-4 max-h-[580px] overflow-y-auto pr-1"
-                variants={stagger}
-                initial="hidden"
-                animate="visible"
-              >
+              <motion.div key="mentor-list" className="space-y-4 max-h-[580px] overflow-y-auto pr-1" variants={stagger} initial="hidden" animate="visible">
                 {MENTORS.map((mentor) => (
                   <motion.div key={mentor.id} variants={fadeIn}>
                     <MentorCard mentor={mentor} isSelected={selectedMentor?.id === mentor.id} onSelect={onMentorChange} />

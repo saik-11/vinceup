@@ -1,5 +1,15 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Contact Us",
+  description: "Get in touch with the VinceUP team. We're here to help with any questions about our mentorship platform.",
+  openGraph: {
+    title: "Contact VinceUP",
+    description: "Reach out to the VinceUP team for support or partnership inquiries.",
+  },
+};
+
+
 export default function ContactPage() {
   return (
     <StatusPage

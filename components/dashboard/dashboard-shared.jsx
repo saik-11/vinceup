@@ -50,8 +50,7 @@ export const panelClass =
   "overflow-visible rounded-[24px] border border-[var(--dashboard-border)] bg-[var(--dashboard-panel)] text-[var(--dashboard-text)] shadow-[var(--dashboard-shadow)] ring-0 backdrop-blur-xl";
 
 /** Hover animation applied on top of panelClass for interactive lift effect. */
-export const interactivePanelClass =
-  "transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[var(--dashboard-shadow-hover)]";
+export const interactivePanelClass = "transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[var(--dashboard-shadow-hover)]";
 
 /** Inner sub-cards (sessions, tasks, insights) inside a panel. */
 export const subCardClass =

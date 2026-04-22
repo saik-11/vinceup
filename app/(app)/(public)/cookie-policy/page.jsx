@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Cookie Policy",
+  description: "Learn how VinceUP uses cookies and similar technologies on our platform.",
+  robots: { index: true, follow: false },
+};
+
+
 export default function CookiePolicyPage() {
   return (
     <StatusPage

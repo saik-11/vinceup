@@ -109,14 +109,4 @@ export const USER_MENU_ITEMS = [
 ];
 
 // ─── Pages that use "public" layout (no sidebar) ───
-export const PUBLIC_PAGES = [
-  "/",
-  "/login",
-  "/signup",
-  "/mentor-signup",
-  "/mentor",
-  "/about",
-  "/service",
-  "/reset-password",
-  "/forgot-password",
-];
+export const PUBLIC_PAGES = ["/", "/login", "/signup", "/mentor-signup", "/mentor", "/about", "/service", "/reset-password", "/forgot-password"];

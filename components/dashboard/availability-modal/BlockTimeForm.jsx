@@ -6,6 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { AlertCircle, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { getBrowserTimezone } from "@/lib/timezone";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -44,20 +45,20 @@ export default function BlockTimeForm({ onBack, onSubmit, selectedDate }) {
         toast.error("Please complete the required date and time entries.");
         return;
       }
-      
+
       const payload = {
         slots: [
           {
             date: format(data.date, "yyyy-MM-dd"),
             start_time: data.startTime,
             end_time: data.endTime,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+            timezone: getBrowserTimezone() || "UTC",
             service_type: null,
-            status: "Blocked"
-          }
-        ]
+            status: "Blocked",
+          },
+        ],
       };
-      
+
       await mentorApi.createAvailability(payload);
       toast.success("Time successfully blocked!");
       onSubmit?.();
@@ -82,9 +83,7 @@ export default function BlockTimeForm({ onBack, onSubmit, selectedDate }) {
         {/* Warning Banner */}
         <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-red-700 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-400">
           <AlertCircle className="size-4 shrink-0 mt-0.5" strokeWidth={2} />
-          <p className="text-[13px] font-medium leading-tight">
-            Blocked time will prevent mentees from booking sessions during this period.
-          </p>
+          <p className="text-[13px] font-medium leading-tight">Blocked time will prevent mentees from booking sessions during this period.</p>
         </div>
 
         {/* Select Date */}
@@ -127,12 +126,7 @@ export default function BlockTimeForm({ onBack, onSubmit, selectedDate }) {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)",
-                      errors.startTime && "border-red-500",
-                    )}
-                  >
+                  <SelectTrigger className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.startTime && "border-red-500")}>
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -153,9 +147,7 @@ export default function BlockTimeForm({ onBack, onSubmit, selectedDate }) {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger
-                    className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.endTime && "border-red-500")}
-                  >
+                  <SelectTrigger className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.endTime && "border-red-500")}>
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>

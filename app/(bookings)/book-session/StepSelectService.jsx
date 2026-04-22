@@ -38,20 +38,12 @@ export default function StepSelectService({ selectedService, onSelect, onNext })
                 relative cursor-pointer rounded-2xl border-2 p-6
                 bg-white dark:bg-gray-900
                 transition-all duration-200 hover:shadow-lg dark:hover:shadow-gray-900/50
-                ${
-                  isSelected
-                    ? "border-primary shadow-md dark:shadow-primary/10"
-                    : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700"
-                }
+                ${isSelected ? "border-primary shadow-md dark:shadow-primary/10" : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700"}
               `}
             >
               {/* Selected checkmark */}
               {isSelected && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute top-4 right-4 flex size-6 items-center justify-center rounded-full bg-primary text-white"
-                >
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-4 right-4 flex size-6 items-center justify-center rounded-full bg-primary text-white">
                   <Check className="size-3.5" />
                 </motion.div>
               )}

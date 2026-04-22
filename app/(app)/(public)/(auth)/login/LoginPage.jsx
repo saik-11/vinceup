@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useLogin } from "@/hooks/useLogin";
 import { getBrowserTimezone } from "@/lib/timezone";
+import { authHelpers } from "@/lib/auth/authHelpers";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email"),
@@ -35,11 +36,12 @@ export default function LoginPage() {
 
   const { mutate: loginMutate, isPending } = useLogin({
     onSuccess: (data) => {
-      const role = data?.user?.role;
       const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl");
       const redirectTo = typeof callbackUrl === "string" && callbackUrl.startsWith("/") ? callbackUrl : "/dashboard";
-      localStorage.setItem("role", role);
+      
+      authHelpers.loginUser(data);
       login(data.user);
+      
       router.replace(redirectTo);
     },
     onError: (message) => {
@@ -96,15 +98,7 @@ export default function LoginPage() {
               <FieldLabel htmlFor="login-email">Email</FieldLabel>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  {...field}
-                  type="email"
-                  id="login-email"
-                  placeholder="your@email.com"
-                  className="pl-10"
-                  aria-invalid={fieldState.invalid}
-                  autoComplete="email"
-                />
+                <Input {...field} type="email" id="login-email" placeholder="your@email.com" className="pl-10" aria-invalid={fieldState.invalid} autoComplete="email" />
               </div>
               {fieldState.invalid && <FieldFeedback variant="error" message={fieldState.error?.message} />}
             </Field>
@@ -119,14 +113,7 @@ export default function LoginPage() {
               <FieldLabel htmlFor="login-password">Password</FieldLabel>
               <div className="relative">
                 <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  {...field}
-                  id="login-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  className="pl-10 pr-10"
-                  aria-invalid={fieldState.invalid}
-                />
+                <Input {...field} id="login-password" type={showPassword ? "text" : "password"} placeholder="Enter your password" className="pl-10 pr-10" aria-invalid={fieldState.invalid} />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}

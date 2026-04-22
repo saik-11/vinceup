@@ -85,14 +85,7 @@ function Carousel({ orientation = "horizontal", opts, setApi, plugins, className
         canScrollNext,
       }}
     >
-      <div
-        onKeyDownCapture={handleKeyDown}
-        className={cn("relative", className)}
-        role="region"
-        aria-roledescription="carousel"
-        data-slot="carousel"
-        {...props}
-      >
+      <div onKeyDownCapture={handleKeyDown} className={cn("relative", className)} role="region" aria-roledescription="carousel" data-slot="carousel" {...props}>
         {children}
       </div>
     </CarouselContext.Provider>
@@ -133,9 +126,7 @@ function CarouselPrevious({ className, variant = "outline", size = "icon-sm", ..
       size={size}
       className={cn(
         "absolute touch-manipulation rounded-full",
-        orientation === "horizontal"
-          ? "top-1/2 -start-12 -translate-y-1/2"
-          : "-top-12 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 rotate-90",
+        orientation === "horizontal" ? "top-1/2 -start-12 -translate-y-1/2" : "-top-12 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 rotate-90",
         className,
       )}
       disabled={!canScrollPrev}
@@ -158,9 +149,7 @@ function CarouselNext({ className, variant = "outline", size = "icon-sm", ...pro
       size={size}
       className={cn(
         "absolute touch-manipulation rounded-full",
-        orientation === "horizontal"
-          ? "top-1/2 -end-12 -translate-y-1/2"
-          : "-bottom-12 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 rotate-90",
+        orientation === "horizontal" ? "top-1/2 -end-12 -translate-y-1/2" : "-bottom-12 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 rotate-90",
         className,
       )}
       disabled={!canScrollNext}

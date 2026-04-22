@@ -66,10 +66,7 @@ function DropdownMenuCheckboxItem({ className, children, checked, inset, ...prop
       checked={checked}
       {...props}
     >
-      <span
-        className="pointer-events-none absolute end-2 flex items-center justify-center"
-        data-slot="dropdown-menu-checkbox-item-indicator"
-      >
+      <span className="pointer-events-none absolute end-2 flex items-center justify-center" data-slot="dropdown-menu-checkbox-item-indicator">
         <DropdownMenuPrimitive.ItemIndicator>
           <CheckIcon />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -106,35 +103,17 @@ function DropdownMenuRadioItem({ className, children, inset, ...props }) {
 
 function DropdownMenuLabel({ className, inset, ...props }) {
   return (
-    <DropdownMenuPrimitive.Label
-      data-slot="dropdown-menu-label"
-      data-inset={inset}
-      className={cn("px-2 py-1.5 text-xs font-medium text-muted-foreground data-inset:ps-8", className)}
-      {...props}
-    />
+    <DropdownMenuPrimitive.Label data-slot="dropdown-menu-label" data-inset={inset} className={cn("px-2 py-1.5 text-xs font-medium text-muted-foreground data-inset:ps-8", className)} {...props} />
   );
 }
 
 function DropdownMenuSeparator({ className, ...props }) {
-  return (
-    <DropdownMenuPrimitive.Separator
-      data-slot="dropdown-menu-separator"
-      className={cn("-mx-1 my-1 h-px bg-border", className)}
-      {...props}
-    />
-  );
+  return <DropdownMenuPrimitive.Separator data-slot="dropdown-menu-separator" className={cn("-mx-1 my-1 h-px bg-border", className)} {...props} />;
 }
 
 function DropdownMenuShortcut({ className, ...props }) {
   return (
-    <span
-      data-slot="dropdown-menu-shortcut"
-      className={cn(
-        "ms-auto text-xs tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground",
-        className,
-      )}
-      {...props}
-    />
+    <span data-slot="dropdown-menu-shortcut" className={cn("ms-auto text-xs tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground", className)} {...props} />
   );
 }
 

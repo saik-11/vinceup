@@ -50,13 +50,7 @@ export default function StepReviewSummary({ selectedService, selectedDate, selec
         {/* ── Left (2 cols) ── */}
         <div className="lg:col-span-2 space-y-6">
           {/* Service Details */}
-          <motion.div
-            custom={0}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
-          >
+          <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible" className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="flex items-center gap-2 text-lg font-bold">
@@ -96,13 +90,7 @@ export default function StepReviewSummary({ selectedService, selectedDate, selec
           </motion.div>
 
           {/* Your Mentor */}
-          <motion.div
-            custom={1}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
-          >
+          <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible" className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <h3 className="flex items-center gap-2 text-lg font-bold mb-4">
               <UserCheck className="size-5 text-primary" />
               Your Mentor

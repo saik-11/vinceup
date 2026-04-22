@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Privacy Policy",
+  description: "Read VinceUP's privacy policy to understand how we collect, use, and protect your personal data.",
+  robots: { index: true, follow: false },
+};
+
+
 export default function PrivacyPolicyPage() {
   return (
     <StatusPage

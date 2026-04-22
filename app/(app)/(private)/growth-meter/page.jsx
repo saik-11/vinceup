@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Growth Meter",
+  description: "Track your career progress and milestones across your mentorship journey.",
+  robots: { index: false, follow: false },
+};
+
+
 export default function GrowthMeterPage() {
   return (
     <StatusPage

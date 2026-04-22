@@ -10,7 +10,7 @@ import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
 import AuthFooterLink from "@/components/auth/AuthFooterLink";
 import SocialButtons from "@/components/auth/SocialButtons";
-import CountryPicker from "@/components/CountryPicker";
+import { CountrySelect, StateSelect, CitySelect } from "@/components/shared/LocationPicker";
 import FieldFeedback from "@/components/FieldFeedback";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,7 +18,6 @@ import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSignupMentor } from "@/hooks/useSignupMentor";
-import { useCountries } from "@/services/Usecountries";
 
 const EXPERIENCE_OPTIONS = [
   { value: "<1", label: "Less than 1 year" },
@@ -41,7 +40,6 @@ const MentorPage = () => {
     onSuccess: () => router.push("/login?registered=true"),
     onError: (message) => setApiError(message),
   });
-  const { data: countries = [], isLoading: countriesLoading } = useCountries();
 
   const form = useForm({
     mode: "all",
@@ -66,6 +64,8 @@ const MentorPage = () => {
 
   const passwordValue = useWatch({ control: form.control, name: "password" }) ?? "";
   const confirmValue = useWatch({ control: form.control, name: "confirmPassword" }) ?? "";
+  const countryValue = useWatch({ control: form.control, name: "country" });
+  const stateValue = useWatch({ control: form.control, name: "state" });
 
   const passwordChecks = {
     length: passwordValue.length >= 8,
@@ -114,13 +114,7 @@ const MentorPage = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="mentor-first-name">First name</FieldLabel>
-                    <Input
-                      {...field}
-                      id="mentor-first-name"
-                      placeholder="John"
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="given-name"
-                    />
+                    <Input {...field} id="mentor-first-name" placeholder="John" aria-invalid={fieldState.invalid} autoComplete="given-name" />
                     <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                   </Field>
                 )}
@@ -135,13 +129,7 @@ const MentorPage = () => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="mentor-last-name">Last name</FieldLabel>
-                    <Input
-                      {...field}
-                      id="mentor-last-name"
-                      placeholder="Doe"
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="family-name"
-                    />
+                    <Input {...field} id="mentor-last-name" placeholder="Doe" aria-invalid={fieldState.invalid} autoComplete="family-name" />
                     <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                   </Field>
                 )}
@@ -160,15 +148,7 @@ const MentorPage = () => {
                   <FieldLabel htmlFor="mentor-email">Email</FieldLabel>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      {...field}
-                      id="mentor-email"
-                      type="email"
-                      placeholder="your@email.com"
-                      className="pl-10"
-                      aria-invalid={fieldState.invalid}
-                      autoComplete="email"
-                    />
+                    <Input {...field} id="mentor-email" type="email" placeholder="your@email.com" className="pl-10" aria-invalid={fieldState.invalid} autoComplete="email" />
                   </div>
                   <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
                 </Field>
@@ -295,14 +275,11 @@ const MentorPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="mentor-country">Country</FieldLabel>
-                  <CountryPicker
-                    id="mentor-country"
-                    countries={countries}
-                    isLoading={countriesLoading}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="e.g., US"
-                  />
+                  <CountrySelect id="mentor-country" value={field.value} onChange={(val) => {
+                    field.onChange(val);
+                    form.setValue("state", "", { shouldValidate: true });
+                    form.setValue("city", "", { shouldValidate: true });
+                  }} placeholder="e.g., US" />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -314,7 +291,10 @@ const MentorPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="mentor-state">Province/State</FieldLabel>
-                  <Input {...field} id="mentor-state" placeholder="e.g., California" aria-invalid={fieldState.invalid} />
+                  <StateSelect id="mentor-state" countryName={countryValue} value={field.value} onChange={(val) => {
+                    field.onChange(val);
+                    form.setValue("city", "", { shouldValidate: true });
+                  }} placeholder="e.g., California" />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -326,7 +306,7 @@ const MentorPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="mentor-city">City</FieldLabel>
-                  <Input {...field} id="mentor-city" placeholder="e.g., San Francisco" aria-invalid={fieldState.invalid} />
+                  <CitySelect id="mentor-city" countryName={countryValue} stateName={stateValue} value={field.value} onChange={field.onChange} placeholder="e.g., San Francisco" />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -350,13 +330,7 @@ const MentorPage = () => {
                     <FieldLabel htmlFor="mentor-company">Company Name</FieldLabel>
                     <div className="relative">
                       <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="mentor-company"
-                        placeholder="e.g., Google"
-                        className="pl-10"
-                        aria-invalid={fieldState.invalid}
-                      />
+                      <Input {...field} id="mentor-company" placeholder="e.g., Google" className="pl-10" aria-invalid={fieldState.invalid} />
                     </div>
                     <FieldFeedback variant="error" message={fieldState.error?.message} />
                   </Field>
@@ -371,13 +345,7 @@ const MentorPage = () => {
                     <FieldLabel htmlFor="mentor-title">Title</FieldLabel>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="mentor-title"
-                        placeholder="e.g., Senior Engineer"
-                        className="pl-10"
-                        aria-invalid={fieldState.invalid}
-                      />
+                      <Input {...field} id="mentor-title" placeholder="e.g., Senior Engineer" className="pl-10" aria-invalid={fieldState.invalid} />
                     </div>
                     <FieldFeedback variant="error" message={fieldState.error?.message} />
                   </Field>
@@ -395,13 +363,7 @@ const MentorPage = () => {
                     <FieldLabel htmlFor="mentor-industry">Industry</FieldLabel>
                     <div className="relative">
                       <TrendingUp className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="mentor-industry"
-                        placeholder="e.g., Technology"
-                        className="pl-10"
-                        aria-invalid={fieldState.invalid}
-                      />
+                      <Input {...field} id="mentor-industry" placeholder="e.g., Technology" className="pl-10" aria-invalid={fieldState.invalid} />
                     </div>
                     <FieldFeedback variant="error" message={fieldState.error?.message} />
                   </Field>
@@ -489,12 +451,7 @@ const MentorPage = () => {
       <SocialButtons />
       <AuthFooterLink text="Already have an account?" href="/login" label="Sign in" />
 
-      <Button
-        asChild
-        variant="outline"
-        className="mt-3 w-full cursor-pointer border-primary! text-primary! border-0 bg-gray-100 hover:bg-gray-200"
-        size="lg"
-      >
+      <Button asChild variant="outline" className="mt-3 w-full cursor-pointer border-primary! text-primary! border-0 bg-gray-100 hover:bg-gray-200" size="lg">
         <Link href="/signup">
           Are you a Mentee? <span className="font-semibold">Sign Up here!</span>
         </Link>

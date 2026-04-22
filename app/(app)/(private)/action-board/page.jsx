@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Action Board",
+  description: "AI-generated action items and task tracking for your mentorship sessions.",
+  robots: { index: false, follow: false },
+};
+
+
 export default function ActionBoardPage() {
   return (
     <StatusPage

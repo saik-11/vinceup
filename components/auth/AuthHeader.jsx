@@ -12,11 +12,7 @@ function DefaultIcon() {
 
 // Gradient icon for forgot/reset pages
 export function GradientIcon({ children }) {
-  return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
-      {children}
-    </div>
-  );
+  return <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-r from-indigo-500 to-purple-600 text-white shadow-lg">{children}</div>;
 }
 
 export default function AuthHeader({

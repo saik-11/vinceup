@@ -2,22 +2,44 @@
 
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
+  const router = useRouter();
+
+  const handleBack = () => {
+    // If the user arrived via in-app navigation, go back.
+    // window.history.length is 1 when the tab was opened directly (no history).
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
+
   return (
-    <div className="h-full w-full flex flex-1 flex-col items-center justify-center gap-4 text-center">
-      <h1 className="text-6xl font-bold">404</h1>
-      <p className="text-lg text-muted-foreground">
-        The page {`you're`} looking for {`doesn't`} exist.
+    <div className="h-full w-full flex flex-1 flex-col items-center justify-center gap-4 text-center px-4">
+      <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+        404 — Page Not Found
+      </p>
+      <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
+        Oops, wrong turn.
+      </h1>
+      <p className="text-base text-muted-foreground max-w-sm leading-relaxed">
+        The page you&apos;re looking for doesn&apos;t exist or may have been moved.
       </p>
 
-      <Button asChild size="lg" className="group cursor-pointer">
-        <Link href={"/"}>
-          <ArrowLeft className="transition-transform duration-300 group-hover:scale-125" />
-          Go Home
-        </Link>
-      </Button>
+      <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+        <Button
+          onClick={handleBack}
+          size="lg"
+          className="group cursor-pointer gap-2"
+          aria-label="Go back to previous page"
+        >
+          <ArrowLeft className="transition-transform duration-300 group-hover:-translate-x-1" />
+          Go Back
+        </Button>
+      </div>
     </div>
   );
 }

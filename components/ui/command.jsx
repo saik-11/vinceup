@@ -9,23 +9,10 @@ import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
 import { SearchIcon, CheckIcon } from "lucide-react";
 
 function Command({ className, ...props }) {
-  return (
-    <CommandPrimitive
-      data-slot="command"
-      className={cn("flex size-full flex-col overflow-hidden rounded-xl! bg-popover p-1 text-popover-foreground", className)}
-      {...props}
-    />
-  );
+  return <CommandPrimitive data-slot="command" className={cn("flex size-full flex-col overflow-hidden rounded-xl! bg-popover p-1 text-popover-foreground", className)} {...props} />;
 }
 
-function CommandDialog({
-  title = "Command Palette",
-  description = "Search for a command to run...",
-  children,
-  className,
-  showCloseButton = false,
-  ...props
-}) {
+function CommandDialog({ title = "Command Palette", description = "Search for a command to run...", children, className, showCloseButton = false, ...props }) {
   return (
     <Dialog {...props}>
       <DialogHeader className="sr-only">
@@ -43,11 +30,7 @@ function CommandInput({ className, ...props }) {
   return (
     <div data-slot="command-input-wrapper" className="p-1 pb-0">
       <InputGroup className="h-8! rounded-lg! border-input/30 bg-input/30 shadow-none! *:data-[slot=input-group-addon]:ps-2!">
-        <CommandPrimitive.Input
-          data-slot="command-input"
-          className={cn("w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50", className)}
-          {...props}
-        />
+        <CommandPrimitive.Input data-slot="command-input" className={cn("w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50", className)} {...props} />
         <InputGroupAddon>
           <SearchIcon className="size-4 shrink-0 opacity-50" />
         </InputGroupAddon>
@@ -57,13 +40,7 @@ function CommandInput({ className, ...props }) {
 }
 
 function CommandList({ className, ...props }) {
-  return (
-    <CommandPrimitive.List
-      data-slot="command-list"
-      className={cn("no-scrollbar max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-none", className)}
-      {...props}
-    />
-  );
+  return <CommandPrimitive.List data-slot="command-list" className={cn("no-scrollbar max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-none", className)} {...props} />;
 }
 
 function CommandEmpty({ className, ...props }) {
@@ -104,13 +81,7 @@ function CommandItem({ className, children, ...props }) {
 }
 
 function CommandShortcut({ className, ...props }) {
-  return (
-    <span
-      data-slot="command-shortcut"
-      className={cn("ms-auto text-xs tracking-widest text-muted-foreground group-data-selected/command-item:text-foreground", className)}
-      {...props}
-    />
-  );
+  return <span data-slot="command-shortcut" className={cn("ms-auto text-xs tracking-widest text-muted-foreground group-data-selected/command-item:text-foreground", className)} {...props} />;
 }
 
 export { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut, CommandSeparator };

@@ -1,5 +1,12 @@
 import StatusPage from "@/components/common/StatusPage";
 
+export const metadata = {
+  title: "Clarity Capsule",
+  description: "AI-powered session summaries and key takeaways from your mentorship sessions.",
+  robots: { index: false, follow: false },
+};
+
+
 export default function ClarityCapsulePage() {
   return (
     <StatusPage

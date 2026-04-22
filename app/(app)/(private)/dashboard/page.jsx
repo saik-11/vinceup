@@ -1,6 +1,7 @@
 import { CareerGrowthDashboard } from "@/components/dashboard/career-growth-dashboard";
 import { getDashboardPayload, getDashboardScenarioName } from "@/lib/dashboard-data";
 import { cookies } from "next/headers";
+import { AUTH_USER_KEY } from "@/lib/auth/authSession";
 import MentorDashboard from "./MentorDashboard";
 
 export const metadata = {
@@ -37,7 +38,13 @@ export default async function DashboardPage({ searchParams }) {
   const scenario = getDashboardScenarioName(params);
   const data = getDashboardPayload(scenario);
   const cookieStore = await cookies();
-  const role = cookieStore.get("role")?.value;
+  const userCookie = cookieStore.get(AUTH_USER_KEY)?.value;
+  let role = null;
+  if (userCookie) {
+    try {
+      role = JSON.parse(userCookie)?.role;
+    } catch (e) {}
+  }
 
   if (data.meta.simulateLatencyMs > 0) {
     await sleep(data.meta.simulateLatencyMs);

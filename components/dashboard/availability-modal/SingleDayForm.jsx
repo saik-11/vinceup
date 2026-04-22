@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { mentorApi } from "@/services/service";
 import { cn } from "@/lib/utils";
+import { getBrowserTimezone } from "@/lib/timezone";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -65,19 +66,19 @@ export default function SingleDayForm({ onBack, onSubmit, selectedDate }) {
         toast.error("Please complete the required date and time entries.");
         return;
       }
-      
+
       const payload = {
         slots: [
           {
             date: format(data.date, "yyyy-MM-dd"),
             start_time: data.startTime,
             end_time: data.endTime,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
-            service_type: null
-          }
-        ]
+            timezone: getBrowserTimezone() || "UTC",
+            service_type: null,
+          },
+        ],
       };
-      
+
       await mentorApi.createAvailability(payload);
       toast.success("Availability successfully saved!");
       onSubmit?.();
@@ -139,12 +140,7 @@ export default function SingleDayForm({ onBack, onSubmit, selectedDate }) {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger
-                    className={cn(
-                      "w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)",
-                      errors.startTime && "border-red-500",
-                    )}
-                  >
+                  <SelectTrigger className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.startTime && "border-red-500")}>
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,9 +161,7 @@ export default function SingleDayForm({ onBack, onSubmit, selectedDate }) {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger
-                    className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.endTime && "border-red-500")}
-                  >
+                  <SelectTrigger className={cn("w-full h-10 rounded-xl bg-white dark:bg-(--dashboard-panel-strong)", errors.endTime && "border-red-500")}>
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>

@@ -4,15 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { dashboardThemeClass, panelClass } from "@/components/dashboard/dashboard-shared";
 
-export default function StatusPage({
-  badge = "In Progress",
-  title,
-  description,
-  primaryHref = "/",
-  primaryLabel = "Go Home",
-  secondaryHref,
-  secondaryLabel,
-}) {
+export default function StatusPage({ badge = "In Progress", title, description, primaryHref = "/", primaryLabel = "Go Home", secondaryHref, secondaryLabel }) {
   return (
     <section
       className={cn(
