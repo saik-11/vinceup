@@ -1,4 +1,4 @@
-import { CareerGrowthDashboard } from "@/components/dashboard/career-growth-dashboard";
+import { CareerGrowthDashboard } from "./CareerGrowthDashboard";
 import { getDashboardPayload, getDashboardScenarioName } from "@/lib/dashboard-data";
 import { cookies } from "next/headers";
 import { AUTH_USER_KEY } from "@/lib/auth/authSession";

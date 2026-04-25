@@ -9,39 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-import { DashboardShell, interactivePanelClass, metaTextClass, panelClass, sectionTitleClass, subCardClass } from "@/components/dashboard/dashboard-shared";
+import { DashboardShell, DashboardHeader, MetricCard, interactivePanelClass, metaTextClass, panelClass, sectionTitleClass, subCardClass, statAccentStyles } from "@/components/dashboard/dashboard-shared";
 import { mentorApi } from "@/services/service";
 import Link from "next/link";
 
 // ─── KPI stat accent styles ───────────────────────────────────────────────────
-// Same pattern as career-growth-dashboard — tinted translucent icon backgrounds.
+// Same pattern as CareerGrowthDashboard — tinted translucent icon backgrounds.
 
-const statAccentStyles = {
-  purple: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(124,58,237,0.14),rgba(192,38,211,0.22))] text-[var(--dashboard-purple)] dark:bg-[linear-gradient(135deg,rgba(139,92,246,0.24),rgba(217,70,239,0.28))]",
-    hoverBorder: "hover:border-[rgba(124,58,237,0.22)] dark:hover:border-[rgba(167,139,250,0.32)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(124,58,237,0.32)] dark:hover:shadow-[0_24px_60px_-32px_rgba(124,58,237,0.36)]",
-    badge: "border-violet-200/80 bg-violet-50 text-violet-700 dark:border-violet-400/20 dark:bg-violet-500/12 dark:text-violet-200",
-  },
-  orange: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(249,115,22,0.16),rgba(234,88,12,0.22))] text-[var(--dashboard-orange)] dark:bg-[linear-gradient(135deg,rgba(251,146,60,0.24),rgba(249,115,22,0.28))]",
-    hoverBorder: "hover:border-[rgba(249,115,22,0.24)] dark:hover:border-[rgba(251,146,60,0.34)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(249,115,22,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(234,88,12,0.34)]",
-    badge: "border-orange-200/80 bg-orange-50 text-orange-700 dark:border-orange-400/20 dark:bg-orange-500/12 dark:text-orange-200",
-  },
-  teal: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(8,145,178,0.14),rgba(14,116,144,0.22))] text-[var(--dashboard-teal)] dark:bg-[linear-gradient(135deg,rgba(6,182,212,0.22),rgba(8,145,178,0.3))]",
-    hoverBorder: "hover:border-[rgba(8,145,178,0.22)] dark:hover:border-[rgba(34,211,238,0.32)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(8,145,178,0.3)] dark:hover:shadow-[0_24px_60px_-32px_rgba(6,182,212,0.3)]",
-    badge: "border-cyan-200/80 bg-cyan-50 text-cyan-700 dark:border-cyan-400/20 dark:bg-cyan-500/12 dark:text-cyan-200",
-  },
-  green: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(18,183,106,0.14),rgba(5,150,105,0.22))] text-[var(--dashboard-green)] dark:bg-[linear-gradient(135deg,rgba(18,183,106,0.22),rgba(5,150,105,0.3))]",
-    hoverBorder: "hover:border-[rgba(18,183,106,0.22)] dark:hover:border-[rgba(52,211,153,0.32)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(18,183,106,0.3)] dark:hover:shadow-[0_24px_60px_-32px_rgba(5,150,105,0.34)]",
-    badge: "border-emerald-200/80 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/12 dark:text-emerald-200",
-  },
-};
+
 
 // ─── Icon map ─────────────────────────────────────────────────────────────────
 
@@ -70,81 +45,6 @@ const insightIcons = {
 
 // ─── Dashboard Header ─────────────────────────────────────────────────────────
 
-function DashboardHeader({ welcome, timezone }) {
-  if (!welcome) return null;
-
-  return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      {/* Left */}
-      <div>
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-[-0.03em] text-(--dashboard-text) sm:text-3xl">Welcome back, {welcome.first_name || "Mentor"}!</h1>
-          {welcome.founding_mentor && (
-            <Badge className="rounded-full bg-[linear-gradient(135deg,#f59e0b,#d97706)] text-white shadow-[0_2px_10px_-2px_rgba(245,158,11,0.5)] border-0 font-bold px-3 py-1 text-[10px] uppercase tracking-wider">
-              Founding Mentor
-            </Badge>
-          )}
-        </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          <p className={cn(metaTextClass, "text-[15px]")}>Here&apos;s your mentorship impact overview</p>
-          {timezone && (
-            <Badge
-              variant="outline"
-              className="hidden sm:inline-flex items-center text-[10px] uppercase font-bold text-(--dashboard-subtle) rounded-full shadow-none border-(--dashboard-border) bg-(--dashboard-panel-muted) py-0 h-5 px-2.5 tracking-wider"
-            >
-              <Globe className="mr-1.5 size-3 opacity-70" />
-              {timezone.replace("_", " ")}
-            </Badge>
-          )}
-        </div>
-      </div>
-
-      {/* Right: VEGA weekly highlight pill */}
-      {welcome.vega_weekly_highlight && (
-        <div className="inline-flex shrink-0 items-center gap-2.5 rounded-[20px] border border-[rgba(124,58,237,0.18)] bg-[rgba(124,58,237,0.06)] px-4 py-2.5 shadow-[0_2px_8px_-3px_rgba(124,58,237,0.12)] dark:border-[rgba(167,139,250,0.22)] dark:bg-[rgba(124,58,237,0.12)]">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-[12px] bg-[linear-gradient(135deg,#7c3aed,#c026d3)] shadow-[0_6px_14px_-4px_rgba(124,58,237,0.55)]">
-            <Sparkles className="size-4 text-white" strokeWidth={2} />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-(--dashboard-purple)">VEGA Weekly Highlight</p>
-            <p className="text-xs font-medium text-(--dashboard-muted)">{welcome.vega_weekly_highlight}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── KPI Stats Grid ───────────────────────────────────────────────────────────
-
-function KpiCard({ stat }) {
-  const Icon = statIcons[stat.icon] ?? BookOpen;
-  const accentStyles = statAccentStyles[stat.badgeColor] ?? statAccentStyles.purple;
-
-  return (
-    <li className="min-w-0">
-      <Card className={cn(panelClass, interactivePanelClass, accentStyles.hoverBorder, accentStyles.hoverShadow, "h-full px-0 py-0 flex flex-col")}>
-        <CardContent className="flex flex-1 flex-col justify-between p-4 sm:p-5 lg:p-6">
-          <div className="space-y-4">
-            <div className="flex items-start justify-between">
-              <div className={cn("flex size-12 items-center justify-center rounded-[16px] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]", accentStyles.iconWrap)}>
-                <Icon className="size-5" />
-              </div>
-              <Badge className={cn("rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ring-0", accentStyles.badge)}>{stat.badge}</Badge>
-            </div>
-
-            <div className="space-y-1 mt-1">
-              <p className={cn("text-[2rem] font-bold leading-none tracking-[-0.04em] text-(--dashboard-text)", stat.valueClass)}>{stat.value}</p>
-              <p className="text-sm font-medium leading-6 text-(--dashboard-muted)">{stat.label}</p>
-            </div>
-          </div>
-
-          {stat.action && <div className="mt-5 pt-3 border-t border-(--dashboard-border) flex items-center">{stat.action}</div>}
-        </CardContent>
-      </Card>
-    </li>
-  );
-}
 
 function KpiStatsGrid({ stats }) {
   if (!stats) return null;
@@ -220,7 +120,13 @@ function KpiStatsGrid({ stats }) {
   return (
     <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Mentorship KPI stats">
       {kpiData.map((stat) => (
-        <KpiCard key={stat.id} stat={stat} />
+        <li key={stat.id} className="min-w-0 h-full">
+          <MetricCard 
+            stat={stat} 
+            icon={statIcons[stat.icon] ?? BookOpen} 
+            accentStyles={statAccentStyles[stat.badgeColor] ?? statAccentStyles.purple} 
+          />
+        </li>
       ))}
     </ul>
   );
@@ -503,7 +409,25 @@ const MentorDashboard = () => {
   return (
     <DashboardShell ariaLabel="Mentor dashboard" maxWidth="max-w-6xl">
       {/* 1. Header */}
-      <DashboardHeader welcome={data.welcome} timezone={data.display_timezone} />
+      {data.welcome ? (
+        <DashboardHeader
+          heading={`Welcome back, ${data.welcome.first_name || "Mentor"}!`}
+          subheading="Here's your mentorship impact overview"
+          badge={
+            data.welcome.founding_mentor ? (
+              <Badge className="rounded-full bg-[linear-gradient(135deg,#f59e0b,#d97706)] text-white shadow-[0_2px_10px_-2px_rgba(245,158,11,0.5)] border-0 font-bold px-3 py-1 text-[10px] uppercase tracking-wider">
+                Founding Mentor
+              </Badge>
+            ) : null
+          }
+          timezone={data.display_timezone}
+          highlight={
+            data.welcome.vega_weekly_highlight
+              ? { value: data.welcome.vega_weekly_highlight }
+              : null
+          }
+        />
+      ) : null}
 
       {/* Getting Started Banner for Mentors with Zero Sessions */}
       {data.stats && data.stats.sessions_delivered === 0 && (

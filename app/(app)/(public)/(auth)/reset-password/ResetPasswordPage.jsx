@@ -37,6 +37,49 @@ const resetSchema = z
     }
   });
 
+const emptyContext = { token: null, email: null, isChecking: true };
+
+let cachedHash = null;
+let cachedResult = emptyContext;
+
+function getClientSnapshot() {
+  const currentHash = window.location.hash;
+  if (cachedHash !== currentHash) {
+    cachedHash = currentHash;
+    const params = new URLSearchParams(currentHash.slice(1));
+    const accessToken = params.get("access_token");
+
+    if (!accessToken) {
+      // Only clear the token if we haven't already parsed one successfully.
+      // This prevents losing the token when the URL hash is cleared.
+      if (cachedResult.isChecking) {
+        cachedResult = { token: null, email: null, isChecking: false };
+      }
+    } else {
+      try {
+        const payload = JSON.parse(atob(accessToken.split(".")[1]));
+        cachedResult = {
+          token: accessToken,
+          email: payload.email ?? null,
+          isChecking: false,
+        };
+      } catch {
+        cachedResult = { token: accessToken, email: null, isChecking: false };
+      }
+    }
+  }
+  return cachedResult;
+}
+
+function getServerSnapshot() {
+  return emptyContext;
+}
+
+function subscribe(callback) {
+  window.addEventListener("hashchange", callback);
+  return () => window.removeEventListener("hashchange", callback);
+}
+
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -46,31 +89,7 @@ export default function ResetPasswordPage() {
   const [seconds, setSeconds] = useState(5);
   const [showPasswordHints, setShowPasswordHints] = useState(false);
 
-  const resetContext = useSyncExternalStore(
-    () => () => {},
-    () => {
-      const params = new URLSearchParams(window.location.hash.slice(1));
-      const accessToken = params.get("access_token");
-
-      if (!accessToken) {
-        return { token: null, email: null, isChecking: false };
-      }
-
-      try {
-        const payload = JSON.parse(atob(accessToken.split(".")[1]));
-        return {
-          token: accessToken,
-          email: payload.email ?? null,
-          isChecking: false,
-        };
-      } catch {
-        return { token: accessToken, email: null, isChecking: false };
-      }
-    },
-    () => ({ token: null, email: null, isChecking: true }),
-  );
-
-  const { token, email, isChecking } = resetContext;
+  const { token, email, isChecking } = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
 
   const { mutate: resetPassword, isPending } = useResetPassword({
     onSuccess: () => setIsSuccess(true),

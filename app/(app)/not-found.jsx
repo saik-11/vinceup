@@ -8,8 +8,6 @@ export default function NotFound() {
   const router = useRouter();
 
   const handleBack = () => {
-    // If the user arrived via in-app navigation, go back.
-    // window.history.length is 1 when the tab was opened directly (no history).
     if (typeof window !== "undefined" && window.history.length > 1) {
       router.back();
     } else {
@@ -18,7 +16,7 @@ export default function NotFound() {
   };
 
   return (
-    <div className="h-full w-full flex flex-1 flex-col items-center justify-center gap-4 text-center px-4">
+    <div className="h-full w-full flex flex-1 flex-col items-center justify-center gap-4 text-center px-4 py-20">
       <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
         404 — Page Not Found
       </p>

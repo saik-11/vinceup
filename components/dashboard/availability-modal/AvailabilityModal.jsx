@@ -18,15 +18,15 @@ const SCREEN_TITLES = {
 };
 
 export default function AvailabilityModal({ isOpen, onClose, initialScreen = "options", selectedDate = null }) {
-  const [prevInitial, setPrevInitial] = useState(initialScreen);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
   const [activeScreen, setActiveScreen] = useState(initialScreen);
 
-  useEffect(() => {
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setActiveScreen(initialScreen);
-      setPrevInitial(initialScreen);
     }
-  }, [isOpen, initialScreen]);
+  }
 
   const handleBack = () => setActiveScreen("options");
 
@@ -42,7 +42,7 @@ export default function AvailabilityModal({ isOpen, onClose, initialScreen = "op
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-full max-w-[480px] p-0 flex flex-col gap-0 overflow-hidden border-slate-100 dark:border-slate-800 bg-background/95 sm:rounded-[24px]" showCloseButton={true}>
+      <DialogContent aria-describedby={undefined} className="w-full max-w-[480px] p-0 flex flex-col gap-0 overflow-hidden border-slate-100 dark:border-slate-800 bg-background/95 sm:rounded-[24px]" showCloseButton={true}>
         <DialogHeader className="p-6 pb-4 border-b border-transparent">
           <DialogTitle className="text-[17px] font-bold text-slate-900 dark:text-slate-100">{SCREEN_TITLES[activeScreen]}</DialogTitle>
         </DialogHeader>

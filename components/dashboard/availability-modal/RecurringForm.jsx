@@ -37,6 +37,7 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -55,12 +56,6 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
   });
 
   useEffect(() => {
-    if (selectedDate) {
-      const dayMap = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-      setSelectedDays([dayMap[selectedDate.getDay()]]);
-    } else {
-      setSelectedDays(["mon", "tue", "wed"]);
-    }
     reset({
       startTime: "",
       endTime: "",

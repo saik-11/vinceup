@@ -121,7 +121,7 @@ const Navbar = ({ children }) => {
 
         <main className="flex flex-row flex-1 relative bg-background">
           {!isPublic && (
-            <motion.div initial={{ width: 0 }} animate={{ width: 257 }} transition={{ duration: 0.3, ease: "easeOut" }} className="shrink-0 overflow-hidden hidden md:block">
+            <motion.div initial={{ width: 257 }} animate={{ width: 257 }} transition={{ duration: 0.3, ease: "easeOut" }} className="shrink-0 overflow-hidden hidden md:block">
               <AppSidebar />
             </motion.div>
           )}

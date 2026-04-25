@@ -13,7 +13,7 @@ const DEFAULT_AUTH_REDIRECT = "/dashboard";
 const MENTOR_ONLY_ROUTES = ["/mentor-calendar"];
 
 /** Routes only accessible to role === "mentee". Mentors → /dashboard. */
-const MENTEE_ONLY_ROUTES = ["/book-session", "/my-sessions", "/action-board", "/clarity-capsule", "/clarity-map", "/growth-meter"];
+const MENTEE_ONLY_ROUTES = ["/book-session", "/action-board", "/clarity-capsule", "/clarity-map", "/growth-meter"];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

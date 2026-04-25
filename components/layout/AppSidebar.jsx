@@ -34,11 +34,10 @@ const groupLabelVariant = {
 export default function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, logout } = useAuth();
+  const { status, logout } = useAuth();
   const { setOpenMobile } = useSidebar();
   const { role } = useRole();
   const sidebarGroups = getSidebarGroups(role);
-  const isLoggedIn = !!isAuthenticated;
 
   // Close mobile sidebar drawer on every route change
   useEffect(() => {
@@ -53,14 +52,27 @@ export default function AppSidebar() {
     router.push("/");
   };
 
-  if (!isLoggedIn) return null;
+  if (status === "loading") {
+    return (
+      <div className="shrink-0 overflow-hidden hidden md:block w-[var(--sidebar-width,16rem)] border-r border-border h-[calc(100svh-4rem)] bg-background">
+        <div className="animate-pulse p-4 flex flex-col gap-3 mt-4">
+          <div className="h-4 w-24 bg-muted rounded mb-2"></div>
+          <div className="h-10 bg-muted rounded-md w-full"></div>
+          <div className="h-10 bg-muted rounded-md w-full"></div>
+          <div className="h-10 bg-muted rounded-md w-full"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") return null;
 
   // Sequential index for staggered menu-item animation
   let itemIndex = 0;
 
   return (
     <AnimatePresence>
-      {isLoggedIn && (
+      {status === "authenticated" && (
         <motion.div
           key="sidebar-wrapper"
           initial={{ width: 0, opacity: 0 }}

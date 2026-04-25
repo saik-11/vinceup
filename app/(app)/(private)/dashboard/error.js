@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { DashboardErrorState } from "@/components/dashboard/career-growth-dashboard";
+import { DashboardErrorState } from "./CareerGrowthDashboard";
 
 export default function Error({ error, unstable_retry }) {
   useEffect(() => {

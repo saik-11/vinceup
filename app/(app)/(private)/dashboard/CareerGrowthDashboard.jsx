@@ -29,37 +29,19 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   dashboardThemeClass,
   DashboardShell,
+  DashboardHeader,
   interactivePanelClass,
   metaTextClass,
   panelClass,
   sectionActionClass,
   sectionTitleClass,
   SectionHeading,
+  statAccentStyles,
+  MetricCard,
   subCardClass,
 } from "@/components/dashboard/dashboard-shared";
 
-const statAccentStyles = {
-  blue: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(88,110,255,0.16),rgba(60,130,246,0.22))] text-[var(--dashboard-blue)] dark:bg-[linear-gradient(135deg,rgba(88,110,255,0.22),rgba(60,130,246,0.28))]",
-    hoverBorder: "hover:border-[rgba(59,130,246,0.22)] dark:hover:border-[rgba(96,165,250,0.32)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(59,130,246,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(37,99,235,0.34)]",
-  },
-  green: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(18,183,106,0.14),rgba(5,150,105,0.22))] text-[var(--dashboard-green)] dark:bg-[linear-gradient(135deg,rgba(18,183,106,0.22),rgba(5,150,105,0.3))]",
-    hoverBorder: "hover:border-[rgba(18,183,106,0.22)] dark:hover:border-[rgba(52,211,153,0.32)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(18,183,106,0.3)] dark:hover:shadow-[0_24px_60px_-32px_rgba(5,150,105,0.34)]",
-  },
-  purple: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(124,58,237,0.14),rgba(192,38,211,0.22))] text-[var(--dashboard-purple)] dark:bg-[linear-gradient(135deg,rgba(139,92,246,0.24),rgba(217,70,239,0.28))]",
-    hoverBorder: "hover:border-[rgba(124,58,237,0.22)] dark:hover:border-[rgba(167,139,250,0.32)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(124,58,237,0.32)] dark:hover:shadow-[0_24px_60px_-32px_rgba(124,58,237,0.36)]",
-  },
-  orange: {
-    iconWrap: "bg-[linear-gradient(135deg,rgba(249,115,22,0.16),rgba(234,88,12,0.22))] text-[var(--dashboard-orange)] dark:bg-[linear-gradient(135deg,rgba(251,146,60,0.24),rgba(249,115,22,0.28))]",
-    hoverBorder: "hover:border-[rgba(249,115,22,0.24)] dark:hover:border-[rgba(251,146,60,0.34)]",
-    hoverShadow: "hover:shadow-[0_22px_54px_-32px_rgba(249,115,22,0.34)] dark:hover:shadow-[0_24px_60px_-32px_rgba(234,88,12,0.34)]",
-  },
-};
+
 
 const actionIcons = {
   mentor: UserRoundSearch,
@@ -113,92 +95,25 @@ function getInitials(name) {
 
 // DashboardShell — imported from dashboard-shared.jsx
 
-function DashboardHeader({ user, activeScenario }) {
-  return (
-    <header className={cn(panelClass, "px-4 py-4 sm:px-6 sm:py-6 lg:px-8")}>
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 items-start gap-4 sm:gap-5">
-          <Avatar
-            size="lg"
-            className="mt-1 border border-white/70 bg-[linear-gradient(135deg,#ede9fe,#dbeafe)] shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(76,29,149,0.9),rgba(30,41,59,0.95))]"
-          >
-            <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? "Vinny"} />
-            <AvatarFallback className="bg-transparent font-semibold text-slate-700 dark:text-slate-100">{getInitials(user.name)}</AvatarFallback>
-          </Avatar>
-
-          <div className="min-w-0">
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <Badge className="rounded-full border border-[rgba(124,58,237,0.12)] bg-[rgba(124,58,237,0.1)] px-3 text-[11px] font-semibold tracking-[0.18em] text-(--dashboard-purple) uppercase dark:border-[rgba(167,139,250,0.18)] dark:bg-[rgba(124,58,237,0.18)] dark:text-violet-200">
-                {user.headline ?? "Career Growth Dashboard"}
-              </Badge>
-              {/* <Badge
-                variant="outline"
-                className="rounded-full border-(--dashboard-border) bg-(--dashboard-panel-strong) px-3 text-(--dashboard-subtle)"
-              >
-                {user.role === "admin" ? "Admin role" : "Viewer role"}
-              </Badge>
-              <Badge
-                variant="outline"
-                className="rounded-full border-(--dashboard-border) bg-(--dashboard-panel-strong) px-3 text-(--dashboard-subtle)"
-              >
-                Scenario: {activeScenario}
-              </Badge> */}
-            </div>
-
-            <h1 className="max-w-3xl text-balance text-[2rem] font-semibold leading-tight tracking-[-0.04em] text-(--dashboard-text) sm:text-[2.4rem] lg:text-[2.75rem]">
-              Welcome back, {user.name ?? "Vinny"}!
-            </h1>
-            <p className="mt-2 max-w-2xl text-base leading-7 text-(--dashboard-muted)">{user.subtitle ?? "Here's your career growth overview"}</p>
-          </div>
-        </div>
-
-        {/* <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="relative w-full md:w-88">
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-(--dashboard-subtle)" />
-            <Input
-              type="search"
-              placeholder="Search sessions, tasks, or mentors"
-              className="h-11 rounded-[16px] border-(--dashboard-border) bg-(--dashboard-panel-strong) px-4 pl-11 text-(--dashboard-text) shadow-none placeholder:text-(--dashboard-subtle) hover:border-(--dashboard-border-strong) focus-visible:border-(--dashboard-purple) focus-visible:ring-[3px] focus-visible:ring-[rgba(124,58,237,0.14)] dark:focus-visible:ring-[rgba(167,139,250,0.18)]"
-              aria-label="Search dashboard content"
-            />
-          </div>
-
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-11 shrink-0 rounded-[16px] border-(--dashboard-border) bg-(--dashboard-panel-strong) text-(--dashboard-muted) shadow-none hover:bg-(--dashboard-panel-muted) hover:text-(--dashboard-text)"
-            aria-label="View notifications"
-          >
-            <Bell className="size-4" />
-          </Button>
-        </div> */}
-      </div>
-    </header>
-  );
-}
-
 function StatsGrid({ stats }) {
+  if (!stats) return null;
+
   return (
     <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Progress stats">
       {stats.map((stat) => {
-        const Icon = statIcons[stat.icon];
-        const accentStyles = statAccentStyles[stat.accent];
+        const Icon = statIcons[stat.icon] ?? CheckCheck;
+        const accentStyles = statAccentStyles[stat.accent] ?? statAccentStyles.blue;
+        
+        // Adapt formatMetric output to what MetricCard expects
+        const displayValue = formatMetric(stat);
 
         return (
-          <li key={stat.id} className="min-w-0">
-            <Card className={cn(panelClass, interactivePanelClass, accentStyles.hoverBorder, accentStyles.hoverShadow, "h-full px-0 py-0")}>
-              <CardContent className="flex h-full flex-col gap-4 p-4 sm:p-6">
-                <div className={cn("flex size-12 items-center justify-center rounded-[16px] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]", accentStyles.iconWrap)}>
-                  <Icon className="size-5" />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-[1.95rem] font-semibold leading-none tracking-[-0.05em] text-(--dashboard-text)">{formatMetric(stat)}</div>
-                  <div className="text-sm font-medium leading-6 text-(--dashboard-muted)">{stat.label}</div>
-                  {stat.helper ? <p className="text-sm leading-6 text-(--dashboard-subtle)">{stat.helper}</p> : null}
-                </div>
-              </CardContent>
-            </Card>
+          <li key={stat.id} className="min-w-0 h-full">
+            <MetricCard 
+              stat={{...stat, value: displayValue}} 
+              icon={Icon} 
+              accentStyles={accentStyles} 
+            />
           </li>
         );
       })}
@@ -482,7 +397,10 @@ export function CareerGrowthDashboard({ data, activeScenario }) {
   };
   return (
     <DashboardShell>
-      <DashboardHeader user={mergedData?.user} activeScenario={activeScenario} />
+      <DashboardHeader 
+        heading={`Welcome back, ${mergedData?.user?.name ?? "Vinny"}!`}
+        subheading={mergedData?.user?.subtitle ?? "Here's your career growth overview"}
+      />
       <StatsGrid stats={mergedData?.stats} />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.95fr)]">

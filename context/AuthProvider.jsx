@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { authStorage } from "@/lib/auth/authStorage";
 import { authHelpers } from "@/lib/auth/authHelpers";
 import { setApiAuthToken } from "@/services/Apiclient";
@@ -15,8 +15,9 @@ export function AuthProvider({ children, initialAuth }) {
   const [user, setUser] = useState(null);
 
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Verify session state on mount by reading cookies directly.
+  // Verify session state on mount and on route change by reading cookies directly.
   // We do NOT call the API here — that would wipe cookies on any network error.
   // The middleware (proxy.js) already guards against unauthenticated route access.
   useEffect(() => {
@@ -42,7 +43,7 @@ export function AuthProvider({ children, initialAuth }) {
     };
 
     initAuth();
-  }, []);
+  }, [pathname]);
 
   const handleSessionExpire = useCallback(() => {
     // The session expiry hook will call this.

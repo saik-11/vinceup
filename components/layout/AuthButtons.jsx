@@ -129,12 +129,29 @@ function UserMenu({ user, onLogout, isLight, setTheme }) {
  * compact — renders minimal icons only (for mobile private navbar)
  */
 function AuthButtonsInner({ layout = "public", compact = false }) {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { status, user, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const router = useRouter();
 
+  if (status === "loading") {
+    if (compact) {
+      return (
+        <div className="flex items-center gap-2 animate-pulse">
+          <div className="size-8 bg-muted rounded-full" />
+          <div className="size-10 bg-muted rounded-full" />
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center gap-3 animate-pulse">
+        <div className="size-8 bg-muted rounded-full" />
+        <div className="h-10 w-24 bg-muted rounded-md" />
+      </div>
+    );
+  }
+
   /* ── Not logged in ── */
-  if (!isAuthenticated) {
+  if (status === "unauthenticated") {
     return (
       <div className="flex flex-wrap items-center gap-2 sm:gap-4">
         <Button asChild variant="ghost" className="hover:bg-transparent! cursor-pointer border" size="lg">

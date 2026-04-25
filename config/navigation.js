@@ -2,6 +2,7 @@ import {
   BookOpen,
   CalendarDays,
   ClipboardCheck,
+  ClipboardList,
   Globe,
   HelpCircle,
   LayoutGrid,
@@ -15,6 +16,7 @@ import {
   BarChart2,
   DollarSign,
   BookMarked,
+  FileText,
 } from "lucide-react";
 
 // ─── Public navbar links ───
@@ -56,23 +58,15 @@ const MENTEE_SIDEBAR_GROUPS = [
 
 const MENTOR_SIDEBAR_GROUPS = [
   {
-    label: "Menu",
+    label: "MAIN MENU",
     icon: null,
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-      { href: "/mentor-calendar", label: "Calendar", icon: CalendarDays },
       { href: "/my-sessions", label: "Sessions", icon: BookOpen },
-      { href: "/mentees", label: "Mentees", icon: Users },
-    ],
-  },
-  {
-    label: "Insights",
-    icon: Sparkles,
-    class: "text-[#9333EA]",
-    items: [
-      { href: "/action-board", label: "Analytics", icon: BarChart2 },
-      { href: "/growth-meter", label: "Earnings", icon: DollarSign },
-      { href: "/clarity-capsule", label: "Resources", icon: BookMarked },
+      { href: "/mentor-calendar", label: "Calendar", icon: CalendarDays },
+      { href: "/pre-session-prep", label: "Pre-Session Prep", icon: ClipboardList },
+      { href: "/capsules", label: "Capsules", icon: FileText },
+      { href: "/earnings", label: "Earnings", icon: DollarSign },
     ],
   },
 ];
