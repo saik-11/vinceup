@@ -311,7 +311,7 @@ function VegaInsightCard({ insight }) {
   return (
     <li className="flex min-w-0">
       <div className={cn(subCardClass, "flex w-full flex-col gap-3 p-4 hover:border-[rgba(124,58,237,0.2)] hover:shadow-[0_12px_28px_-16px_rgba(124,58,237,0.18)]")}>
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-violet-50 text-violet-600 dark:bg-violet-900/30 dark:text-violet-300">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600 dark:bg-violet-900/30 dark:text-violet-300">
           <Icon className="size-4" strokeWidth={2} />
         </div>
         <div>

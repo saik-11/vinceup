@@ -11,7 +11,7 @@ import { SessionExpiredDialog } from "@/components/auth/SessionExpiredDialog";
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children, initialAuth }) {
-  const [status, setStatus] = useState(initialAuth ? "authenticated" : "loading");
+  const [status, setStatus] = useState(initialAuth ? "authenticated" : "unauthenticated");
   const [user, setUser] = useState(null);
 
   const router = useRouter();

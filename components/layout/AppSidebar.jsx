@@ -54,7 +54,7 @@ export default function AppSidebar() {
 
   if (status === "loading") {
     return (
-      <div className="shrink-0 overflow-hidden hidden md:block w-[var(--sidebar-width,16rem)] border-r border-border h-[calc(100svh-4rem)] bg-background">
+      <div className="shrink-0 overflow-hidden hidden md:block w-(--sidebar-width,16rem) border-r border-border h-[calc(100svh-4rem)] bg-background">
         <div className="animate-pulse p-4 flex flex-col gap-3 mt-4">
           <div className="h-4 w-24 bg-muted rounded mb-2"></div>
           <div className="h-10 bg-muted rounded-md w-full"></div>

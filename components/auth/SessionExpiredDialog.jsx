@@ -25,20 +25,11 @@ export function SessionExpiredDialog({ open, onConfirm, isWarning, onContinue })
         <AlertDialogHeader>
           <AlertDialogTitle>{isWarning ? "Session Expiring Soon" : "Session Expired"}</AlertDialogTitle>
           <AlertDialogDescription>
-            {isWarning
-              ? "Your session is about to expire in less than 2 minutes. Do you want to continue your session or log out?"
-              : "Your session has expired. Please sign in again."}
+            {isWarning ? "Your session is about to expire in less than 2 minutes. Do you want to continue your session or log out?" : "Your session has expired. Please sign in again."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          {isWarning ? (
-            <>
-              <AlertDialogCancel onClick={onConfirm}>Log out</AlertDialogCancel>
-              <AlertDialogAction onClick={onContinue}>Continue Session</AlertDialogAction>
-            </>
-          ) : (
-            <AlertDialogAction onClick={onConfirm}>Go to Login</AlertDialogAction>
-          )}
+          <AlertDialogCancel onClick={onConfirm}>Log out</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

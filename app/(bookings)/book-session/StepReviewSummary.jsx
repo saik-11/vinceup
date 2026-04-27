@@ -1,8 +1,9 @@
 "use client";
 
-import { CalendarDays, CheckCircle2, Clock, DollarSign, FileText, Lock, Star, UserCheck } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock, DollarSign, FileText, Lock, MessageSquare, UserCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { PLATFORM_FEE_PER_MIN, TAX_RATE } from "./booking-config";
 
 const fadeUp = {
@@ -21,7 +22,17 @@ const WHATS_NEXT = [
   "Meeting link will be shared 15 minutes before start time",
 ];
 
-export default function StepReviewSummary({ selectedService, selectedDate, selectedTime, selectedMentor, onBack, onCheckout, isPending }) {
+export default function StepReviewSummary({
+  selectedService,
+  selectedDate,
+  selectedTime,
+  selectedMentor,
+  notes,
+  onNotesChange,
+  onBack,
+  onBookSession,
+  isSubmitting,
+}) {
   const sessionCost = selectedService.price;
   const platformFee = PLATFORM_FEE_PER_MIN * selectedService.duration;
   const subtotal = sessionCost + platformFee;
@@ -34,7 +45,7 @@ export default function StepReviewSummary({ selectedService, selectedDate, selec
     year: "numeric",
   });
 
-  const initials = selectedMentor.name
+  const initials = selectedMentor.mentor.name
     .split(" ")
     .map((n) => n[0])
     .join("");
@@ -43,7 +54,7 @@ export default function StepReviewSummary({ selectedService, selectedDate, selec
     <div>
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Review Your Booking</h1>
-        <p className="mt-2 text-muted-foreground">Please review all details before checkout</p>
+        <p className="mt-2 text-muted-foreground">Please review all details before booking</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -82,7 +93,8 @@ export default function StepReviewSummary({ selectedService, selectedDate, selec
                 <div>
                   <p className="text-xs text-muted-foreground">Date & Time</p>
                   <p className="font-semibold">
-                    {formattedDate} at {selectedTime}
+                    {formattedDate} at {selectedMentor.local_time?.start_time ?? selectedTime}
+                    {selectedMentor.local_time?.end_time && ` – ${selectedMentor.local_time.end_time}`}
                   </p>
                 </div>
               </div>
@@ -97,31 +109,53 @@ export default function StepReviewSummary({ selectedService, selectedDate, selec
             </h3>
 
             <div className="flex items-start gap-4">
-              <div className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 dark:from-primary/30 dark:to-primary/10 text-primary font-bold text-2xl">
+              <div className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/5 dark:from-primary/30 dark:to-primary/10 text-primary font-bold text-2xl">
                 {initials}
               </div>
               <div>
-                <h4 className="text-lg font-bold">{selectedMentor.name}</h4>
-                <p className="text-sm text-muted-foreground">{selectedMentor.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{selectedMentor.bio}</p>
-                <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
-                  {selectedMentor.tags.map((tag) => (
-                    <span key={tag} className="text-xs font-medium text-primary">
-                      {tag}
+                <h4 className="text-lg font-bold">{selectedMentor.mentor.name}</h4>
+                <p className="text-sm text-muted-foreground">{selectedMentor.mentor.title}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {selectedMentor.service_type && (
+                    <span className="text-xs font-medium bg-primary/10 dark:bg-primary/20 text-primary rounded-full px-2.5 py-0.5">
+                      {selectedMentor.service_type}
                     </span>
-                  ))}
+                  )}
+                  {selectedMentor.mentor.industry && (
+                    <span className="text-xs text-muted-foreground">{selectedMentor.mentor.industry}</span>
+                  )}
+                  {selectedMentor.mentor.company_name && (
+                    <span className="text-xs text-muted-foreground">{selectedMentor.mentor.company_name}</span>
+                  )}
                 </div>
               </div>
             </div>
           </motion.div>
 
+          {/* Notes */}
+          <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible" className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+            <h3 className="flex items-center gap-2 text-lg font-bold mb-3">
+              <MessageSquare className="size-5 text-primary" />
+              Notes for Mentor
+              <span className="ml-1 text-sm font-normal text-muted-foreground">(optional)</span>
+            </h3>
+            <Textarea
+              placeholder="Share anything you'd like your mentor to know before the session — goals, questions, or context…"
+              value={notes}
+              onChange={(e) => onNotesChange(e.target.value)}
+              rows={4}
+              className="resize-none"
+              disabled={isSubmitting}
+            />
+          </motion.div>
+
           {/* What happens next */}
           <motion.div
-            custom={2}
+            custom={3}
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="rounded-2xl border border-primary/10 dark:border-primary/20 bg-primary/[0.02] dark:bg-primary/[0.05] p-6"
+            className="rounded-2xl border border-primary/10 dark:border-primary/20 bg-primary/2 dark:bg-primary/5 p-6"
           >
             <h3 className="flex items-center gap-2 text-lg font-bold mb-3">
               <CheckCircle2 className="size-5 text-emerald-500" />
@@ -186,14 +220,19 @@ export default function StepReviewSummary({ selectedService, selectedDate, selec
             </div>
           </div>
 
-          <Button size="lg" className="mt-6 w-full cursor-pointer" onClick={() => onCheckout(total)} disabled={isPending}>
+          <Button
+            size="lg"
+            className="mt-6 w-full cursor-pointer"
+            onClick={onBookSession}
+            disabled={isSubmitting}
+          >
             <Lock className="size-4" />
-            {isPending ? "Processing…" : "Proceed to Checkout"}
+            {isSubmitting ? "Booking…" : "Book Session"}
           </Button>
 
           <p className="mt-3 text-center text-xs text-muted-foreground">Secure payment powered by Stripe</p>
 
-          <Button variant="outline" size="lg" className="mt-3 w-full cursor-pointer" onClick={onBack}>
+          <Button variant="outline" size="lg" className="mt-3 w-full cursor-pointer" onClick={onBack} disabled={isSubmitting}>
             Back to Selection
           </Button>
         </motion.div>

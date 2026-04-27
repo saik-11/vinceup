@@ -1,2 +1,2 @@
 /** @deprecated Import from "@/lib/api/service" instead. */
-export { authApi, mentorApi } from "@/lib/api/service";
+export { authApi, mentorApi, menteeApi } from "@/lib/api/service";

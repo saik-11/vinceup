@@ -5,6 +5,7 @@ import { useState } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/sonner";
 
 const AppProviders = ({ children, initialAuth = false }) => {
   const [queryClient] = useState(
@@ -23,7 +24,10 @@ const AppProviders = ({ children, initialAuth = false }) => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange>
         <AuthProvider initialAuth={initialAuth}>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            {children}
+            <Toaster />
+          </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

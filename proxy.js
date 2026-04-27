@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from "@/lib/auth/authSession";
 
 // ─── Auth routes (redirect to dashboard if already logged in) ─────────────────
-const AUTH_ROUTES = ["/login", "/signup", "/mentor-signup", "/forgot-password", "/reset-password"];
+const AUTH_ROUTES = ["/login", "/signup", "/mentor-signup", "/forgot-password"];
+
+// ─── Public routes (accessible regardless of auth state) ─────────────────────
+const PUBLIC_ROUTES = ["/reset-password"];
 
 const DEFAULT_AUTH_REDIRECT = "/dashboard";
 
@@ -31,6 +34,11 @@ function getSafeCallbackUrl(request) {
 
 export function proxy(request) {
   const pathname = request.nextUrl.pathname;
+
+  // ── 0. Public routes — skip all auth/role logic ───────────────────────────────
+  if (isRouteMatch(pathname, PUBLIC_ROUTES)) {
+    return NextResponse.next();
+  }
 
   // ── 1. Auth check ────────────────────────────────────────────────────────────
   const sessionToken = request.cookies.get(AUTH_TOKEN_KEY)?.value;

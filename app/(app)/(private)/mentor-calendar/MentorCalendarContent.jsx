@@ -141,7 +141,7 @@ function PageHeader({ view, setView, onSetAvailability }) {
               id={`calendar-view-${v}`}
               onClick={() => setView(v)}
               className={cn(
-                "px-3.5 py-1.5 text-sm font-medium rounded-[10px] capitalize transition-all duration-150",
+                "px-3.5 py-1.5 text-sm font-medium rounded-lg capitalize transition-all duration-150",
                 view === v ? "bg-[#7c3aed] text-white shadow-sm" : "text-(--dashboard-subtle) hover:text-(--dashboard-muted)",
               )}
             >

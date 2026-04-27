@@ -48,7 +48,7 @@ export const dashboardThemeClass = cn(
 
 /** Glassmorphic panel card used as the outer wrapper of every section. */
 export const panelClass =
-  "overflow-visible rounded-[24px] border border-[var(--dashboard-border)] bg-[var(--dashboard-panel)] text-[var(--dashboard-text)] shadow-[var(--dashboard-shadow)] ring-0 backdrop-blur-xl";
+  "overflow-visible rounded-lg border border-[var(--dashboard-border)] bg-[var(--dashboard-panel)] text-[var(--dashboard-text)] shadow-[var(--dashboard-shadow)] ring-0 backdrop-blur-xl";
 
 /** Hover animation applied on top of panelClass for interactive lift effect. */
 export const interactivePanelClass = "transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[var(--dashboard-shadow-hover)]";
@@ -100,7 +100,6 @@ export const statAccentStyles = {
   },
 };
 
-
 // ─── Shared Components ────────────────────────────────────────────────────────
 
 /**
@@ -113,7 +112,8 @@ export function DashboardShell({ children, ariaLabel = "Dashboard", maxWidth = "
       aria-label={ariaLabel}
       className={cn(
         dashboardThemeClass,
-        "min-h-[calc(100vh-64px)] bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.06),transparent_26%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)] px-4 py-4 sm:px-6 sm:py-6 xl:px-8 xl:py-8",
+        "bg-background",
+        "min-h-[calc(100vh-64px)] bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.025)_0%,transparent_55%),linear-gradient(180deg,#fafafa_0%,#f8fafc_100%)] px-4 py-4 sm:px-6 sm:py-6 xl:px-8 xl:py-8",
         "dark:bg-[radial-gradient(circle_at_top,rgba(124,58,237,0.08),transparent_24%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)]",
       )}
     >
@@ -162,7 +162,7 @@ export function DashboardHeader({ heading, subheading, badge, timezone, highligh
       {/* Left */}
       <div>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-[-0.03em] text-[var(--dashboard-text)] sm:text-3xl">{heading}</h1>
+          <h1 className="text-2xl font-bold tracking-[-0.03em] text-(--dashboard-text) sm:text-3xl">{heading}</h1>
           {badge && badge}
         </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
@@ -170,7 +170,7 @@ export function DashboardHeader({ heading, subheading, badge, timezone, highligh
           {timezone && (
             <Badge
               variant="outline"
-              className="hidden sm:inline-flex items-center text-[10px] uppercase font-bold text-[var(--dashboard-subtle)] rounded-full shadow-none border-[var(--dashboard-border)] bg-[var(--dashboard-panel-muted)] py-0 h-5 px-2.5 tracking-wider"
+              className="hidden sm:inline-flex items-center text-[10px] uppercase font-bold text-(--dashboard-subtle) rounded-full shadow-none border-(--dashboard-border) bg-(--dashboard-panel-muted) py-0 h-5 px-2.5 tracking-wider"
             >
               <Globe className="mr-1.5 size-3 opacity-70" />
               {timezone.replace("_", " ")}
@@ -186,8 +186,8 @@ export function DashboardHeader({ heading, subheading, badge, timezone, highligh
             <Sparkles className="size-4 text-white" strokeWidth={2} />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--dashboard-purple)]">{highlight.label ?? "VEGA Weekly Highlight"}</p>
-            <p className="text-xs font-medium text-[var(--dashboard-muted)]">{highlight.value}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-(--dashboard-purple)">{highlight.label ?? "VEGA Weekly Highlight"}</p>
+            <p className="text-xs font-medium text-(--dashboard-muted)">{highlight.value}</p>
           </div>
         </div>
       )}
@@ -208,11 +208,7 @@ export function MetricCard({ stat, icon: Icon, accentStyles }) {
               <div className={cn("flex size-12 items-center justify-center rounded-[16px] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]", accentStyles.iconWrap)}>
                 <Icon className="size-5" />
               </div>
-              {stat.badge && (
-                <Badge className={cn("rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ring-0", accentStyles.badge)}>
-                  {stat.badge}
-                </Badge>
-              )}
+              {stat.badge && <Badge className={cn("rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ring-0", accentStyles.badge)}>{stat.badge}</Badge>}
             </div>
 
             <div className="space-y-1 mt-1">
@@ -228,5 +224,3 @@ export function MetricCard({ stat, icon: Icon, accentStyles }) {
     </div>
   );
 }
-
-
