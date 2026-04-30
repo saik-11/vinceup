@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RoomEvent } from "livekit-client";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,7 +15,11 @@ function formatTime(timestamp) {
   return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-export function ChatPanel({ room, localIdentity, onClose, className }) {
+/**
+ * @param {Object} props
+ * @param {boolean} [props.embedded] – When true, renders without its own header/close button (parent handles that).
+ */
+export function ChatPanel({ room, localIdentity, onClose, embedded = false, className }) {
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const bottomRef = useRef(null);
@@ -82,28 +87,33 @@ export function ChatPanel({ room, localIdentity, onClose, className }) {
   return (
     <aside
       className={cn(
-        "flex w-80 shrink-0 flex-col border-l border-white/10 bg-slate-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl",
+        "flex shrink-0 flex-col",
+        !embedded && "border-l border-white/10 bg-slate-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl",
         className,
       )}
     >
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 text-cyan-200">
-            <MessageSquare className="h-4 w-4" />
-          </span>
-          <h2 className="text-sm font-semibold text-white">In-call messages</h2>
+      {/* Header — only shown in non-embedded mode */}
+      {!embedded && (
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 text-cyan-200">
+              <MessageSquare className="h-4 w-4" />
+            </span>
+            <h2 className="text-sm font-semibold text-white">In-call messages</h2>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label="Close chat"
+            className="h-9 w-9 rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          aria-label="Close chat"
-          className="h-9 w-9 rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+      )}
 
+      {/* Messages */}
       <ScrollArea className="min-h-0 flex-1 px-4 py-4">
         {messages.length === 0 ? (
           <div className="mt-10 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-6 text-center">
@@ -112,9 +122,12 @@ export function ChatPanel({ room, localIdentity, onClose, className }) {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {messages.map((message) => (
-              <div
+            {messages.map((message, i) => (
+              <motion.div
                 key={message.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
                 className={cn("flex flex-col gap-1", message.isLocal ? "items-end" : "items-start")}
               >
                 <span className="px-1 text-xs text-slate-500">
@@ -130,13 +143,14 @@ export function ChatPanel({ room, localIdentity, onClose, className }) {
                 >
                   {message.text}
                 </div>
-              </div>
+              </motion.div>
             ))}
             <div ref={bottomRef} />
           </div>
         )}
       </ScrollArea>
 
+      {/* Input */}
       <div className="flex items-center gap-2 border-t border-white/10 px-4 py-3">
         <Input
           value={draft}

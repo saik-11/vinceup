@@ -5,6 +5,8 @@ import { Room, RoomEvent, ConnectionState, Track, ParticipantEvent } from "livek
 import { fetchLivekitToken, getLivekitErrorMessage, getTokenExpiryMs } from "@/lib/api/livekit";
 
 const TOKEN_REFRESH_BUFFER_MS = 60_000;
+const PUBLISH_RETRY_DELAY_MS = 1500;
+const PUBLISH_MAX_RETRIES = 3;
 
 function toApiParams({ roomName, identity, participantName, ttlMinutes }) {
   return {
@@ -13,6 +15,46 @@ function toApiParams({ roomName, identity, participantName, ttlMinutes }) {
     participant_name: participantName,
     ttl_minutes: ttlMinutes,
   };
+}
+
+/**
+ * Wait until the room engine is fully ready to publish tracks.
+ * The "engine not connected within timeout" error happens when
+ * enableCameraAndMicrophone() fires before the internal engine
+ * is fully established. We wait for the engine signal.
+ */
+async function waitForEngineConnected(activeRoom, timeoutMs = 8000) {
+  // If already connected via engine, resolve immediately
+  if (activeRoom.state === ConnectionState.Connected && activeRoom.engine?.client?.isConnected) {
+    return;
+  }
+
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      cleanup();
+      // Still resolve — we'll try to publish anyway
+      resolve();
+    }, timeoutMs);
+
+    const onConnected = () => {
+      cleanup();
+      // Small additional buffer for engine readiness
+      setTimeout(resolve, 500);
+    };
+
+    const cleanup = () => {
+      clearTimeout(timer);
+      activeRoom.off(RoomEvent.Connected, onConnected);
+    };
+
+    activeRoom.on(RoomEvent.Connected, onConnected);
+
+    // If already connected, resolve with buffer
+    if (activeRoom.state === ConnectionState.Connected) {
+      cleanup();
+      setTimeout(resolve, 500);
+    }
+  });
 }
 
 export function useLiveKit() {
@@ -75,18 +117,47 @@ export function useLiveKit() {
     setParticipants([activeRoom.localParticipant, ...Array.from(activeRoom.remoteParticipants.values())]);
   }, []);
 
+  /**
+   * Attempt to enable camera + microphone with retries.
+   * The LiveKit engine can briefly reject publishes right after connect().
+   */
+  const enableMediaWithRetry = useCallback(async (activeRoom, retries = PUBLISH_MAX_RETRIES) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        await activeRoom.localParticipant.enableCameraAndMicrophone();
+        return; // success
+      } catch (err) {
+        const isEngineError = String(err?.message ?? "").includes("engine not connected");
+        if (!isEngineError || attempt === retries) {
+          console.warn(`Media publish attempt ${attempt}/${retries} failed:`, err?.message);
+          // Don't throw — allow joining without media. User can toggle manually.
+          return;
+        }
+        // Wait before retrying
+        await new Promise((r) => setTimeout(r, PUBLISH_RETRY_DELAY_MS));
+      }
+    }
+  }, []);
+
   const connectWithToken = useCallback(
     async (activeRoom, tokenData) => {
       setPhase("connecting");
       setConnectionState(ConnectionState.Connecting);
+
       await activeRoom.connect(tokenData.url, tokenData.token);
-      await activeRoom.localParticipant.enableCameraAndMicrophone();
+
+      // Wait for engine to be truly ready before publishing
+      await waitForEngineConnected(activeRoom);
+
+      // Enable camera/mic with retry — don't let failures block join
+      await enableMediaWithRetry(activeRoom);
+
       syncParticipants(activeRoom);
       scheduleTokenRefresh(tokenData.token);
       setConnectionState(ConnectionState.Connected);
       setPhase("connected");
     },
-    [scheduleTokenRefresh, syncParticipants],
+    [enableMediaWithRetry, scheduleTokenRefresh, syncParticipants],
   );
 
   const wireRoomEvents = useCallback(
@@ -117,6 +188,7 @@ export function useLiveKit() {
       activeRoom.on(RoomEvent.Disconnected, onDisconnected);
       activeRoom.on(RoomEvent.Reconnecting, onReconnecting);
       activeRoom.on(RoomEvent.Reconnected, onReconnected);
+      activeRoom.on(RoomEvent.DataReceived, onParticipantChange);
     },
     [clearRefreshTimer, syncParticipants],
   );
@@ -184,7 +256,11 @@ export function useLiveKit() {
     clearRefreshTimer();
 
     if (roomRef.current) {
-      await roomRef.current.disconnect();
+      try {
+        await roomRef.current.disconnect();
+      } catch (err) {
+        console.error("Failed to disconnect from room:", err);
+      }
       roomRef.current.removeAllListeners();
       roomRef.current = null;
       setRoom(null);
@@ -202,7 +278,7 @@ export function useLiveKit() {
     return () => {
       clearRefreshTimer();
       if (roomRef.current) {
-        roomRef.current.disconnect();
+        roomRef.current.disconnect().catch(console.error);
         roomRef.current.removeAllListeners();
       }
     };

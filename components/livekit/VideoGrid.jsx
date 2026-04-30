@@ -2,14 +2,43 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { RoomEvent } from "livekit-client";
+import { AnimatePresence, motion } from "framer-motion";
 import { ParticipantTile } from "./ParticipantTile";
 import { cn } from "@/lib/utils";
 
 function firstRemoteOrLocal(room, participants) {
-  return participants.find((participant) => participant !== room?.localParticipant) ?? participants[0] ?? null;
+  return participants.find((p) => p !== room?.localParticipant) ?? participants[0] ?? null;
 }
 
-export function VideoGrid({ room, participants, className }) {
+/* ─── Animation variants ─── */
+
+const spotlightVariants = {
+  initial: { opacity: 0, scale: 0.98 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 280, damping: 28 },
+  },
+  exit: { opacity: 0, scale: 0.98, transition: { duration: 0.12 } },
+};
+
+const stripItemVariants = {
+  initial: { opacity: 0, y: 8 },
+  animate: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.04, type: "spring", stiffness: 300, damping: 28 },
+  }),
+};
+
+/**
+ * VideoGrid — Google Meet layout
+ *
+ * The spotlight tile fills 100% of the available vertical space.
+ * The control bar is absolutely positioned over it (handled by LiveRoom).
+ * Strip tiles are small thumbnails on the right (desktop) or bottom (mobile).
+ */
+export function VideoGrid({ room, participants, raisedHands = new Set(), className }) {
   const [activeSpeakers, setActiveSpeakers] = useState([]);
   const [pinnedIdentity, setPinnedIdentity] = useState(null);
 
@@ -17,7 +46,7 @@ export function VideoGrid({ room, participants, className }) {
     if (!room) return;
 
     const handleSpeakers = (speakers) => {
-      setActiveSpeakers(speakers.map((speaker) => speaker.identity));
+      setActiveSpeakers(speakers.map((s) => s.identity));
     };
 
     handleSpeakers(room.activeSpeakers ?? []);
@@ -29,71 +58,111 @@ export function VideoGrid({ room, participants, className }) {
   const activeIdentities = useMemo(() => new Set(activeSpeakers), [activeSpeakers]);
   const spotlightParticipant = useMemo(() => {
     if (!participants?.length) return null;
-
     return (
-      participants.find((participant) => participant.identity === activeSpeakerIdentity) ??
-      participants.find((participant) => participant.identity === pinnedIdentity) ??
+      participants.find((p) => p.identity === activeSpeakerIdentity) ??
+      participants.find((p) => p.identity === pinnedIdentity) ??
       firstRemoteOrLocal(room, participants)
     );
   }, [activeSpeakerIdentity, participants, pinnedIdentity, room]);
 
   if (!participants || participants.length === 0) {
     return (
-      <div className={cn("flex min-h-0 flex-1 items-center justify-center p-6 text-slate-400", className)}>
-        <p className="text-sm">Waiting for participants to join...</p>
+      <div className={cn("flex h-full items-center justify-center text-slate-400", className)}>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="h-14 w-14 animate-pulse rounded-full bg-white/5" />
+          <p className="text-sm">Waiting for participants to join…</p>
+        </div>
       </div>
     );
   }
 
-  const stripParticipants = participants.filter((participant) => participant.identity !== spotlightParticipant?.identity);
+  const stripParticipants = participants.filter(
+    (p) => p.identity !== spotlightParticipant?.identity,
+  );
+  const hasStrip = stripParticipants.length > 0;
 
   return (
-    <div className={cn("flex min-h-0 flex-1 flex-col gap-3 p-3 pb-28 sm:p-4 sm:pb-28 lg:flex-row", className)}>
-      <main className="flex min-h-0 flex-1 items-center justify-center">
-        <div className="w-full max-w-6xl transition-all duration-300">
-          <ParticipantTile
+    <div
+      className={cn(
+        "flex h-full min-h-0 flex-1",
+        /* Desktop: horizontal layout (video + side strip) */
+        "flex-col lg:flex-row",
+        /* Padding: small gutter from edges, Google Meet uses ~8px */
+        "gap-2 p-2 sm:gap-2.5 sm:p-2.5",
+        className,
+      )}
+    >
+      {/* ── Spotlight tile ── */}
+      <main className="relative min-h-0 min-w-0 flex-1">
+        <AnimatePresence mode="wait">
+          <motion.div
             key={spotlightParticipant.identity}
-            participant={spotlightParticipant}
-            isLocal={spotlightParticipant === room?.localParticipant}
-            isActiveSpeaker={activeIdentities.has(spotlightParticipant.identity)}
-            featured
-            selected={pinnedIdentity === spotlightParticipant.identity}
-            className="max-h-[calc(100vh-13rem)] min-h-[18rem] bg-slate-950 sm:min-h-[24rem] lg:max-h-[calc(100vh-10rem)]"
-          />
-        </div>
+            variants={spotlightVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="absolute inset-0"
+          >
+            <ParticipantTile
+              participant={spotlightParticipant}
+              isLocal={spotlightParticipant === room?.localParticipant}
+              isActiveSpeaker={activeIdentities.has(spotlightParticipant.identity)}
+              hasRaisedHand={raisedHands.has(spotlightParticipant.identity)}
+              featured
+              selected={pinnedIdentity === spotlightParticipant.identity}
+            />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {stripParticipants.length > 0 && (
-        <aside className="hidden min-h-0 w-72 shrink-0 overflow-y-auto pr-1 lg:block xl:w-80">
-          <div className="grid grid-cols-1 gap-3">
-            {stripParticipants.map((participant) => (
+      {/* ── Desktop: Side strip (right column) ── */}
+      {hasStrip && (
+        <aside className="hidden w-48 shrink-0 flex-col gap-2 overflow-y-auto lg:flex xl:w-56 2xl:w-60">
+          {stripParticipants.map((participant, i) => (
+            <motion.div
+              key={participant.identity}
+              variants={stripItemVariants}
+              initial="initial"
+              animate="animate"
+              custom={i}
+            >
               <ParticipantTile
-                key={participant.identity}
                 participant={participant}
                 isLocal={participant === room?.localParticipant}
                 isActiveSpeaker={activeIdentities.has(participant.identity)}
+                hasRaisedHand={raisedHands.has(participant.identity)}
                 selected={pinnedIdentity === participant.identity}
                 onClick={() => setPinnedIdentity(participant.identity)}
               />
-            ))}
-          </div>
+            </motion.div>
+          ))}
         </aside>
       )}
 
-      {stripParticipants.length > 0 && (
-        <div className="lg:hidden">
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {stripParticipants.map((participant) => (
-              <ParticipantTile
+      {/* ── Mobile / Tablet: Bottom strip ── */}
+      {hasStrip && (
+        <div className="shrink-0 lg:hidden">
+          <div className="flex gap-2 overflow-x-auto scrollbar-none">
+            {stripParticipants.map((participant, i) => (
+              <motion.div
                 key={participant.identity}
-                participant={participant}
-                isLocal={participant === room?.localParticipant}
-                isActiveSpeaker={activeIdentities.has(participant.identity)}
-                selected={pinnedIdentity === participant.identity}
-                compact
-                onClick={() => setPinnedIdentity(participant.identity)}
-                className="h-28 min-w-44"
-              />
+                variants={stripItemVariants}
+                initial="initial"
+                animate="animate"
+                custom={i}
+                className="shrink-0"
+              >
+                <ParticipantTile
+                  participant={participant}
+                  isLocal={participant === room?.localParticipant}
+                  isActiveSpeaker={activeIdentities.has(participant.identity)}
+                  hasRaisedHand={raisedHands.has(participant.identity)}
+                  selected={pinnedIdentity === participant.identity}
+                  compact
+                  onClick={() => setPinnedIdentity(participant.identity)}
+                  className="h-20 w-32 sm:h-24 sm:w-40"
+                />
+              </motion.div>
             ))}
           </div>
         </div>
