@@ -5,7 +5,7 @@ import { Play, Eye, FileText, Pencil, Loader2 } from "lucide-react";
 import { mentorApi } from "@/lib/api/service";
 import { toast } from "sonner";
 
-export const SessionActions = ({ category, capsuleStatus, sessionId, onAction }) => {
+export const SessionActions = ({ category, capsuleStatus, sessionId, duration, onAction }) => {
   const [accepting, setAccepting] = useState(false);
   const [declining, setDeclining] = useState(false);
   const router = useRouter();
@@ -48,7 +48,7 @@ export const SessionActions = ({ category, capsuleStatus, sessionId, onAction })
         </Button>
         <Button
           className="flex-1 rounded-lg bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md transition-all"
-          onClick={() => router.push(`/session/${sessionId}`)}
+          onClick={() => router.push(`/session/${sessionId}${duration ? `?duration=${duration}` : ""}`)}
         >
           <Play className="w-4 h-4 mr-2" />
           Join Session

@@ -4,38 +4,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RoomEvent } from "livekit-client";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
-import {
-  AlertCircle,
-  CalendarClock,
-  Circle,
-  Copy,
-  Info,
-  ShieldCheck,
-  Users,
-  X,
-  Hand,
-  Mic,
-  MicOff,
-  Video as VideoIcon,
-  VideoOff,
-} from "lucide-react";
+import { AlertCircle, CalendarClock, Circle, Copy, Info, ShieldCheck, Users, X, Hand, Mic, MicOff, Video as VideoIcon, VideoOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useIsDesktop, useIsMobile } from "@/hooks/useMediaQuery";
 import { useParticipantTracks } from "@/hooks/useLiveKit";
 import { ChatPanel } from "./ChatPanel";
 import { ConnectionStatus } from "./ConnectionStatus";
-import { ControlBar, HAND_RAISE_TOPIC } from "./ControlBar";
+import { ControlBar, HAND_RAISE_TOPIC, RECORDING_TOPIC } from "./ControlBar";
 import { getParticipantDisplayName } from "./ParticipantTile";
 import { VideoGrid } from "./VideoGrid";
 
@@ -65,7 +45,14 @@ function getQualityLabel(quality) {
 }
 
 function getInitials(name = "") {
-  return name.split(" ").map((w) => w[0]).join("").substring(0, 2).toUpperCase() || "?";
+  return (
+    name
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase() || "?"
+  );
 }
 
 /* ─── Panel animation variants ─── */
@@ -92,15 +79,7 @@ const overlayVariants = {
 
 /* ─── LiveRoom ─── */
 
-export function LiveRoom({
-  room,
-  roomName = "Live Session",
-  participants,
-  connectionState,
-  error,
-  onLeave,
-  className,
-}) {
+export function LiveRoom({ room, roomName = "Live Session", participants, connectionState, error, onLeave, className }) {
   const [activePanel, setActivePanel] = useState(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [activeSpeakers, setActiveSpeakers] = useState([]);
@@ -133,58 +112,39 @@ export function LiveRoom({
     return () => room.off(RoomEvent.ActiveSpeakersChanged, handleSpeakers);
   }, [room]);
 
-  // Listen for hand raise data from other participants
+  // Listen for data from other participants (hand raise + recording state)
   useEffect(() => {
     if (!room) return;
 
-    const handleData = (payload) => {
+    const handleData = (payload, participant) => {
       try {
         const text = new TextDecoder().decode(payload);
         const parsed = JSON.parse(text);
-        if (parsed.topic !== HAND_RAISE_TOPIC) return;
 
-        setRaisedHands((prev) => {
-          const next = new Set(prev);
-          if (parsed.raised) {
-            next.add(parsed.identity);
-          } else {
-            next.delete(parsed.identity);
-          }
-          return next;
-        });
+        // ── Hand raise ──
+        if (parsed.topic === HAND_RAISE_TOPIC) {
+          setRaisedHands((prev) => {
+            const next = new Set(prev);
+            if (parsed.raised) {
+              next.add(parsed.identity);
+            } else {
+              next.delete(parsed.identity);
+            }
+            return next;
+          });
+        }
+
+        // ── Recording state (only trust messages from other participants) ──
+        if (parsed.topic === RECORDING_TOPIC && participant?.identity !== localIdentity) {
+          setIsRecording(parsed.recording);
+        }
       } catch {
-        // Ignore
+        // Ignore malformed payloads
       }
     };
 
     room.on(RoomEvent.DataReceived, handleData);
     return () => room.off(RoomEvent.DataReceived, handleData);
-  }, [room]);
-
-  // Track local hand raise in the set too
-  useEffect(() => {
-    if (!room) return;
-
-    const handleData = (payload, participant) => {
-      // Only care about our own data for the local hand raise tracking
-      if (participant?.identity !== localIdentity) return;
-      try {
-        const text = new TextDecoder().decode(payload);
-        const parsed = JSON.parse(text);
-        if (parsed.topic !== HAND_RAISE_TOPIC) return;
-        setRaisedHands((prev) => {
-          const next = new Set(prev);
-          if (parsed.raised) next.add(parsed.identity);
-          else next.delete(parsed.identity);
-          return next;
-        });
-      } catch {
-        // Ignore
-      }
-    };
-
-    // The local publish also triggers DataReceived for self
-    // But in case it doesn't, we handle it from the control bar event
   }, [room, localIdentity]);
 
   const activeIdentitySet = useMemo(() => new Set(activeSpeakers), [activeSpeakers]);
@@ -199,48 +159,42 @@ export function LiveRoom({
   const handleToggleRecording = useCallback(() => {
     setIsRecording((prev) => {
       const next = !prev;
-      toast.info(next ? "Recording started" : "Recording stopped");
+
+      // Broadcast recording state to all other participants
+      try {
+        const payload = JSON.stringify({
+          topic: RECORDING_TOPIC,
+          recording: next,
+          identity: room?.localParticipant?.identity,
+        });
+        room?.localParticipant?.publishData(new TextEncoder().encode(payload), { reliable: true });
+      } catch (err) {
+        console.error("Failed to broadcast recording state:", err);
+      }
+
+      // Show toast ONCE — done outside the updater to avoid React Strict Mode
+      // double-invocation firing two toasts. We use queueMicrotask to defer it
+      // past the synchronous setState flush.
+      queueMicrotask(() => {
+        toast.info(next ? "Recording started" : "Recording stopped");
+      });
+
       return next;
     });
-  }, []);
+  }, [room]);
 
   // Resolve which panel content to render
-  const panelTitle = activePanel === "chat"
-    ? "In-call messages"
-    : activePanel === "participants"
-      ? "Participants"
-      : activePanel === "details"
-        ? "Meeting details"
-        : "";
+  const panelTitle = activePanel === "chat" ? "In-call messages" : activePanel === "participants" ? "Participants" : activePanel === "details" ? "Meeting details" : "";
 
-  const panelIcon = activePanel === "participants"
-    ? Users
-    : activePanel === "details"
-      ? Info
-      : null;
+  const panelIcon = activePanel === "participants" ? Users : activePanel === "details" ? Info : null;
 
   // Render panel inner content (reused across desktop/tablet/mobile)
   function renderPanelContent() {
     switch (activePanel) {
       case "participants":
-        return (
-          <ParticipantsContent
-            room={room}
-            participants={participants}
-            activeIdentitySet={activeIdentitySet}
-            raisedHands={raisedHands}
-          />
-        );
+        return <ParticipantsContent room={room} participants={participants} activeIdentitySet={activeIdentitySet} raisedHands={raisedHands} />;
       case "details":
-        return (
-          <MeetingDetailsContent
-            room={room}
-            roomName={roomName}
-            elapsedSeconds={elapsedSeconds}
-            participants={participants}
-            isRecording={isRecording}
-          />
-        );
+        return <MeetingDetailsContent room={room} roomName={roomName} elapsedSeconds={elapsedSeconds} participants={participants} isRecording={isRecording} />;
       default:
         return null;
     }
@@ -270,15 +224,7 @@ export function LiveRoom({
             <ShieldCheck className="h-3 w-3" />
             {localQuality}
           </Badge>
-          <Badge
-            variant="outline"
-            className={cn(
-              "hidden md:inline-flex",
-              isRecording
-                ? "border-red-400/40 bg-red-500/15 text-red-200"
-                : "border-white/10 bg-white/5 text-slate-300",
-            )}
-          >
+          <Badge variant="outline" className={cn("hidden md:inline-flex", isRecording ? "border-red-400/40 bg-red-500/15 text-red-200" : "border-white/10 bg-white/5 text-slate-300")}>
             <Circle className={cn("h-2 w-2", isRecording ? "fill-red-400 text-red-400 animate-pulse" : "fill-slate-500 text-slate-500")} />
             {isRecording ? "Recording" : "Not recording"}
           </Badge>
@@ -306,11 +252,14 @@ export function LiveRoom({
 
       {/* Main content area */}
       <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden">
-        {/* Video grid */}
-        <div className="relative min-h-0 min-w-0 flex-1">
-          <VideoGrid room={room} participants={participants} raisedHands={raisedHands} />
+        {/* Main video and controls column */}
+        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+          {/* Video grid */}
+          <div className="relative min-h-0 min-w-0 flex-1">
+            <VideoGrid room={room} participants={participants} raisedHands={raisedHands} />
+          </div>
 
-          {/* Control bar — overlaid on video, absolute bottom center */}
+          {/* Control bar */}
           <ControlBar
             room={room}
             onLeave={onLeave}
@@ -329,14 +278,7 @@ export function LiveRoom({
         {isDesktop && (
           <AnimatePresence mode="wait">
             {panelOpen && activePanel === "chat" && (
-              <motion.div
-                key="chat-panel"
-                variants={panelSlideVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="flex w-[360px] shrink-0 flex-col xl:w-[400px]"
-              >
+              <motion.div key="chat-panel" variants={panelSlideVariants} initial="hidden" animate="visible" exit="exit" className="flex w-[360px] shrink-0 flex-col xl:w-[400px]">
                 <ChatPanel
                   room={room}
                   localIdentity={localIdentity}
@@ -366,14 +308,7 @@ export function LiveRoom({
           <>
             <AnimatePresence>
               {panelOpen && (
-                <motion.div
-                  variants={overlayVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="absolute inset-0 z-20 bg-black/40 backdrop-blur-sm"
-                  onClick={closePanel}
-                />
+                <motion.div variants={overlayVariants} initial="hidden" animate="visible" exit="exit" className="absolute inset-0 z-20 bg-black/40 backdrop-blur-sm" onClick={closePanel} />
               )}
             </AnimatePresence>
             <AnimatePresence mode="wait">
@@ -418,22 +353,12 @@ export function LiveRoom({
               <DrawerHeader className="border-b border-white/10 pb-3">
                 <DrawerTitle className="text-white">{panelTitle}</DrawerTitle>
                 <DrawerDescription className="text-slate-400">
-                  {activePanel === "chat"
-                    ? "Messages are only visible during this call"
-                    : activePanel === "participants"
-                      ? `${participants.length} in this call`
-                      : "Session information"}
+                  {activePanel === "chat" ? "Messages are only visible during this call" : activePanel === "participants" ? `${participants.length} in this call` : "Session information"}
                 </DrawerDescription>
               </DrawerHeader>
               <div className="min-h-0 flex-1 overflow-y-auto">
                 {activePanel === "chat" ? (
-                  <ChatPanel
-                    room={room}
-                    localIdentity={localIdentity}
-                    onClose={closePanel}
-                    embedded
-                    className="h-full border-0 bg-transparent shadow-none backdrop-blur-0"
-                  />
+                  <ChatPanel room={room} localIdentity={localIdentity} onClose={closePanel} embedded className="h-full border-0 bg-transparent shadow-none backdrop-blur-0" />
                 ) : (
                   renderPanelContent()
                 )}
@@ -459,13 +384,7 @@ function PanelHeader({ title, icon: Icon, onClose }) {
         )}
         <h2 className="text-sm font-semibold text-white">{title}</h2>
       </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onClose}
-        aria-label={`Close ${title}`}
-        className="h-8 w-8 rounded-lg text-slate-400 hover:bg-white/10 hover:text-white"
-      >
+      <Button variant="ghost" size="icon" onClick={onClose} aria-label={`Close ${title}`} className="h-8 w-8 rounded-lg text-slate-400 hover:bg-white/10 hover:text-white">
         <X className="h-4 w-4" />
       </Button>
     </div>
@@ -479,9 +398,7 @@ function ParticipantsContent({ room, participants, activeIdentitySet, raisedHand
     <ScrollArea className="min-h-0 flex-1">
       <div className="space-y-0.5 p-3">
         <div className="mb-3 flex items-center justify-between px-2">
-          <span className="text-xs font-medium uppercase tracking-wider text-slate-500">
-            In this call ({participants.length})
-          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-slate-500">In this call ({participants.length})</span>
         </div>
         {participants.map((participant) => (
           <ParticipantRow
@@ -505,40 +422,20 @@ function ParticipantRow({ participant, isLocal, isActiveSpeaker, hasRaisedHand }
   const displayName = isLocal ? `${name} (You)` : name;
 
   return (
-    <div
-      className={cn(
-        "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors",
-        isActiveSpeaker && "bg-cyan-500/8",
-        hasRaisedHand && "bg-amber-500/8",
-      )}
-    >
+    <div className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors", isActiveSpeaker && "bg-cyan-500/8", hasRaisedHand && "bg-amber-500/8")}>
       <div className="relative">
         <Avatar className="h-9 w-9 border border-white/10">
-          <AvatarFallback className="bg-linear-to-br from-indigo-500 via-sky-500 to-emerald-400 text-xs font-semibold text-white">
-            {getInitials(name)}
-          </AvatarFallback>
+          <AvatarFallback className="bg-linear-to-br from-indigo-500 via-sky-500 to-emerald-400 text-xs font-semibold text-white">{getInitials(name)}</AvatarFallback>
         </Avatar>
         {/* Active speaker indicator dot */}
-        {isActiveSpeaker && (
-          <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-950 bg-cyan-400" />
-        )}
+        {isActiveSpeaker && <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-950 bg-cyan-400" />}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <span className="truncate text-sm font-medium text-white">{displayName}</span>
-          {isLocal && (
-            <span className="shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
-              You
-            </span>
-          )}
+          {isLocal && <span className="shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">You</span>}
         </div>
-        <div className="text-xs text-slate-500">
-          {hasRaisedHand
-            ? "✋ Hand raised"
-            : isActiveSpeaker
-              ? "Speaking now"
-              : "In the call"}
-        </div>
+        <div className="text-xs text-slate-500">{hasRaisedHand ? "✋ Hand raised" : isActiveSpeaker ? "Speaking now" : "In the call"}</div>
       </div>
       <div className="flex items-center gap-1.5">
         {hasRaisedHand && (
@@ -547,19 +444,13 @@ function ParticipantRow({ participant, isLocal, isActiveSpeaker, hasRaisedHand }
           </span>
         )}
         <span
-          className={cn(
-            "flex h-7 w-7 items-center justify-center rounded-lg",
-            cameraEnabled ? "bg-emerald-400/10 text-emerald-300" : "bg-white/5 text-slate-500",
-          )}
+          className={cn("flex h-7 w-7 items-center justify-center rounded-lg", cameraEnabled ? "bg-emerald-400/10 text-emerald-300" : "bg-white/5 text-slate-500")}
           title={cameraEnabled ? "Camera on" : "Camera off"}
         >
           {cameraEnabled ? <VideoIcon className="h-3.5 w-3.5" /> : <VideoOff className="h-3.5 w-3.5" />}
         </span>
         <span
-          className={cn(
-            "flex h-7 w-7 items-center justify-center rounded-lg",
-            micEnabled ? "bg-emerald-400/10 text-emerald-300" : "bg-red-500/10 text-red-400",
-          )}
+          className={cn("flex h-7 w-7 items-center justify-center rounded-lg", micEnabled ? "bg-emerald-400/10 text-emerald-300" : "bg-red-500/10 text-red-400")}
           title={micEnabled ? "Mic on" : "Mic muted"}
         >
           {micEnabled ? <Mic className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
@@ -577,9 +468,9 @@ function MeetingDetailsContent({ room, roomName, elapsedSeconds, participants, i
   return (
     <div className="space-y-5 p-4 text-sm text-slate-300">
       {/* Room info */}
-      <section className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="rounded-xl border border-white/10 bg-white/3 p-4">
         <div className="text-[11px] font-medium uppercase tracking-widest text-slate-500">Room</div>
-        <div className="mt-1.5 break-words text-base font-semibold text-white">{roomName}</div>
+        <div className="mt-1.5 wrap-break-words text-base font-semibold text-white">{roomName}</div>
         <Button
           variant="ghost"
           size="sm"
@@ -602,27 +493,15 @@ function MeetingDetailsContent({ room, roomName, elapsedSeconds, participants, i
       </section>
 
       {/* Recording section */}
-      <section className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="rounded-xl border border-white/10 bg-white/3 p-4">
         <div className="text-[11px] font-medium uppercase tracking-widest text-slate-500">Recording</div>
         <div className="mt-3 flex items-center gap-3">
-          <div className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-xl",
-            isRecording ? "bg-red-500/15" : "bg-white/5",
-          )}>
-            <Circle className={cn(
-              "h-5 w-5",
-              isRecording ? "fill-red-400 text-red-400 animate-pulse" : "text-slate-500",
-            )} />
+          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl", isRecording ? "bg-red-500/15" : "bg-white/5")}>
+            <Circle className={cn("h-5 w-5", isRecording ? "fill-red-400 text-red-400 animate-pulse" : "text-slate-500")} />
           </div>
           <div>
-            <div className={cn("text-sm font-medium", isRecording ? "text-red-300" : "text-white")}>
-              {isRecording ? "Recording in progress" : "Not recording"}
-            </div>
-            <div className="text-xs text-slate-500">
-              {isRecording
-                ? `Recording for ${formatDuration(elapsedSeconds)}`
-                : "Start recording from the control bar"}
-            </div>
+            <div className={cn("text-sm font-medium", isRecording ? "text-red-300" : "text-white")}>{isRecording ? "Recording in progress" : "Not recording"}</div>
+            <div className="text-xs text-slate-500">{isRecording ? `Recording for ${formatDuration(elapsedSeconds)}` : "Start recording from the control bar"}</div>
           </div>
         </div>
       </section>
@@ -634,7 +513,7 @@ function MeetingDetailsContent({ room, roomName, elapsedSeconds, participants, i
 
 function DetailCard({ label, value, icon: Icon, className }) {
   return (
-    <div className={cn("rounded-xl border border-white/10 bg-white/[0.03] p-3", className)}>
+    <div className={cn("rounded-xl border border-white/10 bg-white/3 p-3", className)}>
       <div className="flex items-center gap-1.5">
         {Icon && <Icon className="h-3 w-3 text-slate-500" />}
         <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500">{label}</span>

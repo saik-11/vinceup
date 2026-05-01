@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { SidebarProvider } from "../ui/sidebar";
+import { SidebarProvider, useSidebar } from "../ui/sidebar";
 import { AnimatePresence, motion } from "framer-motion";
 import vinceup_logo from "../../public/assets/vinceup_logo.svg";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLayout } from "@/hooks/useLayout";
 import dynamic from "next/dynamic";
 import { Menu, X } from "lucide-react";
@@ -23,16 +23,19 @@ const fadeSlideUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
-const Navbar = ({ children }) => {
+/**
+ * Inner layout shell — must live inside <SidebarProvider> so it can call useSidebar().
+ * Handles the mobile sidebar toggle for authenticated (non-public) routes.
+ */
+function NavbarInner({ children }) {
   const { pathname, layout, isPublic } = useLayout();
+  const { setOpenMobile } = useSidebar();
   const [hoveredHref, setHoveredHref] = useState(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  // Close mobile menu on route change — derived from pathname, no effect needed
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMobileOpen(false);
-  }, [pathname]);
+  // Store the pathname at which the menu was opened instead of a boolean.
+  // mobileOpen derives to true only when the stored pathname matches the
+  // current one — no useEffect needed; route changes close the menu for free.
+  const [menuOpenPathname, setMenuOpenPathname] = useState(null);
+  const mobileOpen = menuOpenPathname === pathname;
 
   const isActive = (href) => {
     if (!pathname) return false;
@@ -41,96 +44,131 @@ const Navbar = ({ children }) => {
   };
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex flex-col w-full bg-background text-foreground">
-        <header className="w-full sticky top-0 inset-x-0 z-50 flex h-16 md:h-20 shrink-0 items-center justify-between border-b border-border px-3 sm:px-4 bg-background/80 backdrop-blur-xl isolate">
-          <div className="font-bold shrink-0">
-            <Link href="/" onClick={() => setMobileOpen(false)}>
-              <Image src={vinceup_logo} alt="vinceup" loading="eager" className="w-28 sm:w-36 md:w-44 h-auto" />
-            </Link>
-          </div>
+    <div className="flex flex-col w-full bg-background text-foreground">
+      <header className="w-full sticky top-0 inset-x-0 z-50 flex h-16 md:h-20 shrink-0 items-center justify-between border-b border-border px-3 sm:px-4 bg-background/80 backdrop-blur-xl isolate">
+        <div className="font-bold shrink-0">
+          <Link href="/" onClick={() => setMenuOpenPathname(null)}>
+            <Image src={vinceup_logo} alt="vinceup" loading="eager" className="w-28 sm:w-36 md:w-44 h-auto" />
+          </Link>
+        </div>
 
-          {/* Desktop nav */}
-          <AnimatePresence mode="wait" initial={false}>
-            {isPublic && (
-              <motion.ul key="nav-links" className="hidden md:flex items-center gap-2 list-none" variants={stagger} initial="hidden" animate="visible" exit="hidden">
-                {NAV_LINKS.map((link) => (
-                  <motion.li key={link.href} className="relative py-2" variants={fadeSlideUp} exit="hidden" onMouseEnter={() => setHoveredHref(link.href)} onMouseLeave={() => setHoveredHref(null)}>
-                    <Link href={link.href} className={`transition-colors p-3 py-3 ${isActive(link.href) ? "text-primary font-bold" : "text-foreground hover:text-primary"}`}>
-                      {link.label}
-                    </Link>
-                    {(hoveredHref ?? pathname) === link.href || (!hoveredHref && isActive(link.href)) ? (
-                      <motion.span layoutId="underline" className="absolute left-0 bottom-0 h-0.5 w-full bg-primary" transition={{ type: "spring", stiffness: 500, damping: 30 }} />
-                    ) : null}
-                  </motion.li>
-                ))}
-              </motion.ul>
-            )}
-          </AnimatePresence>
-
-          <div className="flex items-center gap-2 sm:gap-4">
-            <div className="hidden md:flex items-center gap-4">
-              <AuthButtons layout={layout} />
-            </div>
-            {!isPublic && (
-              <div className="flex md:hidden items-center gap-2">
-                <AuthButtons layout={layout} />
-              </div>
-            )}
-            {isPublic && (
-              <button
-                type="button"
-                aria-label={mobileOpen ? "Close menu" : "Open menu"}
-                aria-expanded={mobileOpen}
-                onClick={() => setMobileOpen((v) => !v)}
-                className="md:hidden p-2 rounded-md hover:bg-muted text-foreground"
-              >
-                {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-              </button>
-            )}
-          </div>
-
-          {/* Mobile menu panel */}
-          <AnimatePresence>
-            {isPublic && mobileOpen && (
-              <motion.div
-                key="mobile-panel"
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-                className="md:hidden absolute top-full left-0 right-0 border-b border-border bg-background/95 backdrop-blur-lg px-4 py-4 flex flex-col gap-2"
-              >
-                {NAV_LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`px-3 py-2 rounded-md transition-colors ${isActive(link.href) ? "text-primary font-bold bg-muted" : "text-foreground hover:text-primary hover:bg-muted"}`}
-                  >
+        {/* Desktop nav — public pages only */}
+        <AnimatePresence mode="wait" initial={false}>
+          {isPublic && (
+            <motion.ul key="nav-links" className="hidden md:flex items-center gap-2 list-none" variants={stagger} initial="hidden" animate="visible" exit="hidden">
+              {NAV_LINKS.map((link) => (
+                <motion.li key={link.href} className="relative py-2" variants={fadeSlideUp} exit="hidden" onMouseEnter={() => setHoveredHref(link.href)} onMouseLeave={() => setHoveredHref(null)}>
+                  <Link href={link.href} className={`transition-colors p-3 py-3 ${isActive(link.href) ? "text-primary font-bold" : "text-foreground hover:text-primary"}`}>
                     {link.label}
                   </Link>
-                ))}
-                <div className="pt-2 border-t border-border mt-2 flex flex-col gap-2">
-                  <AuthButtons layout={layout} />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </header>
+                  {(hoveredHref ?? pathname) === link.href || (!hoveredHref && isActive(link.href)) ? (
+                    <motion.span layoutId="underline" className="absolute left-0 bottom-0 h-0.5 w-full bg-primary" transition={{ type: "spring", stiffness: 500, damping: 30 }} />
+                  ) : null}
+                </motion.li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
 
-        <main className="flex flex-row flex-1 relative bg-background">
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Auth buttons — always visible on desktop */}
+          <div className="hidden md:flex items-center gap-4">
+            <AuthButtons layout={layout} />
+          </div>
+
+          {/* Auth buttons — visible on mobile for authenticated routes */}
           {!isPublic && (
-            <motion.div initial={{ width: 257 }} animate={{ width: 257 }} transition={{ duration: 0.3, ease: "easeOut" }} className="shrink-0 overflow-hidden hidden md:block">
-              <AppSidebar />
+            <div className="flex md:hidden items-center gap-2">
+              <AuthButtons layout={layout} />
+            </div>
+          )}
+
+          {/* Mobile hamburger — public site nav toggle */}
+          {isPublic && (
+            <button
+              type="button"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              onClick={() => setMenuOpenPathname(mobileOpen ? null : pathname)}
+              className="md:hidden p-2 rounded-md hover:bg-muted text-foreground"
+            >
+              {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+          )}
+
+          {/* Mobile hamburger — authenticated sidebar Sheet trigger */}
+          {!isPublic && (
+            <button
+              type="button"
+              aria-label="Open navigation menu"
+              onClick={() => setOpenMobile(true)}
+              className="md:hidden p-2 rounded-md hover:bg-muted text-foreground"
+            >
+              <Menu className="size-5" />
+            </button>
+          )}
+        </div>
+
+        {/* Mobile dropdown — public site nav */}
+        <AnimatePresence>
+          {isPublic && mobileOpen && (
+            <motion.div
+              key="mobile-panel"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden absolute top-full left-0 right-0 border-b border-border bg-background/95 backdrop-blur-lg px-4 py-4 flex flex-col gap-2"
+            >
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpenPathname(null)}
+                  className={`px-3 py-2 rounded-md transition-colors ${isActive(link.href) ? "text-primary font-bold bg-muted" : "text-foreground hover:text-primary hover:bg-muted"}`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <div className="pt-2 border-t border-border mt-2 flex flex-col gap-2">
+                <AuthButtons layout={layout} />
+              </div>
             </motion.div>
           )}
-          <section className="grow min-w-0 bg-background">{children}</section>
-        </main>
-        {isPublic && <Footer />}
-      </div>
-    </SidebarProvider>
+        </AnimatePresence>
+      </header>
+
+      <main className="flex flex-row flex-1 relative bg-background">
+        {/* Desktop sidebar — static inline panel, hidden on mobile */}
+        {!isPublic && (
+          <motion.div initial={{ width: 257 }} animate={{ width: 257 }} transition={{ duration: 0.3, ease: "easeOut" }} className="shrink-0 overflow-hidden hidden md:block">
+            <AppSidebar />
+          </motion.div>
+        )}
+
+        {/*
+          Mobile sidebar — rendered outside the desktop motion wrapper.
+          AppSidebar uses useSidebar().openMobile + a Sheet to render the
+          drawer, so it must be mounted even when the inline panel is hidden.
+        */}
+        {!isPublic && (
+          <div className="md:hidden">
+            <AppSidebar />
+          </div>
+        )}
+
+        <section className="grow min-w-0 bg-background">{children}</section>
+      </main>
+
+      {isPublic && <Footer />}
+    </div>
   );
-};
+}
+
+const Navbar = ({ children }) => (
+  <SidebarProvider defaultOpen={true}>
+    <NavbarInner>{children}</NavbarInner>
+  </SidebarProvider>
+);
 
 export default Navbar;

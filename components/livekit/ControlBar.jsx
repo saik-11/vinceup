@@ -41,6 +41,7 @@ import {
 /* ─── Data channel topics ─── */
 
 const HAND_RAISE_TOPIC = "lk-hand-raise";
+const RECORDING_TOPIC = "lk-recording-state";
 
 /* ─── Icon size helper ─── */
 
@@ -133,7 +134,11 @@ export function ControlBar({
       setMicEnabled(next);
     } catch (err) {
       console.error("Failed to toggle microphone:", err);
-      toast.error("Could not toggle microphone. Check permissions.");
+      if (err?.name === "NotReadableError" || String(err?.message).includes("Device in use")) {
+        toast.error("Microphone is currently in use by another application. Please close it and try again.", { duration: 5000 });
+      } else {
+        toast.error("Could not toggle microphone. Check permissions.");
+      }
     } finally {
       setToggling(null);
     }
@@ -148,7 +153,11 @@ export function ControlBar({
       setCamEnabled(next);
     } catch (err) {
       console.error("Failed to toggle camera:", err);
-      toast.error("Could not toggle camera. Check permissions.");
+      if (err?.name === "NotReadableError" || String(err?.message).includes("Device in use")) {
+        toast.error("Camera is currently in use by another application. Please close it and try again.", { duration: 5000 });
+      } else {
+        toast.error("Could not toggle camera. Check permissions.");
+      }
     } finally {
       setToggling(null);
     }
@@ -189,7 +198,7 @@ export function ControlBar({
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.15 }}
         className={cn(
-          "pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-3 pb-4 sm:pb-5",
+          "pointer-events-none z-20 flex w-full shrink-0 justify-center px-3 pb-4 pt-2 sm:pb-5",
           className,
         )}
       >
@@ -527,4 +536,4 @@ function DeviceMenuItems({ room }) {
   );
 }
 
-export { HAND_RAISE_TOPIC };
+export { HAND_RAISE_TOPIC, RECORDING_TOPIC };

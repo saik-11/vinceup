@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore, useCallback } from "react";
 
 /**
  * Subscribe to a CSS media query and return whether it matches.
@@ -9,20 +9,24 @@ import { useEffect, useState } from "react";
  * @returns {boolean} Whether the media query currently matches.
  */
 export function useMediaQuery(query) {
-  const [matches, setMatches] = useState(false);
+  const subscribe = useCallback(
+    (callback) => {
+      if (typeof window === "undefined") return () => {};
+      const mql = window.matchMedia(query);
+      mql.addEventListener("change", callback);
+      return () => mql.removeEventListener("change", callback);
+    },
+    [query]
+  );
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const mql = window.matchMedia(query);
-    setMatches(mql.matches);
-
-    const handler = (event) => setMatches(event.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
+  const getSnapshot = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(query).matches;
   }, [query]);
 
-  return matches;
+  const getServerSnapshot = useCallback(() => false, []);
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 /** Convenience breakpoint hooks matching the design spec. */

@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
 import dynamic from "next/dynamic";
@@ -15,6 +15,8 @@ const JoinSession = dynamic(
 export default function SessionRoomPage({ params }) {
   const { sessionId } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const durationParam = searchParams.get("duration");
   const { user } = useAuth();
   const { role } = useRole();
 
@@ -29,7 +31,8 @@ export default function SessionRoomPage({ params }) {
     <JoinSession
       sessionId={sessionId}
       userId={user?.id ?? user?.user_id ?? ""}
-      userName={user?.name ?? user?.full_name ?? ""}
+      userName={user?.first_name ?? user?.name ?? user?.full_name ?? ""}
+      sessionDuration={durationParam}
       role={livekitRole}
       onClose={handleClose}
       className="h-full w-full"

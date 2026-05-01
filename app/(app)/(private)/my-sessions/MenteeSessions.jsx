@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, ChevronRight, Sparkles, FileText, AlertCircle, RotateCcw } from "lucide-react";
+import { Calendar, ChevronRight, Sparkles, FileText, AlertCircle, RotateCcw, Video } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,9 @@ import {
   DashboardHeader,
 } from "@/components/dashboard/dashboard-shared";
 import { menteeApi } from "@/services/service";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTimeFormat } from "@/hooks/useTimeFormat";
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
@@ -43,32 +46,10 @@ function StatusBadge({ status }) {
   );
 }
 
-// ─── Date/Time Helpers ────────────────────────────────────────────────────────
-
-function parseLocalDate(scheduledAtLocal) {
-  if (!scheduledAtLocal) return null;
-  const d = new Date(scheduledAtLocal);
-  return isNaN(d.getTime()) ? null : d;
-}
-
-function formatSessionDateTime(scheduledAtLocal) {
-  const d = parseLocalDate(scheduledAtLocal);
-  if (!d) return { date: "—", time: "—" };
-  return {
-    date: d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    time: d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
-  };
-}
-
-function isTodaySession(scheduledAtLocal) {
-  const d = parseLocalDate(scheduledAtLocal);
-  if (!d) return false;
-  return d.toDateString() === new Date().toDateString();
-}
-
 // ─── Session Card ─────────────────────────────────────────────────────────────
 
 function SessionCard({ session, variant }) {
+  const { formatSessionDateTime } = useTimeFormat();
   const { date, time } = formatSessionDateTime(session.scheduled_at_local);
   const isUpcomingVariant = variant === "upcoming" || variant === "today";
 
@@ -77,42 +58,56 @@ function SessionCard({ session, variant }) {
       className={cn(
         panelClass,
         interactivePanelClass,
-        "group flex flex-col sm:flex-row sm:items-center justify-between gap-4",
-        "[&]:p-5 [&]:md:p-6",
+        "group flex flex-col gap-3",
+        "p-4 sm:p-5 md:p-6",
       )}
     >
-      {/* Session info */}
-      <article className="flex flex-col min-w-0 gap-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-base font-semibold tracking-tight md:text-lg text-(--dashboard-text)">
+      {/* Session info + status badge */}
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+        <article className="flex flex-col min-w-0 flex-1 gap-1">
+          <h3 className="text-base font-semibold tracking-tight md:text-lg text-(--dashboard-text) leading-snug">
             {session.service_type}
           </h3>
-          <StatusBadge status={session.status} />
-        </div>
 
-        {session.notes && (
-          <p className={cn("text-sm line-clamp-1", metaTextClass)}>{session.notes}</p>
-        )}
+          {session.notes && (
+            <p className={cn("text-sm line-clamp-1", metaTextClass)}>{session.notes}</p>
+          )}
 
-        <div className={cn("flex items-center gap-2 mt-1 text-sm", metaTextClass)}>
-          <Calendar className="w-4 h-4 opacity-60 shrink-0" aria-hidden="true" />
-          <time dateTime={session.scheduled_at_local}>
-            {date}&nbsp;&bull;&nbsp;{time}
-          </time>
-        </div>
-      </article>
+          <div className={cn("flex items-center gap-2 mt-0.5 text-sm", metaTextClass)}>
+            <Calendar className="w-3.5 h-3.5 opacity-60 shrink-0" aria-hidden="true" />
+            <time dateTime={session.scheduled_at_local} className="leading-snug">
+              {date}&nbsp;&bull;&nbsp;{time}
+            </time>
+          </div>
+        </article>
+
+        {/* Status badge — always top-right, never overflows */}
+        <StatusBadge status={session.status} />
+      </div>
 
       {/* Actions */}
-      <div className="flex items-center shrink-0 gap-2 mt-2 sm:mt-0">
+      <div className="flex flex-wrap items-center gap-2">
         {isUpcomingVariant && session.status !== "cancelled" && (
           <>
-            <Button className="gap-2 px-5 text-sm text-white rounded-full shadow-sm bg-[linear-gradient(135deg,#7c3aed,#c026d3)] hover:opacity-90 hover:shadow-[0_8px_20px_-6px_rgba(124,58,237,0.6)] active:scale-95 transition-all duration-200">
+            {session.status === "confirmed" && (
+              <Button
+                onClick={() => {
+                  const d = session.duration_minutes || session.duration;
+                  window.location.href = `/session/${session.id}${d ? `?duration=${d}` : ""}`;
+                }}
+                className="gap-2 px-4 text-sm text-white rounded-full shadow-sm bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all duration-200"
+              >
+                <Video className="w-4 h-4" aria-hidden="true" />
+                Join the session
+              </Button>
+            )}
+            <Button className="gap-2 px-4 text-sm text-white rounded-full shadow-sm bg-[linear-gradient(135deg,#7c3aed,#c026d3)] hover:opacity-90 hover:shadow-[0_8px_20px_-6px_rgba(124,58,237,0.6)] active:scale-95 transition-all duration-200">
               <Sparkles className="w-4 h-4" aria-hidden="true" />
               View Prep
             </Button>
             <Button
               variant="ghost"
-              className="gap-1 px-4 text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-500/10 group/btn rounded-full"
+              className="gap-1 px-3 text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-500/10 group/btn rounded-full"
             >
               Details
               <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1" aria-hidden="true" />
@@ -123,7 +118,7 @@ function SessionCard({ session, variant }) {
         {variant === "past" && (
           <Button
             variant="ghost"
-            className="gap-1 px-4 text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-500/10 group/btn rounded-full"
+            className="gap-1 px-3 text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-500/10 group/btn rounded-full"
           >
             <FileText className="w-4 h-4" />
             View Notes
@@ -180,54 +175,13 @@ function ErrorState({ onRetry }) {
   );
 }
 
-// ─── Session Tabs ─────────────────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 const TAB_LIST = [
   { key: "upcoming", label: "Upcoming" },
   { key: "today", label: "Today" },
   { key: "past", label: "Past" },
 ];
-
-function SessionTabs({ activeTab, onTabChange, counts }) {
-  return (
-    <div
-      role="tablist"
-      className="flex gap-1 rounded-xl border border-(--dashboard-border) bg-(--dashboard-panel-muted) p-1 w-fit"
-    >
-      {TAB_LIST.map(({ key, label }) => (
-        <button
-          key={key}
-          role="tab"
-          type="button"
-          aria-selected={activeTab === key}
-          onClick={() => onTabChange(key)}
-          className={cn(
-            "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-150 cursor-pointer",
-            activeTab === key
-              ? "bg-(--dashboard-panel-strong) text-(--dashboard-text) shadow-sm"
-              : "text-(--dashboard-subtle) hover:text-(--dashboard-muted)",
-          )}
-        >
-          {label}
-          {counts[key] > 0 && (
-            <span
-              className={cn(
-                "inline-flex min-w-4.5 h-4.5 items-center justify-center rounded-full px-1 text-[10px] font-bold",
-                activeTab === key
-                  ? "bg-(--dashboard-purple) text-white"
-                  : "bg-(--dashboard-border) text-(--dashboard-subtle)",
-              )}
-            >
-              {counts[key]}
-            </span>
-          )}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function MenteeSessions() {
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -237,6 +191,7 @@ export default function MenteeSessions() {
   const [displayTimezone, setDisplayTimezone] = useState("");
   const [upcoming, setUpcoming] = useState([]);
   const [past, setPast] = useState([]);
+  const { isTodaySession } = useTimeFormat();
 
   useEffect(() => {
     let active = true;
@@ -267,12 +222,12 @@ export default function MenteeSessions() {
 
   const todaySessions = useMemo(
     () => upcoming.filter((s) => isTodaySession(s.scheduled_at_local)),
-    [upcoming],
+    [upcoming, isTodaySession],
   );
 
   const futureSessions = useMemo(
     () => upcoming.filter((s) => !isTodaySession(s.scheduled_at_local)),
-    [upcoming],
+    [upcoming, isTodaySession],
   );
 
   const counts = {
@@ -293,15 +248,15 @@ export default function MenteeSessions() {
     past: "No past sessions yet.",
   };
 
-  const renderContent = () => {
+  const renderContent = (tabKey) => {
     if (loading) return <SessionSkeleton />;
     if (error) return <ErrorState onRetry={() => setRetryCount((c) => c + 1)} />;
-    const sessions = tabData[activeTab];
-    if (!sessions.length) return <EmptyState message={emptyMessages[activeTab]} />;
+    const sessions = tabData[tabKey];
+    if (!sessions.length) return <EmptyState message={emptyMessages[tabKey]} />;
     return (
       <div className="flex flex-col gap-4">
         {sessions.map((session) => (
-          <SessionCard key={session.id} session={session} variant={activeTab} />
+          <SessionCard key={session.id} session={session} variant={tabKey} />
         ))}
       </div>
     );
@@ -315,9 +270,44 @@ export default function MenteeSessions() {
         timezone={displayTimezone || undefined}
       />
 
-      <SessionTabs activeTab={activeTab} onTabChange={setActiveTab} counts={counts} />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col overflow-hidden">
+        <TabsList className="bg-transparent h-auto p-0 pb-[3.8rem] border-b border-slate-200 dark:border-slate-800 w-full grid grid-cols-3 rounded-none">
+          {TAB_LIST.map((cat, index) => {
+            const count = counts[cat.key] ?? 0;
+            return (
+              <TabsTrigger
+                key={cat.key}
+                value={cat.key}
+                className={`group relative flex items-center justify-center gap-2 data-[state=active]:bg-purple-50 dark:data-[state=active]:bg-purple-500/10 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-none data-[state=active]:border-b-[3px] data-[state=active]:border-t-0 data-[state=active]:border-r-0 data-[state=active]:border-l-0 data-[state=active]:border-purple-600 data-[state=active]:dark:border-purple-800 border border-transparent rounded-none py-4 sm:py-5 font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all -mb-px
+                  ${index === 0 ? "rounded-tl-xl" : ""} ${index === TAB_LIST.length - 1 ? "rounded-tr-xl" : ""}`}
+              >
+                <div className="flex items-center">
+                  {cat.label}
+                </div>
+                <span className="py-0.5 px-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold group-data-[state=active]:bg-purple-100 dark:group-data-[state=active]:bg-purple-500/20 group-data-[state=active]:text-purple-700 dark:group-data-[state=active]:text-purple-300">
+                  {count}
+                </span>
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
 
-      {renderContent()}
+        <AnimatePresence>
+          {TAB_LIST.map((cat) => (
+            <TabsContent key={cat.key} value={cat.key} className="mt-0 outline-none">
+              <motion.div
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="p-4 sm:p-6 flex flex-col gap-4 bg-slate-50 dark:bg-slate-900"
+              >
+                {renderContent(cat.key)}
+              </motion.div>
+            </TabsContent>
+          ))}
+        </AnimatePresence>
+      </Tabs>
     </DashboardShell>
   );
 }

@@ -85,13 +85,7 @@ export function ChatPanel({ room, localIdentity, onClose, embedded = false, clas
   };
 
   return (
-    <aside
-      className={cn(
-        "flex shrink-0 flex-col",
-        !embedded && "border-l border-white/10 bg-slate-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl",
-        className,
-      )}
-    >
+    <aside className={cn("flex shrink-0 flex-col", !embedded && "border-l border-white/10 bg-slate-950/95 shadow-2xl shadow-black/40 backdrop-blur-xl", className)}>
       {/* Header — only shown in non-embedded mode */}
       {!embedded && (
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
@@ -101,13 +95,7 @@ export function ChatPanel({ room, localIdentity, onClose, embedded = false, clas
             </span>
             <h2 className="text-sm font-semibold text-white">In-call messages</h2>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Close chat"
-            className="h-9 w-9 rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
-          >
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close chat" className="h-9 w-9 rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -116,7 +104,7 @@ export function ChatPanel({ room, localIdentity, onClose, embedded = false, clas
       {/* Messages */}
       <ScrollArea className="min-h-0 flex-1 px-4 py-4">
         {messages.length === 0 ? (
-          <div className="mt-10 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-6 text-center">
+          <div className="mt-10 rounded-lg border border-white/10 bg-white/4 px-4 py-6 text-center">
             <p className="text-sm font-medium text-white">No messages yet</p>
             <p className="mt-1 text-xs text-slate-400">Messages are visible only during this call.</p>
           </div>
@@ -135,10 +123,8 @@ export function ChatPanel({ room, localIdentity, onClose, embedded = false, clas
                 </span>
                 <div
                   className={cn(
-                    "max-w-[85%] break-words rounded-2xl px-3 py-2 text-sm shadow-sm",
-                    message.isLocal
-                      ? "rounded-br-md bg-cyan-500 text-slate-950"
-                      : "rounded-bl-md bg-white/10 text-slate-100",
+                    "max-w-[85%] wrap-break-word rounded-2xl px-3 py-2 text-sm shadow-sm",
+                    message.isLocal ? "rounded-br-md bg-cyan-500 text-slate-950" : "rounded-bl-md bg-white/10 text-slate-100",
                   )}
                 >
                   {message.text}

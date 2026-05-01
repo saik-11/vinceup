@@ -117,10 +117,6 @@ export function useLiveKit() {
     setParticipants([activeRoom.localParticipant, ...Array.from(activeRoom.remoteParticipants.values())]);
   }, []);
 
-  /**
-   * Attempt to enable camera + microphone with retries.
-   * The LiveKit engine can briefly reject publishes right after connect().
-   */
   const enableMediaWithRetry = useCallback(async (activeRoom, retries = PUBLISH_MAX_RETRIES) => {
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
@@ -130,6 +126,17 @@ export function useLiveKit() {
         const isEngineError = String(err?.message ?? "").includes("engine not connected");
         if (!isEngineError || attempt === retries) {
           console.warn(`Media publish attempt ${attempt}/${retries} failed:`, err?.message);
+          
+          if (err?.name === "NotReadableError" || String(err?.message).includes("Device in use")) {
+            import("sonner").then(({ toast }) => {
+              toast.error("Camera or microphone is in use by another application. Please close it and try again.", { duration: 6000 });
+            });
+          } else if (err?.name === "NotAllowedError" || String(err?.message).includes("Permission denied")) {
+            import("sonner").then(({ toast }) => {
+              toast.error("Camera/microphone permissions are required to be heard or seen.", { duration: 6000 });
+            });
+          }
+          
           // Don't throw — allow joining without media. User can toggle manually.
           return;
         }
