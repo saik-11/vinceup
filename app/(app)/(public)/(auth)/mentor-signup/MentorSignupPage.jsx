@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, Building2, Eye, EyeOff, LockKeyhole, Mail, MailCheck, MapPin, TrendingUp } from "lucide-react";
+import { Briefcase, Building2, Eye, EyeOff, LockKeyhole, Mail, MailCheck, MapPin, TrendingUp, Clock, ArrowRight, Award } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,9 +35,16 @@ const MentorPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [showPasswordHints, setShowPasswordHints] = useState(false);
+  const [pendingData, setPendingData] = useState(null);
 
   const { mutate: signup, isPending } = useSignupMentor({
-    onSuccess: () => router.push("/login?registered=true"),
+    onSuccess: (data) => {
+      if (data?.mentor_status === "pending") {
+        setPendingData(data);
+      } else {
+        router.push("/login?registered=true");
+      }
+    },
     onError: (message) => setApiError(message),
   });
 
@@ -91,6 +98,39 @@ const MentorPage = () => {
       work_experience: values.workExperience,
     });
   };
+
+  if (pendingData) {
+    return (
+      <AuthCard maxWidth="md">
+        <div className="flex flex-col items-center justify-center space-y-6 py-8 text-center">
+          <div className="rounded-full bg-primary/10 p-4 ring-8 ring-primary/5">
+            <Award className="h-12 w-12 text-primary" />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Application Submitted!</h2>
+            <p className="text-muted-foreground text-sm max-w-md mx-auto">
+              {pendingData.message || "Thank you for your interest in becoming a mentor. We've received your application and will review it shortly."}
+            </p>
+          </div>
+
+          <div className="w-full max-w-sm space-y-6 pt-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-center shadow-sm">
+              <p className="text-sm font-medium text-primary">
+                Our team will contact you via email within 2-3 business days with next steps.
+              </p>
+            </div>
+
+            <Button asChild className="w-full" size="lg">
+              <Link href="/">
+                Return to Home
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </AuthCard>
+    );
+  }
 
   return (
     <AuthCard maxWidth="lg">
@@ -275,11 +315,16 @@ const MentorPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="mentor-country">Country</FieldLabel>
-                  <CountrySelect id="mentor-country" value={field.value} onChange={(val) => {
-                    field.onChange(val);
-                    form.setValue("state", "", { shouldValidate: true });
-                    form.setValue("city", "", { shouldValidate: true });
-                  }} placeholder="e.g., US" />
+                  <CountrySelect
+                    id="mentor-country"
+                    value={field.value}
+                    onChange={(val) => {
+                      field.onChange(val);
+                      form.setValue("state", "", { shouldValidate: true });
+                      form.setValue("city", "", { shouldValidate: true });
+                    }}
+                    placeholder="e.g., US"
+                  />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}
@@ -291,10 +336,16 @@ const MentorPage = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="mentor-state">Province/State</FieldLabel>
-                  <StateSelect id="mentor-state" countryName={countryValue} value={field.value} onChange={(val) => {
-                    field.onChange(val);
-                    form.setValue("city", "", { shouldValidate: true });
-                  }} placeholder="e.g., California" />
+                  <StateSelect
+                    id="mentor-state"
+                    countryName={countryValue}
+                    value={field.value}
+                    onChange={(val) => {
+                      field.onChange(val);
+                      form.setValue("city", "", { shouldValidate: true });
+                    }}
+                    placeholder="e.g., California"
+                  />
                   <FieldFeedback variant="error" message={fieldState.error?.message} />
                 </Field>
               )}

@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { CheckCircle2, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { mentorApi } from "@/services/service";
+import { getBrowserTimezone } from "@/lib/timezone";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -38,6 +41,8 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
     handleSubmit,
     control,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -50,10 +55,16 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
     },
   });
 
-  const repeatIndefinitely = useWatch({
-    control,
-    name: "repeatIndefinitely",
-  });
+  const repeatIndefinitely = watch("repeatIndefinitely");
+  const startTime = watch("startTime");
+
+  useEffect(() => {
+    if (startTime) {
+      const [h, m] = startTime.split(":");
+      const nextH = (parseInt(h, 10) + 1).toString().padStart(2, "0");
+      setValue("endTime", `${nextH}:${m}`, { shouldValidate: true });
+    }
+  }, [startTime, setValue]);
 
   useEffect(() => {
     reset({
@@ -70,13 +81,68 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
     setSelectedDays((prev) => (prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]));
   };
 
-  const doSubmit = async (data) => {
-    if (selectedDays.length === 0) {
-      alert("Please select at least one day");
-      return;
+  const getNextDateForDay = (dayStr) => {
+    const dayMap = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+    const target = dayMap[dayStr];
+    const today = new Date();
+    const current = today.getDay();
+    let diff = target - current;
+    if (diff <= 0) {
+      diff += 7; // Get the next occurrence, even if it's today we might want to start next week, but usually diff < 0 or diff === 0 we just start from next available day. Let's make it diff < 0.
     }
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    onSubmit?.({ ...data, days: selectedDays });
+    if (diff === 7) diff = 0; // if it's today, we can just use today.
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + diff);
+    return nextDate;
+  };
+
+  const doSubmit = async (data) => {
+    try {
+      if (selectedDays.length === 0) {
+        toast.error("Please select at least one day");
+        return;
+      }
+
+      if (!data.startTime || !data.endTime) {
+        toast.error("Please complete the required time entries.");
+        return;
+      }
+
+      let resolvedEndDate = data.endDate;
+      if (data.repeatIndefinitely) {
+        resolvedEndDate = new Date();
+        resolvedEndDate.setFullYear(resolvedEndDate.getFullYear() + 1); // 1 year from now
+      }
+
+      if (!resolvedEndDate) {
+        toast.error("Please provide an end date or select repeat indefinitely.");
+        return;
+      }
+
+      const formattedEndDate = format(resolvedEndDate, "yyyy-MM-dd");
+      const tz = getBrowserTimezone() || "UTC";
+
+      const slots = selectedDays.map((dayStr) => {
+        const nextDate = getNextDateForDay(dayStr);
+        return {
+          date: format(nextDate, "yyyy-MM-dd"),
+          start_time: data.startTime,
+          end_time: data.endTime,
+          timezone: tz,
+          service_type: null,
+          end_date: formattedEndDate,
+        };
+      });
+
+      const payload = { slots };
+
+      await mentorApi.createAvailability(payload);
+      toast.success("Recurring availability successfully saved!");
+      onSubmit?.();
+    } catch (err) {
+      console.error("Availability save failed:", err);
+      toast.error(err.response?.data?.message || err.message || "Failed to create recurring availability.");
+    }
   };
 
   const labelClass = "text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5 inline-block";

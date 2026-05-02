@@ -47,12 +47,7 @@ export const SessionCard = ({ session, category, index, onAction }) => {
   const formattedScheduledAt = scheduledAtLocal ? `${date} • ${time}` : "—";
 
   return (
-    <motion.div
-      initial={{ opacity: 1, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-    >
+    <motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.1 }} whileHover={{ y: -4, transition: { duration: 0.2 } }}>
       <Card className="rounded-xl border border-slate-200 dark:border-slate-800 shadow-none hover:shadow-sm transition-all bg-white dark:bg-slate-900 overflow-hidden">
         <CardContent className="p-4 sm:p-6">
           {/* Top Row — avatar + name block + status badge */}
@@ -67,9 +62,7 @@ export const SessionCard = ({ session, category, index, onAction }) => {
             {/* Name / email / badges — fills remaining space */}
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
-                <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-base truncate leading-snug">
-                  {name}
-                </h4>
+                <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-base truncate leading-snug">{name}</h4>
                 {/* Status badge pulled here so it never overflows */}
                 <StatusBadge status={status} />
               </div>
@@ -102,35 +95,19 @@ export const SessionCard = ({ session, category, index, onAction }) => {
                 <BookOpen className="w-3.5 h-3.5 shrink-0" />
                 <span className="text-[10px] font-medium uppercase tracking-wider">Type</span>
               </div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-snug break-words">
-                {serviceType}
-              </p>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-snug wrap-break-words">{serviceType}</p>
             </div>
             <div className="flex flex-col gap-1 min-w-0">
               <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                {isRequestsTab ? (
-                  <Clock className="w-3.5 h-3.5 shrink-0" />
-                ) : (
-                  <CalendarDays className="w-3.5 h-3.5 shrink-0" />
-                )}
-                <span className="text-[10px] font-medium uppercase tracking-wider">
-                  {isRequestsTab ? "Requested" : "Scheduled"}
-                </span>
+                {isRequestsTab ? <Clock className="w-3.5 h-3.5 shrink-0" /> : <CalendarDays className="w-3.5 h-3.5 shrink-0" />}
+                <span className="text-[10px] font-medium uppercase tracking-wider">{isRequestsTab ? "Requested" : "Scheduled"}</span>
               </div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-snug break-words">
-                {isRequestsTab && requestedAgo ? `${requestedAgo} ago` : formattedScheduledAt}
-              </p>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-snug wrap-break-words">{isRequestsTab && requestedAgo ? `${requestedAgo} ago` : formattedScheduledAt}</p>
             </div>
           </div>
 
           {/* Bottom Row — actions */}
-          <SessionActions
-            category={category}
-            capsuleStatus={capsuleStatus}
-            sessionId={session.id}
-            duration={duration}
-            onAction={onAction}
-          />
+          <SessionActions category={category} capsuleStatus={capsuleStatus} sessionId={session.id} duration={duration} onAction={onAction} />
         </CardContent>
       </Card>
     </motion.div>

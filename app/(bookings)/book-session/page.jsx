@@ -115,7 +115,14 @@ const BookSession = () => {
   useEffect(() => {
     if (!selectedDate) return;
 
-    const formattedDate = selectedDate instanceof Date ? selectedDate.toISOString().split("T")[0] : selectedDate;
+    const formattedDate =
+      selectedDate instanceof Date
+        ? [
+            selectedDate.getFullYear(),
+            String(selectedDate.getMonth() + 1).padStart(2, "0"),
+            String(selectedDate.getDate()).padStart(2, "0"),
+          ].join("-")
+        : selectedDate;
 
     const params = { date: formattedDate };
 

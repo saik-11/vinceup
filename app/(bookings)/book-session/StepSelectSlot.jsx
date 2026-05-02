@@ -146,10 +146,68 @@ export default function StepSelectSlot({
     return date < today;
   };
 
+  /**
+   * Parse a time string into a Date on the given calendar date.
+   * Supports both 24-hour ("08:00", "15:30") and 12-hour AM/PM ("9:00 AM", "3:30 PM") formats.
+   * Returns null if parsing fails.
+   */
+  const parseSlotTime = (timeStr, onDate) => {
+    if (!timeStr || !onDate) return null;
+
+    let hours, minutes;
+
+    // 12-hour AM/PM format: "9:00 AM", "12:30 PM"
+    const ampmMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (ampmMatch) {
+      hours = parseInt(ampmMatch[1], 10);
+      minutes = parseInt(ampmMatch[2], 10);
+      const meridiem = ampmMatch[3].toUpperCase();
+      if (meridiem === "AM" && hours === 12) hours = 0;
+      if (meridiem === "PM" && hours !== 12) hours += 12;
+    } else {
+      // 24-hour format: "08:00", "15:30"
+      const h24Match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+      if (!h24Match) return null;
+      hours = parseInt(h24Match[1], 10);
+      minutes = parseInt(h24Match[2], 10);
+    }
+
+    const d = new Date(onDate);
+    d.setHours(hours, minutes, 0, 0);
+    return d;
+  };
+
   const uniqueTimes = useMemo(() => {
+    const now = new Date();
+    const cutoff = new Date(now.getTime() + 60 * 60 * 1000); // now + 1 hour
+
+    // Check if the selected date is today (same calendar day in local time)
+    const isToday = selectedDate
+      ? (() => {
+          const sel = new Date(selectedDate);
+          const today = new Date();
+          return (
+            sel.getFullYear() === today.getFullYear() &&
+            sel.getMonth() === today.getMonth() &&
+            sel.getDate() === today.getDate()
+          );
+        })()
+      : false;
+
     const times = availableSlots.map((s) => s.local_time?.start_time ?? s.start_time);
-    return [...new Set(times)].sort();
-  }, [availableSlots]);
+    const uniqueSet = [...new Set(times)];
+
+    const filtered = isToday
+      ? uniqueSet.filter((time) => {
+          const slotDate = parseSlotTime(time, selectedDate);
+          // Keep slot only if it is >= 60 min from now (or unparseable → show it)
+          if (!slotDate) return true;
+          return slotDate >= cutoff;
+        })
+      : uniqueSet;
+
+    return filtered.sort();
+  }, [availableSlots, selectedDate]);
 
   const mentorsForTime = useMemo(() => {
     if (!selectedTime) return [];
