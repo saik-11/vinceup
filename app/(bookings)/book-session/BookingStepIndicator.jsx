@@ -1,36 +1,38 @@
 "use client";
 
+import { Fragment } from "react";
 import { Check } from "lucide-react";
 import { STEPS } from "./booking-config";
 
 export default function BookingStepIndicator({ currentStep }) {
   return (
-    <div className="flex items-center justify-center gap-0">
-      {STEPS.map((step, i) => {
-        const stepNum = i + 1;
-        const isCompleted = currentStep > stepNum;
-        const isActive = currentStep === stepNum;
-        const isLast = i === STEPS.length - 1;
+    <nav aria-label="Booking progress" className="mx-auto w-full max-w-[760px] px-4">
+      <div className="grid grid-cols-[1fr_120px_1fr_120px_1fr] items-start max-sm:grid-cols-[1fr_48px_1fr_48px_1fr]">
+        {STEPS.map((step, index) => {
+          const stepNum = index + 1;
+          const isCompleted = currentStep > stepNum;
+          const isActive = currentStep === stepNum;
 
-        return (
-          <div key={step.label} className="flex items-center">
-            <div className="flex items-center gap-2">
-              <div
-                className={`flex size-9 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 ${
-                  isCompleted ? "bg-emerald-500 text-white" : isActive ? "bg-primary text-white" : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-                }`}
-              >
-                {isCompleted ? <Check className="size-5" /> : stepNum}
+          return (
+            <Fragment key={step.label}>
+              <div className="flex min-w-0 flex-col items-center text-center">
+                <div
+                  className={`flex size-10 items-center justify-center rounded-full text-sm font-bold ${
+                    isCompleted ? "bg-emerald-500 text-white" : isActive ? "bg-primary text-white" : "bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                  }`}
+                >
+                  {isCompleted ? <Check className="size-5" /> : stepNum}
+                </div>
+                <span className={`mt-2 max-w-40 truncate text-sm font-medium max-sm:text-xs ${isActive ? "text-primary" : "text-gray-600 dark:text-gray-400"}`}>
+                  {step.label}
+                </span>
               </div>
-              <span className={`text-sm font-medium whitespace-nowrap ${isCompleted ? "text-emerald-600 dark:text-emerald-400" : isActive ? "text-primary" : "text-gray-400 dark:text-gray-500"}`}>
-                {step.label}
-              </span>
-            </div>
 
-            {!isLast && <div className={`mx-3 h-0.5 w-20 rounded-full transition-colors duration-300 ${isCompleted ? "bg-emerald-400" : "bg-gray-200 dark:bg-gray-700"}`} />}
-          </div>
-        );
-      })}
-    </div>
+              {index < STEPS.length - 1 && <div className={`mt-5 h-1 rounded-full ${isCompleted ? "bg-emerald-500" : "bg-gray-200 dark:bg-gray-800"}`} />}
+            </Fragment>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

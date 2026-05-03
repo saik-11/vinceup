@@ -1,126 +1,327 @@
 "use client";
 
 import { useMemo } from "react";
-import { CalendarDays, Clock, Check, Globe, AlertCircle, RotateCcw } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AlertCircle, ArrowRight, Check, ChevronRight, Clock, RotateCcw, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// ─── Timezone Badge ───
-const TimezoneBadge = ({ timezone }) => (
-  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 dark:bg-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary">
-    <Globe className="size-3" />
-    {timezone}
-  </span>
-);
+const getSlotTime = (slot) => slot?.local_time?.start_time ?? slot?.start_time ?? "";
+const getSlotEndTime = (slot) => slot?.local_time?.end_time ?? slot?.end_time ?? "";
+const getMentorName = (mentor) => mentor?.name ?? mentor?.full_name ?? "";
+const getMentorRole = (mentor) => mentor?.title ?? mentor?.role ?? mentor?.headline ?? mentor?.company_name ?? "";
+const getMentorImage = (mentor) => mentor?.avatar ?? mentor?.avatar_url ?? mentor?.profile_image_url ?? mentor?.image_url ?? "";
+const getMentorRating = (mentor) => mentor?.rating ?? mentor?.average_rating;
+const getMentorSessions = (mentor) => mentor?.sessions ?? mentor?.session_count ?? mentor?.completed_sessions;
+const getMentorReviews = (mentor) => mentor?.reviews ?? mentor?.review_count;
 
-// ─── Avatar with initials ───
-const MentorAvatar = ({ name }) => {
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
+const initialsFor = (name = "") =>
+  name
+    .trim()
+    .split(/\s+/)
+    .map((part) => part[0])
     .join("")
-    .toUpperCase()
-    .slice(0, 2);
+    .slice(0, 2)
+    .toUpperCase();
+
+const formatSelectedDate = (date) =>
+  date?.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+function StepNumber({ value, active }) {
   return (
-    <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-primary/20 to-primary/5 dark:from-primary/30 dark:to-primary/10 text-primary font-bold text-base">
-      {initials}
-    </div>
+    <span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${active ? "bg-primary text-white" : "bg-gray-200 text-gray-500 dark:bg-gray-800"}`}>
+      {value}
+    </span>
   );
-};
+}
 
-// ─── Mentor Card (slot-based) ───
-const MentorCard = ({ slot, isSelected, onSelect }) => {
-  const { mentor, service_type, local_time } = slot;
+function SectionTitle({ number, title, active }) {
   return (
-    <div
-      onClick={() => onSelect(slot)}
-      className={`
-        relative cursor-pointer rounded-2xl border-2 p-4 transition-all duration-200
-        ${
-          isSelected
-            ? "border-primary bg-primary/2 dark:bg-primary/5 shadow-sm"
-            : "border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm"
-        }
-      `}
-    >
-      {isSelected && (
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-4 right-4 flex size-6 items-center justify-center rounded-full bg-primary text-white">
-          <Check className="size-3.5" />
-        </motion.div>
-      )}
+    <CardHeader className="flex flex-row items-center justify-between p-6 pb-4">
+      <CardTitle className="flex min-w-0 items-center gap-3 text-2xl font-bold leading-none text-gray-950 dark:text-gray-50">
+        <StepNumber value={number} active={active} />
+        <span className="truncate">{title}</span>
+      </CardTitle>
+      <ChevronRight className="size-5 shrink-0 text-gray-400" aria-hidden="true" />
+    </CardHeader>
+  );
+}
 
-      <div className="flex items-start gap-3">
-        <MentorAvatar name={mentor.name} />
-        <div className="min-w-0 flex-1 pr-6">
-          <h4 className="font-bold">{mentor.name}</h4>
-          <p className="text-sm text-muted-foreground mt-0.5 leading-snug">{mentor.title}</p>
-          {mentor.company_name && <p className="text-xs text-muted-foreground mt-0.5">{mentor.company_name}</p>}
-        </div>
-      </div>
+function SubstepPill({ hasDate, hasTime, hasMentor }) {
+  const steps = [
+    { label: "Date", done: hasDate, active: !hasDate },
+    { label: "Time", done: hasTime, active: hasDate && !hasTime },
+    { label: "Mentor", done: hasMentor, active: hasTime && !hasMentor },
+  ];
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {service_type && <span className="text-xs font-medium bg-primary/10 dark:bg-primary/20 text-primary rounded-full px-2.5 py-0.5">{service_type}</span>}
-        {mentor.industry && <span className="text-xs text-muted-foreground">{mentor.industry}</span>}
-        {local_time && (
-          <span className="ml-auto text-xs text-muted-foreground">
-            {local_time.start_time} – {local_time.end_time}
+  return (
+    <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-5 py-2 text-sm dark:border-purple-900/60 dark:bg-purple-950/30">
+      {steps.map((step, index) => (
+        <span key={step.label} className="inline-flex items-center gap-2">
+          <span className={step.done ? "font-medium text-emerald-600" : step.active ? "font-medium text-primary" : "text-gray-400"}>
+            {step.done ? <Check className="mr-1 inline size-3.5" /> : `${index + 1} `}
+            {step.label}
           </span>
-        )}
-      </div>
+          {index < steps.length - 1 && <ChevronRight className="size-3.5 text-gray-400" />}
+        </span>
+      ))}
     </div>
   );
-};
+}
 
-// ─── Skeletons ───
-const TimeSkeleton = () => (
-  <div className="grid grid-cols-3 gap-3">
-    {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} className="h-11 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
-    ))}
-  </div>
-);
+function EmptyState({ icon: Icon, title, description, children }) {
+  return (
+    <div className="flex min-h-48 flex-col items-center justify-center text-center">
+      <Icon className="size-12 text-gray-300 dark:text-gray-700" />
+      <p className="mt-4 text-base font-medium text-gray-600 dark:text-gray-300">{title}</p>
+      {description && <p className="mt-2 text-xs text-gray-400">{description}</p>}
+      {children}
+    </div>
+  );
+}
 
-const MentorSkeleton = () => (
-  <div className="space-y-4">
-    {Array.from({ length: 3 }).map((_, i) => (
-      <div key={i} className="rounded-2xl border-2 border-gray-100 dark:border-gray-800 p-4 animate-pulse">
-        <div className="flex items-start gap-3">
-          <div className="size-14 rounded-xl bg-gray-100 dark:bg-gray-800" />
-          <div className="flex-1 space-y-2 py-1">
-            <div className="h-4 w-32 rounded bg-gray-100 dark:bg-gray-800" />
-            <div className="h-3 w-48 rounded bg-gray-100 dark:bg-gray-800" />
-            <div className="h-3 w-24 rounded bg-gray-100 dark:bg-gray-800" />
+function ErrorState({ label, onRetry }) {
+  return (
+    <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center">
+      <AlertCircle className="size-9 text-red-400" />
+      <p className="text-sm text-gray-500">{label}</p>
+      <Button variant="outline" size="sm" onClick={onRetry}>
+        <RotateCcw className="size-4" />
+        Retry
+      </Button>
+    </div>
+  );
+}
+
+function CalendarCard({ selectedDate, onDateChange }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return (
+    <Card className="rounded-2xl border border-gray-200 bg-white py-0 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <SectionTitle number={1} title="Select Date" active />
+      <CardContent className="p-6 pt-0">
+        <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={onDateChange}
+            defaultMonth={selectedDate ?? new Date()}
+            disabled={(date) => date < today}
+            className="mx-auto w-full max-w-117 p-0 [--cell-radius:10px] [--cell-size:3.2rem] sm:[--cell-size:3.65rem]"
+            classNames={{
+              month_caption: "flex h-10 w-full items-center justify-center px-10",
+              caption_label: "text-base font-bold text-gray-950 dark:text-gray-50",
+              button_previous: "size-8 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800",
+              button_next: "size-8 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800",
+              weekday: "flex-1 text-sm font-medium text-gray-600 dark:text-gray-300",
+              week: "mt-3 flex w-full",
+              outside: "text-gray-300 opacity-60 dark:text-gray-700",
+              disabled: "text-gray-300 opacity-50 dark:text-gray-700",
+              day_button: "hover:border hover:border-primary data-[selected-single=true]:bg-primary data-[selected-single=true]:text-white",
+            }}
+          />
+        </div>
+
+        {selectedDate && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-300">
+            <Check className="size-4" />
+            {formatSelectedDate(selectedDate)}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function TimeSkeletonRows() {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <Skeleton key={index} className="h-12 rounded-lg bg-gray-100 dark:bg-gray-800" />
+      ))}
+    </div>
+  );
+}
+
+function TimeCard({ selectedDate, selectedTime, times, onTimeChange, loadingSlots, slotsError, onRetry }) {
+  let content;
+
+  if (!selectedDate) {
+    content = (
+      <div>
+        <EmptyState icon={Clock} title="Select a date to view available time slots" description="Choose a date from the calendar above" />
+        <TimeSkeletonRows />
+      </div>
+    );
+  } else if (loadingSlots) {
+    content = <TimeSkeletonRows />;
+  } else if (slotsError) {
+    content = <ErrorState label="Failed to load available slots" onRetry={onRetry} />;
+  } else if (times.length === 0) {
+    content = <EmptyState icon={Clock} title="No time slots available for this date" />;
+  } else {
+    content = (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {times.map((time) => (
+          <button
+            key={time}
+            type="button"
+            onClick={() => onTimeChange(time)}
+            className={`h-12 rounded-lg border px-4 text-base font-medium ${
+              selectedTime === time ? "border-primary bg-primary text-white" : "border-gray-200 bg-white text-gray-950 hover:border-primary dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50"
+            }`}
+          >
+            {time}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <Card className="rounded-2xl border border-gray-200 bg-white py-0 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <SectionTitle number={2} title="Choose Time" active={Boolean(selectedDate)} />
+      <CardContent className="p-6 pt-0">{content}</CardContent>
+    </Card>
+  );
+}
+
+function MentorSkeletonRows() {
+  return (
+    <div className="space-y-4">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div key={index} className="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+          <div className="flex items-start gap-4">
+            <Skeleton className="size-16 rounded-xl bg-gray-200 dark:bg-gray-800" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-800" />
+              <Skeleton className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-800" />
+              <div className="flex gap-2 pt-1">
+                <Skeleton className="h-6 w-20 rounded bg-gray-200 dark:bg-gray-800" />
+                <Skeleton className="h-6 w-24 rounded bg-gray-200 dark:bg-gray-800" />
+              </div>
+            </div>
           </div>
         </div>
+      ))}
+    </div>
+  );
+}
+
+function MentorCard({ slot, selected, onSelect }) {
+  const mentor = slot.mentor ?? {};
+  const name = getMentorName(mentor);
+  const role = getMentorRole(mentor);
+  const image = getMentorImage(mentor);
+  const rating = getMentorRating(mentor);
+  const reviews = getMentorReviews(mentor);
+  const sessions = getMentorSessions(mentor);
+  const tags = [slot.service_type, ...(mentor.tags ?? mentor.skills ?? mentor.expertise ?? [])].filter(Boolean);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(slot)}
+      className={`relative w-full rounded-xl border p-4 text-left ${
+        selected ? "border-primary bg-primary/5 dark:bg-primary/10" : "border-gray-200 bg-white hover:border-primary/60 dark:border-gray-800 dark:bg-gray-950"
+      }`}
+    >
+      {selected && (
+        <span className="absolute right-4 top-4 flex size-5 items-center justify-center rounded-full border-2 border-primary text-primary">
+          <Check className="size-3" />
+        </span>
+      )}
+      <div className="flex items-start gap-4">
+        <Avatar className="size-16 rounded-xl">
+          {image ? <AvatarImage className="rounded-xl" src={image} alt="" /> : null}
+          <AvatarFallback className="rounded-xl bg-gray-100 font-bold text-primary dark:bg-gray-800">{initialsFor(name)}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1 pr-6">
+          <h4 className="truncate text-lg font-bold leading-tight text-gray-950 dark:text-gray-50">{name || "Mentor details unavailable"}</h4>
+          {role && <p className="mt-1 truncate text-sm text-gray-600 dark:text-gray-300">{role}</p>}
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+            {rating ? (
+              <span className="inline-flex items-center gap-1 font-semibold text-gray-900 dark:text-gray-100">
+                <Star className="size-4 fill-amber-400 text-amber-400" />
+                {rating}
+              </span>
+            ) : null}
+            {reviews ? <span>({reviews})</span> : null}
+            {sessions ? <span>{sessions} sessions</span> : null}
+            {getSlotEndTime(slot) ? (
+              <span>
+                {getSlotTime(slot)} - {getSlotEndTime(slot)}
+              </span>
+            ) : null}
+          </div>
+          {tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {tags.slice(0, 4).map((tag) => (
+                <Badge key={tag} className="h-6 rounded bg-purple-50 px-2 text-xs font-medium text-purple-700 hover:bg-purple-50 dark:bg-purple-950/40 dark:text-purple-300">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    ))}
-  </div>
-);
+    </button>
+  );
+}
 
-// ─── Empty / Error States ───
-const EmptyState = ({ message }) => <p className="py-16 text-center text-sm text-muted-foreground">{message}</p>;
+function MentorPanel({ selectedDate, selectedTime, mentors, selectedMentor, onMentorChange, loadingSlots, slotsError, onRetry }) {
+  const showPlaceholder = !selectedDate || !selectedTime;
 
-const ErrorState = ({ onRetry }) => (
-  <div className="py-10 flex flex-col items-center gap-3">
-    <AlertCircle className="size-8 text-destructive/70" />
-    <p className="text-sm text-muted-foreground">Failed to load available slots</p>
-    <Button variant="outline" size="sm" onClick={onRetry} className="gap-1.5 cursor-pointer">
-      <RotateCcw className="size-3.5" />
-      Retry
-    </Button>
-  </div>
-);
+  let content;
+  if (showPlaceholder) {
+    content = (
+      <div>
+        <EmptyState icon={Users} title="Choose a time slot to view available mentors" description="Select your preferred time from the options above" />
+        <MentorSkeletonRows />
+      </div>
+    );
+  } else if (loadingSlots) {
+    content = <MentorSkeletonRows />;
+  } else if (slotsError) {
+    content = <ErrorState label="Failed to load available mentors" onRetry={onRetry} />;
+  } else if (mentors.length === 0) {
+    content = <EmptyState icon={Users} title="No mentors available for this time slot" />;
+  } else {
+    content = (
+      <div className="max-h-185 space-y-4 overflow-y-auto pr-1">
+        {mentors.map((slot) => (
+          <MentorCard key={slot.id ?? `${getSlotTime(slot)}-${slot.mentor?.id ?? slot.mentor?.name}`} slot={slot} selected={selectedMentor?.id === slot.id} onSelect={onMentorChange} />
+        ))}
+      </div>
+    );
+  }
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-};
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.05 } },
-};
+  return (
+    <Card className="min-h-150 rounded-2xl border border-gray-200 bg-white py-0 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <CardHeader className="flex-row items-center justify-between p-6 pb-4">
+        <CardTitle className="flex min-w-0 items-center gap-3 text-2xl font-bold leading-none text-gray-950 dark:text-gray-50">
+          <StepNumber value={3} active={Boolean(selectedTime)} />
+          <span className="truncate">Pick Your Mentor</span>
+        </CardTitle>
+        {!showPlaceholder && !loadingSlots && !slotsError && (
+          <Badge className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-300">
+            {mentors.length} available
+          </Badge>
+        )}
+      </CardHeader>
+      <CardContent className="p-6 pt-0">{content}</CardContent>
+    </Card>
+  );
+}
 
 export default function StepSelectSlot({
   selectedService,
@@ -130,211 +331,73 @@ export default function StepSelectSlot({
   onTimeChange,
   selectedMentor,
   onMentorChange,
-  availableSlots,
-  displayTimezone,
+  availableSlots = [],
   loadingSlots,
   slotsError,
   onRetry,
   onBack,
   onNext,
 }) {
-  const isComplete = selectedDate && selectedTime && selectedMentor;
-
-  const disablePastDates = (date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
-
-  /**
-   * Parse a time string into a Date on the given calendar date.
-   * Supports both 24-hour ("08:00", "15:30") and 12-hour AM/PM ("9:00 AM", "3:30 PM") formats.
-   * Returns null if parsing fails.
-   */
-  const parseSlotTime = (timeStr, onDate) => {
-    if (!timeStr || !onDate) return null;
-
-    let hours, minutes;
-
-    // 12-hour AM/PM format: "9:00 AM", "12:30 PM"
-    const ampmMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-    if (ampmMatch) {
-      hours = parseInt(ampmMatch[1], 10);
-      minutes = parseInt(ampmMatch[2], 10);
-      const meridiem = ampmMatch[3].toUpperCase();
-      if (meridiem === "AM" && hours === 12) hours = 0;
-      if (meridiem === "PM" && hours !== 12) hours += 12;
-    } else {
-      // 24-hour format: "08:00", "15:30"
-      const h24Match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
-      if (!h24Match) return null;
-      hours = parseInt(h24Match[1], 10);
-      minutes = parseInt(h24Match[2], 10);
-    }
-
-    const d = new Date(onDate);
-    d.setHours(hours, minutes, 0, 0);
-    return d;
-  };
-
-  const uniqueTimes = useMemo(() => {
-    const now = new Date();
-    const cutoff = new Date(now.getTime() + 60 * 60 * 1000); // now + 1 hour
-
-    // Check if the selected date is today (same calendar day in local time)
-    const isToday = selectedDate
-      ? (() => {
-          const sel = new Date(selectedDate);
-          const today = new Date();
-          return (
-            sel.getFullYear() === today.getFullYear() &&
-            sel.getMonth() === today.getMonth() &&
-            sel.getDate() === today.getDate()
-          );
-        })()
-      : false;
-
-    const times = availableSlots.map((s) => s.local_time?.start_time ?? s.start_time);
-    const uniqueSet = [...new Set(times)];
-
-    const filtered = isToday
-      ? uniqueSet.filter((time) => {
-          const slotDate = parseSlotTime(time, selectedDate);
-          // Keep slot only if it is >= 60 min from now (or unparseable → show it)
-          if (!slotDate) return true;
-          return slotDate >= cutoff;
-        })
-      : uniqueSet;
-
-    return filtered.sort();
+  const times = useMemo(() => {
+    if (!selectedDate) return [];
+    return [...new Set(availableSlots.map(getSlotTime).filter(Boolean))].sort();
   }, [availableSlots, selectedDate]);
 
   const mentorsForTime = useMemo(() => {
     if (!selectedTime) return [];
-    return availableSlots.filter((s) => (s.local_time?.start_time ?? s.start_time) === selectedTime);
+    return availableSlots.filter((slot) => getSlotTime(slot) === selectedTime);
   }, [availableSlots, selectedTime]);
 
-  const renderTimeSection = () => {
-    if (!selectedDate) return <EmptyState message="Please select a date first" />;
-    if (loadingSlots) return <TimeSkeleton />;
-    if (slotsError) return <ErrorState onRetry={onRetry} />;
-    if (uniqueTimes.length === 0) return <EmptyState message="No slots available for selected date" />;
-
-    return (
-      <motion.div className="grid grid-cols-3 gap-3" variants={stagger} initial="hidden" animate="visible">
-        {uniqueTimes.map((time) => {
-          const isSelected = selectedTime === time;
-          return (
-            <motion.button
-              key={time}
-              variants={fadeIn}
-              type="button"
-              onClick={() => onTimeChange(time)}
-              className={`
-                rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all cursor-pointer
-                ${
-                  isSelected
-                    ? "border-primary text-primary bg-primary/5 dark:bg-primary/10"
-                    : "border-gray-100 dark:border-gray-800 text-muted-foreground hover:border-gray-200 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                }
-              `}
-            >
-              {time}
-            </motion.button>
-          );
-        })}
-      </motion.div>
-    );
-  };
-
-  const renderMentorSection = () => {
-    if (!selectedDate || !selectedTime) {
-      return <EmptyState message="Please select a date and time first" />;
-    }
-    if (loadingSlots) return <MentorSkeleton />;
-    if (slotsError) return <ErrorState onRetry={onRetry} />;
-    if (mentorsForTime.length === 0) return <EmptyState message="No mentors available for this time slot" />;
-
-    return (
-      <AnimatePresence mode="wait">
-        <motion.div key={selectedTime} className="space-y-4 max-h-145 overflow-y-auto pr-1" variants={stagger} initial="hidden" animate="visible">
-          {mentorsForTime.map((slot) => (
-            <motion.div key={slot.id} variants={fadeIn}>
-              <MentorCard slot={slot} isSelected={selectedMentor?.id === slot.id} onSelect={onMentorChange} />
-            </motion.div>
-          ))}
-        </motion.div>
-      </AnimatePresence>
-    );
-  };
+  const isComplete = Boolean(selectedDate && selectedTime && selectedMentor);
 
   return (
-    <div>
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Select Date, Time & Mentor</h1>
-        <p className="mt-2 text-muted-foreground">
-          Booking: <span className="font-semibold text-primary underline">{selectedService?.title}</span>
-        </p>
+    <section className="mx-auto max-w-7xl">
+      <div className="mb-10 text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-gray-950 dark:text-gray-50 md:text-[42px]">Select Date, Time & Mentor</h1>
+        {selectedService?.title ? (
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+            Booking: <span className="font-semibold text-primary">{selectedService.title}</span>
+          </p>
+        ) : null}
+        <SubstepPill hasDate={Boolean(selectedDate)} hasTime={Boolean(selectedTime)} hasMentor={Boolean(selectedMentor)} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
-        {/* ── Left: Date + Time ── */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          {/* Calendar */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-            className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
-          >
-            <h3 className="flex items-center gap-2 text-lg font-bold mb-4">
-              <CalendarDays className="size-5 text-primary" />
-              Select Date
-            </h3>
-            <div className="flex justify-center">
-              <Calendar mode="single" selected={selectedDate} onSelect={onDateChange} disabled={disablePastDates} className="rounded-xl w-100" />
-            </div>
-          </motion.div>
-
-          {/* Time slots */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.1 }}
-            className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="flex items-center gap-2 text-lg font-bold">
-                <Clock className="size-5 text-primary" />
-                Select Time
-              </h3>
-              {displayTimezone && <TimezoneBadge timezone={displayTimezone} />}
-            </div>
-            {renderTimeSection()}
-          </motion.div>
+          <CalendarCard selectedDate={selectedDate} onDateChange={onDateChange} />
+          <TimeCard selectedDate={selectedDate} selectedTime={selectedTime} times={times} onTimeChange={onTimeChange} loadingSlots={loadingSlots} slotsError={slotsError} onRetry={onRetry} />
         </div>
-
-        {/* ── Right: Mentors ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.15 }}
-          className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6"
-        >
-          <h3 className="flex items-center gap-2 text-lg font-bold mb-4">Select Your Mentor</h3>
-          {renderMentorSection()}
-        </motion.div>
+        <MentorPanel
+          selectedDate={selectedDate}
+          selectedTime={selectedTime}
+          mentors={mentorsForTime}
+          selectedMentor={selectedMentor}
+          onMentorChange={onMentorChange}
+          loadingSlots={loadingSlots}
+          slotsError={slotsError}
+          onRetry={onRetry}
+        />
       </div>
 
-      {/* Footer */}
-      <div className="mt-10 flex items-center justify-between max-w-5xl mx-auto">
-        <Button variant="outline" size="lg" onClick={onBack} className="cursor-pointer">
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={onBack}
+          className="h-13 rounded-xl border-2 border-gray-300 bg-white px-5 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+        >
           Back to Services
         </Button>
-        <Button size="lg" variant={isComplete ? "default" : "outline"} disabled={!isComplete} onClick={onNext} className="cursor-pointer">
-          Continue to Summary →
+        <Button
+          size="lg"
+          disabled={!isComplete}
+          onClick={onNext}
+          className="h-13 rounded-xl bg-primary px-8 text-base font-bold text-white shadow-none hover:bg-primary/90 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-100 dark:disabled:bg-gray-800"
+        >
+          Continue to Summary
+          <ArrowRight className="size-5" />
         </Button>
       </div>
-    </div>
+    </section>
   );
 }

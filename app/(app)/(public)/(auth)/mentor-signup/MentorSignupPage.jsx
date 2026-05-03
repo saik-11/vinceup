@@ -1,19 +1,22 @@
 "use client";
 
-import { Briefcase, Building2, Eye, EyeOff, LockKeyhole, Mail, MailCheck, MapPin, TrendingUp, Clock, ArrowRight, Award } from "lucide-react";
+import { AlertCircle, Award, Briefcase, Building2, MailCheck, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import AuthCard from "@/components/auth/AuthCard";
-import AuthHeader from "@/components/auth/AuthHeader";
 import AuthFooterLink from "@/components/auth/AuthFooterLink";
+import AuthHeader from "@/components/auth/AuthHeader";
 import SocialButtons from "@/components/auth/SocialButtons";
-import { CountrySelect, StateSelect, CitySelect } from "@/components/shared/LocationPicker";
+import { EmailVerificationField } from "@/components/auth/signup/EmailVerificationField";
+import { LocationSection } from "@/components/auth/signup/LocationSection";
+import { NameFields } from "@/components/auth/signup/NameFields";
+import { PasswordFields } from "@/components/auth/signup/PasswordFields";
+import { MENTOR_LINKS, TermsField } from "@/components/auth/signup/TermsField";
 import FieldFeedback from "@/components/FieldFeedback";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,14 +30,10 @@ const EXPERIENCE_OPTIONS = [
   { value: ">10", label: "More than 10 years" },
 ];
 
-const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const MentorPage = () => {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [apiError, setApiError] = useState(null);
-  const [showPasswordHints, setShowPasswordHints] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
   const [pendingData, setPendingData] = useState(null);
 
   const { mutate: signup, isPending } = useSignupMentor({
@@ -69,19 +68,6 @@ const MentorPage = () => {
     },
   });
 
-  const passwordValue = useWatch({ control: form.control, name: "password" }) ?? "";
-  const confirmValue = useWatch({ control: form.control, name: "confirmPassword" }) ?? "";
-  const countryValue = useWatch({ control: form.control, name: "country" });
-  const stateValue = useWatch({ control: form.control, name: "state" });
-
-  const passwordChecks = {
-    length: passwordValue.length >= 8,
-    lowercase: /[a-z]/.test(passwordValue),
-    uppercase: /[A-Z]/.test(passwordValue),
-    number: /\d/.test(passwordValue),
-    special: /[@$!%*?&#]/.test(passwordValue),
-  };
-
   const onSubmit = (values) => {
     setApiError(null);
     signup({
@@ -101,30 +87,28 @@ const MentorPage = () => {
 
   if (pendingData) {
     return (
-      <AuthCard maxWidth="md">
-        <div className="flex flex-col items-center justify-center space-y-6 py-8 text-center">
-          <div className="rounded-full bg-primary/10 p-4 ring-8 ring-primary/5">
-            <Award className="h-12 w-12 text-primary" />
+      <AuthCard>
+        <div className="flex flex-col items-center justify-center space-y-7 py-6 px-2 sm:px-4 text-center">
+          <div className="rounded-[20px] bg-[#783cf9] p-4 flex items-center justify-center">
+            <Award className="h-10 w-10 text-white" />
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">Application Submitted!</h2>
-            <p className="text-muted-foreground text-sm max-w-md mx-auto">
+          <div className="space-y-3">
+            <h2 className="text-[26px] font-bold tracking-tight text-gray-900">Application Submitted!</h2>
+            <p className="text-gray-600 text-[15px] leading-relaxed max-w-90 mx-auto">
               {pendingData.message || "Thank you for your interest in becoming a mentor. We've received your application and will review it shortly."}
             </p>
           </div>
 
-          <div className="w-full max-w-sm space-y-6 pt-4">
-            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-center shadow-sm">
-              <p className="text-sm font-medium text-primary">
-                Our team will contact you via email within 2-3 business days with next steps.
-              </p>
+          <div className="w-full pt-1">
+            <div className="rounded-xl bg-[#fbf7ff] p-5 sm:px-8 text-center mx-auto max-w-95">
+              <p className="text-[14.5px] text-gray-700 leading-snug">Our team will contact you via email within 2-3 business days with next steps.</p>
             </div>
+          </div>
 
-            <Button asChild className="w-full" size="lg">
-              <Link href="/">
-                Return to Home
-              </Link>
+          <div className="pt-2">
+            <Button asChild className="h-12 px-8 bg-[#783cf9] hover:bg-[#682ae1] text-white rounded-lg shadow-sm text-[15px] font-medium">
+              <Link href="/">Return to Home</Link>
             </Button>
           </div>
         </div>
@@ -133,7 +117,7 @@ const MentorPage = () => {
   }
 
   return (
-    <AuthCard maxWidth="lg">
+    <AuthCard>
       <AuthHeader title="Become a Mentor" subtitle="Share your expertise and help others grow in their careers" />
 
       <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -143,227 +127,13 @@ const MentorPage = () => {
             <MailCheck className="h-4 w-4" /> Basic Information
           </FieldLegend>
           <FieldGroup>
-            <div className="grid grid-cols-2 gap-3">
-              <Controller
-                name="first_name"
-                control={form.control}
-                rules={{
-                  required: "Please enter your first name",
-                  maxLength: { value: 50, message: "First name is too long" },
-                }}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="mentor-first-name">First name</FieldLabel>
-                    <Input {...field} id="mentor-first-name" placeholder="John" aria-invalid={fieldState.invalid} autoComplete="given-name" />
-                    <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
-                  </Field>
-                )}
-              />
-              <Controller
-                name="last_name"
-                control={form.control}
-                rules={{
-                  required: "Please enter your last name",
-                  maxLength: { value: 50, message: "Last name is too long" },
-                }}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="mentor-last-name">Last name</FieldLabel>
-                    <Input {...field} id="mentor-last-name" placeholder="Doe" aria-invalid={fieldState.invalid} autoComplete="family-name" />
-                    <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
-                  </Field>
-                )}
-              />
-            </div>
-
-            <Controller
-              name="email"
-              control={form.control}
-              rules={{
-                required: "Email is required",
-                pattern: { value: EMAIL_RX, message: "Please enter a valid email" },
-              }}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="mentor-email">Email</FieldLabel>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input {...field} id="mentor-email" type="email" placeholder="your@email.com" className="pl-10" aria-invalid={fieldState.invalid} autoComplete="email" />
-                  </div>
-                  <FieldFeedback variant={fieldState.invalid ? "error" : "hint"} message={fieldState.error?.message} />
-                </Field>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-              <Controller
-                name="password"
-                control={form.control}
-                rules={{
-                  required: "Password is required",
-                  minLength: { value: 8, message: "Password must be at least 8 characters" },
-                  validate: (v) => {
-                    if (!/[a-z]/.test(v)) return "Must include a lowercase letter";
-                    if (!/[A-Z]/.test(v)) return "Must include an uppercase letter";
-                    if (!/\d/.test(v)) return "Must include a number";
-                    if (!/[@$!%*?&#]/.test(v)) return "Must include a special character";
-                    return true;
-                  },
-                  onChange: () => {
-                    if (form.formState.touchedFields.confirmPassword) {
-                      form.trigger("confirmPassword");
-                    }
-                  },
-                }}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="mentor-password">Password</FieldLabel>
-                    <div className="relative">
-                      <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        {...field}
-                        id="mentor-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className="pl-10 pr-9"
-                        aria-invalid={fieldState.invalid}
-                        autoComplete="new-password"
-                        onFocus={() => setShowPasswordHints(true)}
-                        onBlur={(e) => {
-                          field.onBlur(e);
-                          if (!fieldState.error?.message) setTimeout(() => setShowPasswordHints(false), 150);
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => setShowPassword((p) => !p)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                        tabIndex={-1}
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                    <FieldFeedback variant="error" message={fieldState.error?.message} />
-                    {(showPasswordHints || !!fieldState.error?.message) && (
-                      <div className="col-span-2 space-y-1">
-                        <FieldFeedback variant={passwordChecks.length ? "success" : "error"} message="At least 8 characters" />
-                        <FieldFeedback variant={passwordChecks.lowercase ? "success" : "error"} message="1 lowercase letter" />
-                        <FieldFeedback variant={passwordChecks.uppercase ? "success" : "error"} message="1 uppercase letter" />
-                        <FieldFeedback variant={passwordChecks.number ? "success" : "error"} message="1 number" />
-                        <FieldFeedback variant={passwordChecks.special ? "success" : "error"} message="1 special character" />
-                      </div>
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="confirmPassword"
-                control={form.control}
-                rules={{
-                  required: "Please confirm your password",
-                  validate: (v) => v === form.getValues("password") || "Passwords do not match",
-                }}
-                render={({ field, fieldState }) => {
-                  const showSuccess = fieldState.isTouched && confirmValue && passwordValue === confirmValue && !fieldState.error;
-                  return (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="mentor-confirm">Confirm Password</FieldLabel>
-                      <div className="relative">
-                        <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          id="mentor-confirm"
-                          type={showConfirm ? "text" : "password"}
-                          placeholder="••••••••"
-                          className={`pl-10 pr-9 ${showSuccess ? "border-emerald-500 focus-visible:ring-emerald-500/30" : ""}`}
-                          aria-invalid={fieldState.invalid}
-                          autoComplete="new-password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirm((p) => !p)}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                          tabIndex={-1}
-                          aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
-                        >
-                          {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                      {fieldState.error?.message && <FieldFeedback variant="error" message={fieldState.error.message} />}
-                      {showSuccess && <FieldFeedback variant="success" message="Passwords match" />}
-                    </Field>
-                  );
-                }}
-              />
-            </div>
+            <NameFields control={form.control} idPrefix="mentor" />
+            <EmailVerificationField control={form.control} idPrefix="mentor" onVerifiedChange={setEmailVerified} />
+            <PasswordFields form={form} idPrefix="mentor" />
           </FieldGroup>
         </FieldSet>
 
-        {/* Location */}
-        <FieldSet>
-          <FieldLegend variant="label" className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" /> Location
-          </FieldLegend>
-          <div className="grid grid-cols-3 gap-3">
-            <Controller
-              name="country"
-              control={form.control}
-              rules={{ required: "Country is required" }}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="mentor-country">Country</FieldLabel>
-                  <CountrySelect
-                    id="mentor-country"
-                    value={field.value}
-                    onChange={(val) => {
-                      field.onChange(val);
-                      form.setValue("state", "", { shouldValidate: true });
-                      form.setValue("city", "", { shouldValidate: true });
-                    }}
-                    placeholder="e.g., US"
-                  />
-                  <FieldFeedback variant="error" message={fieldState.error?.message} />
-                </Field>
-              )}
-            />
-            <Controller
-              name="state"
-              control={form.control}
-              rules={{ required: "Province/State is required" }}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="mentor-state">Province/State</FieldLabel>
-                  <StateSelect
-                    id="mentor-state"
-                    countryName={countryValue}
-                    value={field.value}
-                    onChange={(val) => {
-                      field.onChange(val);
-                      form.setValue("city", "", { shouldValidate: true });
-                    }}
-                    placeholder="e.g., California"
-                  />
-                  <FieldFeedback variant="error" message={fieldState.error?.message} />
-                </Field>
-              )}
-            />
-            <Controller
-              name="city"
-              control={form.control}
-              rules={{ required: "City is required" }}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="mentor-city">City</FieldLabel>
-                  <CitySelect id="mentor-city" countryName={countryValue} stateName={stateValue} value={field.value} onChange={field.onChange} placeholder="e.g., San Francisco" />
-                  <FieldFeedback variant="error" message={fieldState.error?.message} />
-                </Field>
-              )}
-            />
-          </div>
-        </FieldSet>
+        <LocationSection form={form} idPrefix="mentor" />
 
         {/* Professional Details */}
         <FieldSet>
@@ -463,38 +233,18 @@ const MentorPage = () => {
           </FieldGroup>
         </FieldSet>
 
-        {/* Terms */}
-        <Controller
-          name="terms"
-          control={form.control}
-          rules={{ validate: (v) => v === true || "You must agree to the terms" }}
-          render={({ field, fieldState }) => (
-            <div>
-              <div className="flex items-center gap-2">
-                <Checkbox id="mentor-terms" checked={field.value} onCheckedChange={field.onChange} aria-invalid={fieldState.invalid} />
-                <label htmlFor="mentor-terms" className="text-sm cursor-pointer select-none">
-                  I agree to the{" "}
-                  <Link href="/terms-of-service" className="font-medium text-primary hover:underline">
-                    Terms of Service
-                  </Link>
-                  ,{" "}
-                  <Link href="/privacy-policy" className="font-medium text-primary hover:underline">
-                    Privacy Policy
-                  </Link>
-                  , and{" "}
-                  <Link href="/mentor-guidelines" className="font-medium text-primary hover:underline">
-                    Mentor Guidelines
-                  </Link>
-                </label>
-              </div>
-              <FieldFeedback variant="error" message={fieldState.error?.message} />
-            </div>
-          )}
-        />
+        <TermsField control={form.control} idPrefix="mentor" links={MENTOR_LINKS} />
 
         {apiError && <FieldFeedback variant="block-error" message={apiError} />}
 
-        <Button type="submit" className="w-full cursor-pointer" size="lg" disabled={isPending}>
+        {!emailVerified && (
+          <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 sm:px-4 text-amber-800 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-300">
+            <AlertCircle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
+            <p className="text-sm font-medium">Please verify your email to continue with account creation</p>
+          </div>
+        )}
+
+        <Button type="submit" className="w-full cursor-pointer" size="lg" disabled={isPending || !emailVerified}>
           {isPending ? "Submitting…" : "Submit Application"}
         </Button>
       </form>

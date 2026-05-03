@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import BookingStepIndicator from "./BookingStepIndicator";
@@ -9,6 +8,7 @@ import StepSelectService from "./StepSelectService";
 import StepSelectSlot from "./StepSelectSlot";
 import StepReviewSummary from "./StepReviewSummary";
 import StepPaymentSuccess from "./StepPaymentSuccess";
+import { SERVICES } from "./booking-config";
 import { menteeApi, paySimulation } from "@/lib/api/service";
 
 const pageVariants = {
@@ -26,7 +26,6 @@ const pageVariants = {
 };
 
 const BookSession = () => {
-  const router = useRouter();
   const [step, setStep] = useState(1);
 
   const [selectedService, setSelectedService] = useState(null);
@@ -45,8 +44,18 @@ const BookSession = () => {
 
   const goTo = (s) => setStep(s);
 
+  const handleServiceChange = (service) => {
+    setSelectedService(service);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setSelectedMentor(null);
+    setAvailableSlots([]);
+    setDisplayTimezone("");
+    setSlotsError(false);
+  };
+
   const handleBookSession = () => {
-    if (!selectedMentor?.id) {
+    if (!selectedService || !selectedMentor?.id) {
       toast.error(`Missing booking details. Please go back and re-select a slot.`);
       return;
     }
@@ -55,7 +64,7 @@ const BookSession = () => {
 
     const payload = {
       availability_slot_id: selectedMentor.id,
-      service_type: selectedService?.title || "something for now",
+      service_type: selectedService.type ?? selectedService.id ?? selectedService.title,
     };
     const trimmedNotes = notes.trim();
     if (trimmedNotes) payload.notes = trimmedNotes;
@@ -67,8 +76,9 @@ const BookSession = () => {
         toast.success(res.data.message || "Session booked successfully!");
         const bookingId = res.data?.booking?.id;
         if (bookingId) {
-          paySimulation.paidedSimulation(bookingId).then((data) => {
-            router.push(`/my-sessions`);
+          paySimulation.paidedSimulation(bookingId).then((paymentRes) => {
+            setBookingResult({ ...res.data, payment: paymentRes?.data ?? paymentRes });
+            setStep(4);
           });
         } else {
           setStep(4);
@@ -113,7 +123,12 @@ const BookSession = () => {
   }, [step]);
 
   useEffect(() => {
-    if (!selectedDate) return;
+    if (!selectedDate) {
+      setAvailableSlots([]);
+      setDisplayTimezone("");
+      setSlotsError(false);
+      return;
+    }
 
     const formattedDate =
       selectedDate instanceof Date
@@ -160,9 +175,9 @@ const BookSession = () => {
   }, [selectedDate, selectedService, retryCount]);
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen bg-slate-50 pb-16 text-slate-950 dark:bg-slate-950 dark:text-slate-50">
       {step <= 3 && (
-        <div className="pt-8 pb-6">
+        <div className="pt-8 pb-7">
           <BookingStepIndicator currentStep={displayStep} />
         </div>
       )}
@@ -173,7 +188,7 @@ const BookSession = () => {
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step-1" variants={pageVariants} initial="enter" animate="center" exit="exit">
-              <StepSelectService selectedService={selectedService} onSelect={setSelectedService} onNext={() => goTo(2)} />
+              <StepSelectService services={SERVICES} selectedService={selectedService} onSelect={handleServiceChange} onNext={() => goTo(2)} />
             </motion.div>
           )}
 

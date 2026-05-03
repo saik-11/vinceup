@@ -22,7 +22,7 @@ const AppProviders = ({ children, initialAuth = false }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system">
+      <ThemeProvider defaultTheme="light">
         <AuthProvider initialAuth={initialAuth}>
           <TooltipProvider>
             {children}

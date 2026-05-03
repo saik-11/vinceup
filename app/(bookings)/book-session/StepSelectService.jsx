@@ -1,98 +1,98 @@
 "use client";
 
-import { Check, Clock } from "lucide-react";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { SERVICES } from "./booking-config";
+import { ArrowRight, Check, Clock, FileText } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
-};
-
-export default function StepSelectService({ selectedService, onSelect, onNext }) {
+function EmptyServices() {
   return (
-    <div>
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Choose Your Service</h1>
-        <p className="mt-2 text-muted-foreground">Select the type of mentorship session you need</p>
+    <Card className="mx-auto max-w-2xl rounded-2xl border border-gray-200 bg-white py-0 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <CardContent className="flex min-h-56 flex-col items-center justify-center p-6 text-center">
+        <FileText className="size-12 text-gray-300 dark:text-gray-700" />
+        <p className="mt-4 text-base font-medium text-gray-600 dark:text-gray-300">No services available</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function StepSelectService({ services = [], selectedService, onSelect, onNext }) {
+  return (
+    <section className="mx-auto max-w-[1280px]">
+      <div className="mb-10 text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-gray-950 dark:text-gray-50">Choose Your Service</h1>
+        <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">Select the type of mentorship session you need</p>
       </div>
 
-      <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto" variants={stagger} initial="hidden" animate="visible">
-        {SERVICES.map((service) => {
-          const Icon = service.icon;
-          const isSelected = selectedService?.id === service.id;
+      {services.length === 0 ? (
+        <EmptyServices />
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {services.map((service) => {
+            const Icon = service.icon ?? FileText;
+            const isSelected = selectedService?.id === service.id;
 
-          return (
-            <motion.div
-              key={service.id}
-              variants={fadeUp}
-              onClick={() => onSelect(service)}
-              className={`
-                relative cursor-pointer rounded-2xl border-2 p-6
-                bg-white dark:bg-gray-900
-                transition-all duration-200 hover:shadow-lg dark:hover:shadow-gray-900/50
-                ${isSelected ? "border-primary shadow-md dark:shadow-primary/10" : "border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700"}
-              `}
-            >
-              {/* Selected checkmark */}
-              {isSelected && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-4 right-4 flex size-6 items-center justify-center rounded-full bg-primary text-white">
-                  <Check className="size-3.5" />
-                </motion.div>
-              )}
+            return (
+              <button key={service.id} type="button" onClick={() => onSelect(service)} className="text-left">
+                <Card
+                  className={`h-full rounded-2xl border bg-white py-0 shadow-sm dark:bg-gray-900 ${
+                    isSelected ? "border-primary bg-primary/5 dark:bg-primary/10" : "border-gray-200 dark:border-gray-800"
+                  }`}
+                >
+                  <CardContent className="relative p-6">
+                    {isSelected && (
+                      <span className="absolute right-6 top-6 flex size-6 items-center justify-center rounded-full border-2 border-primary text-primary">
+                        <Check className="size-3.5" />
+                      </span>
+                    )}
 
-              {/* Icon + Title + Description */}
-              <div className="flex items-start gap-3">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
-                  <Icon className="size-5" />
-                </div>
-                <div className="pr-6">
-                  <h3 className="text-lg font-bold leading-tight">{service.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{service.description}</p>
-                </div>
-              </div>
+                    <div className="flex items-start gap-4 pr-9">
+                      <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+                        <Icon className="size-6" />
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="text-xl font-bold leading-tight text-gray-950 dark:text-gray-50">{service.title}</h2>
+                        {service.description && <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">{service.description}</p>}
+                      </div>
+                    </div>
 
-              {/* Tags */}
-              <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1.5">
-                {service.tags.map((tag) => (
-                  <span key={tag} className="text-xs font-medium text-primary">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+                    {service.tags?.length ? (
+                      <div className="mt-5 flex flex-wrap gap-2 pl-[4.5rem]">
+                        {service.tags.map((tag) => (
+                          <Badge key={tag} className="h-6 rounded bg-purple-50 px-2 text-xs font-medium text-purple-700 hover:bg-purple-50 dark:bg-purple-950/40 dark:text-purple-300">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
 
-              {/* Duration + Price */}
-              <div className="mt-4 flex items-center gap-3 pt-1">
-                <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <Clock className="size-3.5" />
-                  {service.duration} minutes
-                </span>
-                <span className="text-xl font-bold text-primary">${service.price}</span>
-              </div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+                    <div className="mt-6 flex items-center gap-3 pl-[4.5rem]">
+                      {service.duration ? (
+                        <span className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
+                          <Clock className="size-4" />
+                          {service.duration} minutes
+                        </span>
+                      ) : null}
+                      {service.price != null ? <span className="text-2xl font-bold text-primary">${service.price}</span> : null}
+                    </div>
+                  </CardContent>
+                </Card>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
-      <div className="mt-10 flex items-center justify-between max-w-4xl mx-auto">
-        <Button variant="outline" size="lg" asChild className="cursor-pointer">
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Button variant="outline" size="lg" asChild className="h-13 rounded-xl border-2 border-gray-300 bg-white px-5 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
           <Link href="/dashboard">Back to Dashboard</Link>
         </Button>
-        {selectedService && (
-          <motion.div initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }}>
-            <Button size="lg" onClick={onNext} className="cursor-pointer">
-              Continue to Schedule →
-            </Button>
-          </motion.div>
-        )}
+        <Button size="lg" onClick={onNext} disabled={!selectedService} className="h-13 rounded-xl bg-primary px-8 text-base font-bold text-white shadow-none hover:bg-primary/90 disabled:bg-gray-200 disabled:text-gray-400 disabled:opacity-100 dark:disabled:bg-gray-800">
+          Continue to Schedule
+          <ArrowRight className="size-5" />
+        </Button>
       </div>
-    </div>
+    </section>
   );
 }

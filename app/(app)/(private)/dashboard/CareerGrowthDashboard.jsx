@@ -154,7 +154,7 @@ function SessionsCard({ sessions }) {
                   )}
                 >
                   <div className="flex min-w-0 flex-1 gap-4">
-                    <div className="flex size-12 shrink-0 items-center justify-center rounded-[16px] bg-[linear-gradient(135deg,#7552ff,#8b5cf6)] text-white shadow-[0_10px_24px_-18px_rgba(117,82,255,0.9)]">
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#7552ff,#8b5cf6)] text-white shadow-[0_10px_24px_-18px_rgba(117,82,255,0.9)]">
                       <CalendarDays className="size-5" />
                     </div>
 
@@ -257,7 +257,7 @@ function TasksCard({ tasks }) {
 
 function VegaInsightsCard({ insights }) {
   return (
-    <Card className="overflow-hidden rounded-[24px] border-0 bg-[linear-gradient(180deg,#7c3aed_0%,#b832e0_100%)] px-0 py-0 text-white shadow-[0_28px_72px_-34px_rgba(124,58,237,0.82)] ring-0 dark:shadow-[0_30px_80px_-36px_rgba(91,33,182,0.88)]">
+    <Card className="overflow-hidden rounded-lg border-0 bg-[linear-gradient(180deg,#7c3aed_0%,#b832e0_100%)] px-0 py-0 text-white shadow-[0_28px_72px_-34px_rgba(124,58,237,0.82)] ring-0 dark:shadow-[0_30px_80px_-36px_rgba(91,33,182,0.88)]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.28),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.12),transparent_42%)]"
@@ -279,7 +279,7 @@ function VegaInsightsCard({ insights }) {
 
             return (
               <li key={insight.id}>
-                <div className="rounded-[20px] border border-white/12 bg-white/10 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-sm transition-colors duration-200 hover:bg-white/12">
+                <div className="rounded-lg border border-white/12 bg-white/10 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-sm transition-colors duration-200 hover:bg-white/12">
                   <div className="mb-2 flex items-center gap-2 text-lg font-semibold tracking-[-0.02em]">
                     <span className="flex size-7 items-center justify-center rounded-full bg-white/12">
                       <InsightIcon className="size-4" />
@@ -288,7 +288,7 @@ function VegaInsightsCard({ insights }) {
                   </div>
                   <p className="text-sm leading-6 text-white/84">{insight.body}</p>
                   {insight.ctaLabel ? (
-                    <Button asChild variant="ghost" className="mt-3 h-9 rounded-full px-3 text-sm font-medium text-white hover:bg-white/10 hover:text-white">
+                    <Button asChild variant="ghost" className="mt-3 h-9 rounded-lg px-3 text-sm font-medium text-white hover:bg-white/10 hover:text-white">
                       <Link href={insight.ctaHref ?? "/dashboard"}>
                         {insight.ctaLabel}
                         <ArrowRight className="size-4" />

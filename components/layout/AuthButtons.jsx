@@ -101,7 +101,7 @@ function UserMenu({ user, onLogout, isLight, setTheme }) {
           </DropdownMenuItem>
         ))}
 
-        <DropdownMenuItem
+        {/* <DropdownMenuItem
           onSelect={(event) => {
             event.preventDefault();
             setTheme(isLight ? "dark" : "light");
@@ -111,7 +111,7 @@ function UserMenu({ user, onLogout, isLight, setTheme }) {
           {isLight ? <Sun className="size-4" /> : <Moon className="size-4" />}
           <span className="flex-1">Theme</span>
           <Switch checked={!isLight} onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} onClick={(event) => event.stopPropagation()} className="cursor-pointer" />
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
         <DropdownMenuSeparator />
 

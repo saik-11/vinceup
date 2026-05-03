@@ -1,5 +1,5 @@
 import Image from "next/image";
-import vinceup_logo from "@/public/assets/vinceup_logo.svg";
+import vinceup_logo from "@/app/favicon.ico";
 
 // Default icon = VinceUp logo in a primary-colored box
 function DefaultIcon() {

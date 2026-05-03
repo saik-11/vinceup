@@ -210,7 +210,7 @@ function SearchableDropdown({
       {open && (
         <div
           className={cn(
-            "absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-border bg-popover shadow-md",
+            "absolute z-50 mt-1 w-[min(24rem,calc(100vw-2rem))] min-w-full overflow-hidden rounded-md border border-border bg-popover shadow-md",
             "animate-in fade-in-0 zoom-in-95 duration-100",
           )}
           role="presentation"
@@ -282,7 +282,7 @@ function SearchableDropdown({
                         {item.flag}
                       </span>
                     )}
-                    <span className="flex-1 truncate">{item.name}</span>
+                    <span className="flex-1 whitespace-normal break-words">{item.name}</span>
                     {item.meta && (
                       <span className="shrink-0 tabular-nums text-xs text-muted-foreground">
                         {item.meta}
@@ -450,42 +450,41 @@ export function LocationPicker({
     city: externalValue?.city ?? null,
   });
 
-  // Sync external value → internal (controlled mode)
-  useEffect(() => {
-    if (externalValue !== undefined) {
-      setInternal({
-        country: externalValue.country ?? null,
-        state: externalValue.state ?? null,
-        city: externalValue.city ?? null,
-      });
-    }
-  }, [externalValue]);
+  const isControlled = externalValue !== undefined;
+  const currentCountry = isControlled ? (externalValue.country ?? null) : internal.country;
+  const currentState = isControlled ? (externalValue.state ?? null) : internal.state;
+  const currentCity = isControlled ? (externalValue.city ?? null) : internal.city;
+
+  const commitChange = useCallback(
+    (next) => {
+      if (!isControlled) setInternal(next);
+      onChange?.(next);
+    },
+    [isControlled, onChange],
+  );
 
   const handleCountryChange = useCallback(
     (country) => {
       const next = { country, state: null, city: null };
-      setInternal(next);
-      onChange?.(next);
+      commitChange(next);
     },
-    [onChange],
+    [commitChange],
   );
 
   const handleStateChange = useCallback(
     (state) => {
-      const next = { country: internal.country, state, city: null };
-      setInternal(next);
-      onChange?.(next);
+      const next = { country: currentCountry, state, city: null };
+      commitChange(next);
     },
-    [onChange, internal.country],
+    [commitChange, currentCountry],
   );
 
   const handleCityChange = useCallback(
     (city) => {
-      const next = { ...internal, city };
-      setInternal(next);
-      onChange?.(next);
+      const next = { country: currentCountry, state: currentState, city };
+      commitChange(next);
     },
-    [onChange, internal],
+    [commitChange, currentCountry, currentState],
   );
 
   return (
@@ -502,7 +501,7 @@ export function LocationPicker({
         )}
         <CountrySelect
           id={ids.country ?? "location-country"}
-          value={internal.country}
+          value={currentCountry}
           onChange={handleCountryChange}
           placeholder={placeholders.country}
           disabled={disabled}
@@ -521,8 +520,8 @@ export function LocationPicker({
         )}
         <StateSelect
           id={ids.state ?? "location-state"}
-          countryName={internal.country}
-          value={internal.state}
+          countryName={currentCountry}
+          value={currentState}
           onChange={handleStateChange}
           placeholder={placeholders.state}
           disabled={disabled}
@@ -541,9 +540,9 @@ export function LocationPicker({
         )}
         <CitySelect
           id={ids.city ?? "location-city"}
-          countryName={internal.country}
-          stateName={internal.state}
-          value={internal.city}
+          countryName={currentCountry}
+          stateName={currentState}
+          value={currentCity}
           onChange={handleCityChange}
           placeholder={placeholders.city}
           disabled={disabled}

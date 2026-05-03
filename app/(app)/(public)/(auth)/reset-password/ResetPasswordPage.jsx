@@ -150,7 +150,7 @@ export default function ResetPasswordPage() {
 
   if (!token || !email) {
     return (
-      <AuthCard maxWidth="sm" className="border-destructive/50 dark:border-destructive/30">
+      <AuthCard className="border-destructive/50 dark:border-destructive/30">
         <div className="flex flex-col items-center pb-6 pt-2 text-center">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 dark:bg-destructive/20">
             <AlertCircle className="h-6 w-6 text-destructive" aria-hidden="true" />
