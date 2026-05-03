@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -76,7 +76,9 @@ function GetInTouch() {
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                 <div className="space-y-2">
-                  <Label htmlFor="contact-name" className="font-semibold text-foreground">Name</Label>
+                  <Label htmlFor="contact-name" className="font-semibold text-foreground">
+                    Name
+                  </Label>
                   <Input
                     id="contact-name"
                     placeholder="Your full name"
@@ -92,7 +94,9 @@ function GetInTouch() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="contact-email" className="font-semibold text-foreground">Email</Label>
+                  <Label htmlFor="contact-email" className="font-semibold text-foreground">
+                    Email
+                  </Label>
                   <Input
                     id="contact-email"
                     type="email"
@@ -109,7 +113,9 @@ function GetInTouch() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="contact-comments" className="font-semibold text-foreground">Comments</Label>
+                  <Label htmlFor="contact-comments" className="font-semibold text-foreground">
+                    Comments
+                  </Label>
                   <Textarea
                     id="contact-comments"
                     placeholder="How can we help you?"
@@ -165,7 +171,7 @@ function GetInTouch() {
 
 export default function AboutContent() {
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden">
       {/* Hero */}
       <section className="relative overflow-hidden py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-linear-to-br to-white via-[#FAF5FF] from-[#EEF2FF] dark:from-[#0f0a1a] dark:via-[#130d24] dark:to-background">
         <div className="absolute -top-40 -right-40 w-64 sm:w-96 h-64 sm:h-96 bg-linear-to-tl from-white to-[#DAB2FF] dark:from-transparent dark:to-[#6b21a8]/30 rounded-full blur-3xl" />
@@ -219,10 +225,12 @@ export default function AboutContent() {
           <div className="text-[#364153] dark:text-slate-300 order-1 md:order-2">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6">Our Mission</h2>
             <p className="leading-relaxed mb-4 text-sm sm:text-base">
-              VinceUp exists to democratize access to world-class career mentorship. We believe that everyone deserves guidance from experienced professionals, paired with intelligent tools that help them grow faster and smarter.
+              VinceUp exists to democratize access to world-class career mentorship. We believe that everyone deserves guidance from experienced professionals, paired with intelligent tools that help
+              them grow faster and smarter.
             </p>
             <p className="leading-relaxed text-sm sm:text-base">
-              By combining expert human mentorship with our AI assistant VEGA, we create a comprehensive career growth operating system that tracks progress, provides insights, and helps professionals achieve their goals with clarity and confidence.
+              By combining expert human mentorship with our AI assistant VEGA, we create a comprehensive career growth operating system that tracks progress, provides insights, and helps professionals
+              achieve their goals with clarity and confidence.
             </p>
           </div>
         </div>
@@ -235,8 +243,14 @@ export default function AboutContent() {
             <CardTitle className="text-2xl sm:text-3xl font-bold text-center">Our Journey</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 sm:space-y-5 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl mx-auto pb-8 sm:pb-10 px-4 sm:px-6">
-            <p>VinceUp was born from a simple observation: traditional career development is broken. Expensive career coaches are out of reach for most, while free advice is often generic and unhelpful.</p>
-            <p>In 2024, our founders came together with a vision to bridge this gap. We built a platform that makes expert mentorship accessible and affordable, while leveraging AI to maximize the impact of every interaction.</p>
+            <p>
+              VinceUp was born from a simple observation: traditional career development is broken. Expensive career coaches are out of reach for most, while free advice is often generic and
+              unhelpful.
+            </p>
+            <p>
+              In 2024, our founders came together with a vision to bridge this gap. We built a platform that makes expert mentorship accessible and affordable, while leveraging AI to maximize the
+              impact of every interaction.
+            </p>
             <p>Today, {`we're`} proud to serve over 25,000 professionals worldwide, with a network of 500+ expert mentors and our AI assistant VEGA working 24/7 to accelerate career growth.</p>
           </CardContent>
         </Card>
@@ -324,4 +338,3 @@ export default function AboutContent() {
     </div>
   );
 }
-

@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 
 // ─── Data ──────────────────────────────────────────────────────
 
-
 const heroStats = [
   { value: "500+", label: "Expert Mentors" },
   { value: "25k+", label: "Learners Helped" },
@@ -217,10 +216,10 @@ export default function HomeContent() {
       <section className="relative overflow-hidden bg-[#0C0E2B] text-white">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
+          // style={{
+          //   backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          //   backgroundSize: "40px 40px",
+          // }}
         />
         <div className="pointer-events-none absolute -top-40 -left-40 h-125 w-125 rounded-full bg-purple-600/25 blur-3xl" />
         <div className="pointer-events-none absolute top-10 right-0 h-80 w-80 rounded-full bg-indigo-500/15 blur-3xl" />

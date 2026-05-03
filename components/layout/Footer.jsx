@@ -1,4 +1,4 @@
-import Image from "next/image";
+import NextImage from "next/image";
 import Link from "next/link";
 import vinceup_logo from "../../public/assets/vinceup_icon.png";
 
@@ -93,7 +93,7 @@ const Footer = () => {
           {/* Brand column */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/">
-              <Image src={vinceup_logo} alt="VinceUp" loading="eager" className="h-10 w-auto" />
+              <NextImage src={vinceup_logo} alt="VinceUp" width={851} height={279} loading="eager" className="h-10 w-auto" />
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-gray-400">Your career growth operating system, powered by expert mentorship and AI intelligence.</p>
 

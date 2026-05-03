@@ -6,17 +6,10 @@ import { dashboardThemeClass, panelClass } from "@/components/dashboard/dashboar
 
 export default function StatusPage({ badge = "In Progress", title, description, primaryHref = "/", primaryLabel = "Go Home", secondaryHref, secondaryLabel }) {
   return (
-    <section
-      className={cn(
-        dashboardThemeClass,
-        "min-h-[calc(100vh-5rem)] px-6 py-16",
-        "bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.11),transparent_26%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)]",
-        "dark:bg-[radial-gradient(circle_at_top,rgba(124,58,237,0.16),transparent_24%),linear-gradient(180deg,var(--dashboard-bg)_0%,var(--dashboard-bg-bottom)_100%)]",
-      )}
-    >
+    <section className={cn(dashboardThemeClass, "min-h-[calc(100vh-5rem)] px-6 py-16")}>
       <div className={cn(panelClass, "mx-auto flex max-w-3xl flex-col items-center px-8 py-14 text-center")}>
         {/* Icon */}
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(124,58,237,0.1)] text-[var(--dashboard-purple)] dark:bg-[rgba(167,139,250,0.15)]">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(124,58,237,0.1)] text-(--dashboard-purple) dark:bg-[rgba(167,139,250,0.15)]">
           <Clock3 className="h-6 w-6" />
         </div>
 

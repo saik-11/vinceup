@@ -1,7 +1,7 @@
 import ResetPasswordPage from "./ResetPasswordPage";
 
 export const metadata = {
-  title: "Reset Password | VinceUP",
+  title: "Reset Password",
   description: "Create a new password for your VinceUP account.",
 };
 

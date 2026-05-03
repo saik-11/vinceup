@@ -41,8 +41,6 @@ import {
   subCardClass,
 } from "@/components/dashboard/dashboard-shared";
 
-
-
 const actionIcons = {
   mentor: UserRoundSearch,
   roadmap: LayoutDashboard,
@@ -103,17 +101,13 @@ function StatsGrid({ stats }) {
       {stats.map((stat) => {
         const Icon = statIcons[stat.icon] ?? CheckCheck;
         const accentStyles = statAccentStyles[stat.accent] ?? statAccentStyles.blue;
-        
+
         // Adapt formatMetric output to what MetricCard expects
         const displayValue = formatMetric(stat);
 
         return (
           <li key={stat.id} className="min-w-0 h-full">
-            <MetricCard 
-              stat={{...stat, value: displayValue}} 
-              icon={Icon} 
-              accentStyles={accentStyles} 
-            />
+            <MetricCard stat={{ ...stat, value: displayValue }} icon={Icon} accentStyles={accentStyles} />
           </li>
         );
       })}
@@ -145,7 +139,7 @@ function EmptyBlock({ icon: Icon, title, description, ctaLabel, ctaHref }) {
 
 function SessionsCard({ sessions }) {
   return (
-    <Card className={cn(panelClass, "px-0 py-0")}>
+    <Card className={cn(panelClass, "px-0 py-0 border-3")}>
       <CardContent className="space-y-6 p-4 sm:p-6">
         <SectionHeading title="Upcoming Sessions" description="Keep your coaching cadence tight and prep before each call." actionLabel="View all" actionHref="/my-sessions" />
 
@@ -186,7 +180,7 @@ function SessionsCard({ sessions }) {
 
                   <Button
                     asChild
-                    className="h-11 w-full shrink-0 rounded-full bg-[linear-gradient(135deg,#7c3aed,#c026d3)] px-5 text-white shadow-[0_16px_32px_-22px_rgba(168,85,247,0.66)] transition-all duration-200 hover:opacity-95 sm:w-auto"
+                    className="h-11 w-full shrink-0 rounded-lg hover:rounded-2xl bg-[linear-gradient(135deg,#7c3aed,#c026d3)] px-5 text-white shadow-[0_16px_32px_-22px_rgba(168,85,247,0.66)] transition-all duration-200 hover:opacity-95 sm:w-auto"
                   >
                     <Link href={session.prepHref ?? "/clarity-capsule"}>
                       <Sparkles className="size-4" />
@@ -209,7 +203,7 @@ function SessionsCard({ sessions }) {
 
         <Button
           asChild
-          className="h-11 w-full rounded-[16px] bg-[linear-gradient(135deg,#5b52f2,#4f46e5)] text-sm font-medium text-white shadow-[0_18px_40px_-24px_rgba(79,70,229,0.72)] transition-all duration-200 hover:opacity-95"
+          className="h-11 w-full rounded-lg hover:rounded-2xl bg-[linear-gradient(135deg,#5b52f2,#4f46e5)] text-sm font-medium text-white shadow-[0_18px_40px_-24px_rgba(79,70,229,0.72)] transition-all duration-200 hover:opacity-95"
         >
           <Link href="/book-session">
             Book Another Session
@@ -237,7 +231,7 @@ function TasksCard({ tasks }) {
                       {task.title ?? "Task details pending"}
                     </h3>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-sm leading-6 text-(--dashboard-subtle)">
-                      <Badge className={cn("rounded-full border px-2.5 py-1 text-xs font-semibold ring-0", priorityTone[task.priority ?? "low"])}>{task.priority ?? "low"}</Badge>
+                      <Badge className={cn("rounded-[4px] border px-2.5 py-1 text-xs font-semibold ring-0", priorityTone[task.priority ?? "low"])}>{task.priority ?? "low"}</Badge>
                       <span>Due {task.dueDate ?? "TBD"}</span>
                     </div>
                   </div>
@@ -397,10 +391,7 @@ export function CareerGrowthDashboard({ data, activeScenario }) {
   };
   return (
     <DashboardShell>
-      <DashboardHeader 
-        heading={`Welcome back, ${mergedData?.user?.name ?? "Vinny"}!`}
-        subheading={mergedData?.user?.subtitle ?? "Here's your career growth overview"}
-      />
+      <DashboardHeader heading={`Welcome back, ${mergedData?.user?.name ?? "Vinny"}!`} subheading={mergedData?.user?.subtitle ?? "Here's your career growth overview"} />
       <StatsGrid stats={mergedData?.stats} />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.95fr)]">

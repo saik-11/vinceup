@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SidebarProvider, useSidebar } from "../ui/sidebar";
 import { AnimatePresence, motion } from "framer-motion";
 import vinceup_logo from "../../public/assets/vinceup_logo.svg";
-import Image from "next/image";
+import NextImage from "next/image";
 import { useState } from "react";
 import { useLayout } from "@/hooks/useLayout";
 import dynamic from "next/dynamic";
@@ -44,11 +44,11 @@ function NavbarInner({ children }) {
   };
 
   return (
-    <div className="flex flex-col w-full bg-background text-foreground">
+    <div className="flex min-h-svh w-full flex-col text-foreground">
       <header className="w-full sticky top-0 inset-x-0 z-50 flex h-16 md:h-20 shrink-0 items-center justify-between border-b border-border px-3 sm:px-4 bg-background/80 backdrop-blur-xl isolate">
         <div className="font-bold shrink-0">
           <Link href="/" onClick={() => setMenuOpenPathname(null)}>
-            <Image src={vinceup_logo} alt="vinceup" loading="eager" className="w-28 sm:w-36 md:w-44 h-auto" />
+            <NextImage src={vinceup_logo} alt="vinceup" loading="eager" className="w-28 sm:w-36 md:w-44 h-auto" />
           </Link>
         </div>
 
@@ -98,12 +98,7 @@ function NavbarInner({ children }) {
 
           {/* Mobile hamburger — authenticated sidebar Sheet trigger */}
           {!isPublic && (
-            <button
-              type="button"
-              aria-label="Open navigation menu"
-              onClick={() => setOpenMobile(true)}
-              className="md:hidden p-2 rounded-md hover:bg-muted text-foreground"
-            >
+            <button type="button" aria-label="Open navigation menu" onClick={() => setOpenMobile(true)} className="md:hidden p-2 rounded-md hover:bg-muted text-foreground">
               <Menu className="size-5" />
             </button>
           )}
@@ -138,7 +133,7 @@ function NavbarInner({ children }) {
         </AnimatePresence>
       </header>
 
-      <main className="flex flex-row flex-1 relative bg-background">
+      <main className="relative flex flex-1 flex-row">
         {/* Desktop sidebar — static inline panel, hidden on mobile */}
         {!isPublic && (
           <motion.div initial={{ width: 257 }} animate={{ width: 257 }} transition={{ duration: 0.3, ease: "easeOut" }} className="shrink-0 overflow-hidden hidden md:block">
@@ -157,7 +152,7 @@ function NavbarInner({ children }) {
           </div>
         )}
 
-        <section className="grow min-w-0 bg-background">{children}</section>
+        <section className="grow min-w-0">{children}</section>
       </main>
 
       {isPublic && <Footer />}

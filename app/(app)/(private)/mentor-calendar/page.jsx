@@ -2,7 +2,7 @@
 import { MentorCalendarContent } from "./MentorCalendarContent";
 
 export const metadata = {
-  title: "Calendar | Vinceup",
+  title: "Calendar",
   description: "Manage your availability and bookings as a mentor.",
 };
 

@@ -217,10 +217,11 @@ export function JoinSession({
   const [form, setForm] = useState(initialValues);
   const [formErrors, setFormErrors] = useState({});
   const [showAdvanced, setShowAdvanced] = useState(false);
+  // Pre-join audio/video state — persisted across join so call screen is consistent
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(false);
 
-  const { room, phase, connectionState, participants, error, validationErrors, join, retry, leave } =
+  const { room, phase, connectionState, participants, error, validationErrors, joinedAt, join, retry, leave } =
     useLiveKit();
 
   const pending = phase === "fetching" || phase === "connecting";
@@ -263,9 +264,12 @@ export function JoinSession({
         identity: form.identity,
         participantName: form.participantName,
         ttlMinutes: Number(form.ttlMinutes),
+        // Pass the user's pre-join media choices into the hook
+        initialMicEnabled: micOn,
+        initialCamEnabled: camOn,
       });
     },
-    [form, join, validateForm],
+    [form, join, validateForm, micOn, camOn],
   );
 
   const handleRetry = useCallback(async () => {
@@ -274,9 +278,23 @@ export function JoinSession({
 
   const handleLeave = useCallback(async () => {
     await leave();
+    // Navigate away immediately — phase is now "leaving" so no pre-join flicker
     onClose?.();
   }, [leave, onClose]);
 
+  // ── Render: actively leaving — show nothing (prevents pre-join flash) ──
+  if (phase === "leaving") {
+    return (
+      <div className={cn("flex h-screen w-full items-center justify-center bg-slate-950", className)}>
+        <div className="flex flex-col items-center gap-3 text-slate-400">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="text-sm">Leaving session…</span>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Render: in-call ──
   if (phase === "connected" && room) {
     return (
       <LiveRoom
@@ -285,6 +303,9 @@ export function JoinSession({
         participants={participants}
         connectionState={connectionState}
         error={error}
+        joinedAt={joinedAt}
+        initialMicEnabled={micOn}
+        initialCamEnabled={camOn}
         onLeave={handleLeave}
         className={className}
       />
@@ -294,10 +315,14 @@ export function JoinSession({
   const durationLabel =
     TTL_OPTIONS.find((o) => o.value === form.ttlMinutes)?.label ?? `${form.ttlMinutes} min`;
 
+  // Count of remote participants already in the room (from any pre-fetch)
+  // This is 0 until we've connected, but the UI note keeps it friendly.
+  const remoteCount = participants.filter((p) => p?.identity !== form.identity).length;
+
   return (
     <div
       className={cn(
-        "flex min-h-screen w-full items-center justify-center bg-background px-4 py-10",
+        "flex min-h-screen w-full items-center justify-center px-4 py-10",
         className,
       )}
     >
@@ -338,6 +363,29 @@ export function JoinSession({
               {camOn ? "Camera on" : "Camera off"}
             </span>
           </div>
+
+          {/* Joining indicator (shown while fetching/connecting) */}
+          {pending && (
+            <div className="flex items-center justify-center gap-2 rounded-xl border border-border bg-muted/40 px-4 py-2.5 text-xs text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>{phase === "fetching" ? "Requesting access token…" : "Connecting to session…"}</span>
+            </div>
+          )}
+
+          {/* Participant hint */}
+          {!pending && remoteCount === 0 && (
+            <p className="text-center text-xs text-muted-foreground">
+              You&apos;ll be the first to join this session.
+            </p>
+          )}
+          {!pending && remoteCount > 0 && (
+            <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+              <Users className="h-3.5 w-3.5" />
+              <span>
+                {remoteCount} participant{remoteCount !== 1 ? "s" : ""} already in the call
+              </span>
+            </div>
+          )}
         </div>
 
         {/* ── Right: Join panel ── */}

@@ -17,7 +17,7 @@ export default function NotFound() {
 
   return (
     <>
-      <title>Page Not Found | VinceUP</title>
+      <title>Page Not Found</title>
       <div className="h-full w-full flex flex-1 flex-col items-center justify-center gap-4 text-center px-4 py-20">
         <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">404 — Page Not Found</p>
         <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">Oops, wrong turn.</h1>

@@ -160,7 +160,7 @@ const BookSession = () => {
   }, [selectedDate, selectedService, retryCount]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-transparent pb-16">
+    <div className="min-h-screen pb-16">
       {step <= 3 && (
         <div className="pt-8 pb-6">
           <BookingStepIndicator currentStep={displayStep} />

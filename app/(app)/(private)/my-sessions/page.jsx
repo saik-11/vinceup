@@ -3,7 +3,7 @@ import MenteeSessions from "./MenteeSessions";
 import MentorSessions from "./MentorSessions";
 
 export const metadata = {
-  title: "Session Management | VinceUp",
+  title: "Session Management",
   description: "Manage mentorship sessions and requests.",
   robots: { index: false, follow: false },
 };

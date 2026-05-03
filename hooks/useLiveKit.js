@@ -63,12 +63,15 @@ export function useLiveKit() {
   const refreshTimerRef = useRef(null);
   const refreshTokenRef = useRef(null);
 
+  // "idle" | "fetching" | "connecting" | "connected" | "leaving" | "error"
   const [phase, setPhase] = useState("idle");
   const [connectionState, setConnectionState] = useState(ConnectionState.Disconnected);
   const [participants, setParticipants] = useState([]);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const [room, setRoom] = useState(null);
+  /** ISO timestamp set when the room reaches "connected" phase */
+  const [joinedAt, setJoinedAt] = useState(null);
 
   const clearRefreshTimer = useCallback(() => {
     if (refreshTimerRef.current) {
@@ -117,37 +120,51 @@ export function useLiveKit() {
     setParticipants([activeRoom.localParticipant, ...Array.from(activeRoom.remoteParticipants.values())]);
   }, []);
 
-  const enableMediaWithRetry = useCallback(async (activeRoom, retries = PUBLISH_MAX_RETRIES) => {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        await activeRoom.localParticipant.enableCameraAndMicrophone();
-        return; // success
-      } catch (err) {
-        const isEngineError = String(err?.message ?? "").includes("engine not connected");
-        if (!isEngineError || attempt === retries) {
-          console.warn(`Media publish attempt ${attempt}/${retries} failed:`, err?.message);
-          
-          if (err?.name === "NotReadableError" || String(err?.message).includes("Device in use")) {
-            import("sonner").then(({ toast }) => {
-              toast.error("Camera or microphone is in use by another application. Please close it and try again.", { duration: 6000 });
-            });
-          } else if (err?.name === "NotAllowedError" || String(err?.message).includes("Permission denied")) {
-            import("sonner").then(({ toast }) => {
-              toast.error("Camera/microphone permissions are required to be heard or seen.", { duration: 6000 });
-            });
+  /**
+   * Enable media respecting the user's pre-join choices.
+   * If the user turned off mic or cam on the pre-join screen, we honour that.
+   */
+  const enableMediaWithRetry = useCallback(
+    async (activeRoom, { initialMicEnabled = true, initialCamEnabled = false } = {}, retries = PUBLISH_MAX_RETRIES) => {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          if (initialMicEnabled && initialCamEnabled) {
+            await activeRoom.localParticipant.enableCameraAndMicrophone();
+          } else if (initialMicEnabled) {
+            await activeRoom.localParticipant.setMicrophoneEnabled(true);
+          } else if (initialCamEnabled) {
+            await activeRoom.localParticipant.setCameraEnabled(true);
           }
-          
-          // Don't throw — allow joining without media. User can toggle manually.
+          // If both are off, we publish nothing — user will toggle manually
           return;
+        } catch (err) {
+          const isEngineError = String(err?.message ?? "").includes("engine not connected");
+          if (!isEngineError || attempt === retries) {
+            console.warn(`Media publish attempt ${attempt}/${retries} failed:`, err?.message);
+
+            if (err?.name === "NotReadableError" || String(err?.message).includes("Device in use")) {
+              import("sonner").then(({ toast }) => {
+                toast.error("Camera or microphone is in use by another application. Please close it and try again.", { duration: 6000 });
+              });
+            } else if (err?.name === "NotAllowedError" || String(err?.message).includes("Permission denied")) {
+              import("sonner").then(({ toast }) => {
+                toast.error("Camera/microphone permissions are required to be heard or seen.", { duration: 6000 });
+              });
+            }
+
+            // Don't throw — allow joining without media. User can toggle manually.
+            return;
+          }
+          // Wait before retrying
+          await new Promise((r) => setTimeout(r, PUBLISH_RETRY_DELAY_MS));
         }
-        // Wait before retrying
-        await new Promise((r) => setTimeout(r, PUBLISH_RETRY_DELAY_MS));
       }
-    }
-  }, []);
+    },
+    [],
+  );
 
   const connectWithToken = useCallback(
-    async (activeRoom, tokenData) => {
+    async (activeRoom, tokenData, mediaOptions) => {
       setPhase("connecting");
       setConnectionState(ConnectionState.Connecting);
 
@@ -157,11 +174,12 @@ export function useLiveKit() {
       await waitForEngineConnected(activeRoom);
 
       // Enable camera/mic with retry — don't let failures block join
-      await enableMediaWithRetry(activeRoom);
+      await enableMediaWithRetry(activeRoom, mediaOptions);
 
       syncParticipants(activeRoom);
       scheduleTokenRefresh(tokenData.token);
       setConnectionState(ConnectionState.Connected);
+      setJoinedAt(new Date().toISOString());
       setPhase("connected");
     },
     [enableMediaWithRetry, scheduleTokenRefresh, syncParticipants],
@@ -175,7 +193,8 @@ export function useLiveKit() {
       const onParticipantChange = () => syncParticipants(activeRoom);
       const onDisconnected = () => {
         clearRefreshTimer();
-        setPhase("idle");
+        // Keep phase as "leaving" here — JoinSession will call onClose()
+        // which navigates away. Setting "idle" here causes the flicker.
         setParticipants([]);
         setConnectionState(ConnectionState.Disconnected);
       };
@@ -201,7 +220,7 @@ export function useLiveKit() {
   );
 
   const join = useCallback(
-    async ({ roomName, identity, participantName, ttlMinutes }) => {
+    async ({ roomName, identity, participantName, ttlMinutes, initialMicEnabled = true, initialCamEnabled = false }) => {
       setPhase("fetching");
       setError(null);
       setValidationErrors({});
@@ -223,7 +242,7 @@ export function useLiveKit() {
       wireRoomEvents(activeRoom);
 
       try {
-        await connectWithToken(activeRoom, tokenData);
+        await connectWithToken(activeRoom, tokenData, { initialMicEnabled, initialCamEnabled });
         return { ok: true };
       } catch (connectError) {
         activeRoom.removeAllListeners();
@@ -260,6 +279,8 @@ export function useLiveKit() {
   }, [refreshToken]);
 
   const leave = useCallback(async () => {
+    // Set "leaving" immediately so JoinSession renders nothing (no flicker)
+    setPhase("leaving");
     clearRefreshTimer();
 
     if (roomRef.current) {
@@ -276,9 +297,11 @@ export function useLiveKit() {
     lastParamsRef.current = null;
     setError(null);
     setValidationErrors({});
-    setPhase("idle");
     setParticipants([]);
+    setJoinedAt(null);
     setConnectionState(ConnectionState.Disconnected);
+    // Keep phase as "leaving" — the caller (JoinSession → onClose) will navigate
+    // away immediately after this resolves, so we never flip back to "idle".
   }, [clearRefreshTimer]);
 
   useEffect(() => {
@@ -298,6 +321,7 @@ export function useLiveKit() {
     participants,
     error,
     validationErrors,
+    joinedAt,
     join,
     retry,
     leave,

@@ -5,7 +5,7 @@ import { AUTH_USER_KEY } from "@/lib/auth/authSession";
 import MentorDashboard from "./MentorDashboard";
 
 export const metadata = {
-  title: "Dashboard | Vinceup",
+  title: "Dashboard",
   description: "Career growth dashboard for mentorship progress and VEGA insights.",
 };
 

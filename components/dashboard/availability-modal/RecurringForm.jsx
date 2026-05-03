@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { CheckCircle2, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -41,7 +41,6 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
     handleSubmit,
     control,
     reset,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -55,8 +54,8 @@ export default function RecurringForm({ onBack, onSubmit, selectedDate }) {
     },
   });
 
-  const repeatIndefinitely = watch("repeatIndefinitely");
-  const startTime = watch("startTime");
+  const repeatIndefinitely = useWatch({ control, name: "repeatIndefinitely" });
+  const startTime = useWatch({ control, name: "startTime" });
 
   useEffect(() => {
     if (startTime) {

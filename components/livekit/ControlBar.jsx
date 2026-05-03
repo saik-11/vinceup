@@ -93,11 +93,14 @@ export function ControlBar({
   isParticipantsOpen,
   isDetailsOpen,
   isRecording,
+  // Pre-join choices — used as initial state so controls are consistent
+  initialMicEnabled = true,
+  initialCamEnabled = false,
   className,
 }) {
   const local = room?.localParticipant;
-  const [micEnabled, setMicEnabled] = useState(false);
-  const [camEnabled, setCamEnabled] = useState(false);
+  const [micEnabled, setMicEnabled] = useState(initialMicEnabled);
+  const [camEnabled, setCamEnabled] = useState(initialCamEnabled);
   const [screenSharing, setScreenSharing] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
   const [toggling, setToggling] = useState(null);

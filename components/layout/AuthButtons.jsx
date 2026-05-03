@@ -4,7 +4,7 @@ import { memo } from "react";
 import { Bell, Calendar, ChevronDown, Globe, HelpCircle, LayoutDashboard, LogOut, Moon, Settings, ShoppingBag, Sun, UserCircle, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
